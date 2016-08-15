@@ -108,6 +108,8 @@ public class BlocklyActivity extends AbstractBlocklyActivity {
         JSContext context = new JSContext();
         JSFunction Robot = new JSFunction(context,"Robot") {
             public Integer Robot(String cmd, Integer val) {
+                if (val < 1)
+                    val = 1;
                 switch(cmd.toUpperCase()) {
                     case "MOVEFORWARD":
                         mRobot.sendCommand(mRobot.MOVE_FORWARD, val);
@@ -120,6 +122,39 @@ public class BlocklyActivity extends AbstractBlocklyActivity {
                         break;
                     case "TURNLEFT":
                         mRobot.sendCommand(mRobot.TURN_LEFT, val);
+                        break;
+                    case "SHAKEHEAD":
+                        mRobot.sendCommand(mRobot.SHAKE_HEAD, val);
+                        break;
+                    case "BOUNCE":
+                        mRobot.sendCommand(mRobot.BOUNCE, val);
+                        break;
+                    case "WOBBLE":
+                        mRobot.sendCommand(mRobot.WOBBLE, val);
+                        break;
+                    case "WOBBLELEFT":
+                        mRobot.sendCommand(mRobot.WOBBLE_LEFT, val);
+                        break;
+                    case "WOBBLERIGHT":
+                        mRobot.sendCommand(mRobot.WOBBLE_RIGHT, val);
+                        break;
+                    case "TAPFEET":
+                        mRobot.sendCommand(mRobot.TAP_FEET, val);
+                        break;
+                    case "TAPFOOTLEFT":
+                        mRobot.sendCommand(mRobot.TAP_FOOT_LEFT, val);
+                        break;
+                    case "TAPFOOTRIGHT":
+                        mRobot.sendCommand(mRobot.TAP_FOOT_RIGHT, val);
+                        break;
+                    case "SHAKELEGS":
+                        mRobot.sendCommand(mRobot.SHAKE_LEGS, val);
+                        break;
+                    case "SHAKELEGLEFT":
+                        mRobot.sendCommand(mRobot.SHAKE_LEG_LEFT, val);
+                        break;
+                    case "SHAKELEGRIGHT":
+                        mRobot.sendCommand(mRobot.SHAKE_LEG_RIGHT, val);
                         break;
                     default:
                         System.err.println("Unrecognized cmd:" + cmd);

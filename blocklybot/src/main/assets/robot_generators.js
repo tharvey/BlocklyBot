@@ -4,16 +4,12 @@
 Blockly.JavaScript['robot_move_internal'] = function(block) {
   // Generate JavaScript for moving forward or backwards.
   var value = block.getFieldValue('VALUE');
-//  return 'Robot.' + block.getFieldValue('DIR') + '(' + value + ', \'block_id_' + block.id + '\');\n';
-//  return 'Robot ' + block.getFieldValue('DIR') + ' ' + value + '\n';
   return 'Robot("' + block.getFieldValue('DIR') + '",' + value + ', \'block_id_' + block.id + '\');\n';
 };
 
 Blockly.JavaScript['robot_turn_internal'] = function(block) {
   // Generate JavaScript for turning left or right.
   var value = block.getFieldValue('VALUE');
-//  return 'Robot.' + block.getFieldValue('DIR') + '(' + value + ', \'block_id_' + block.id + '\');\n';
-//  return 'Robot ' + block.getFieldValue('DIR') + ' ' + value + '\n';
   return 'Robot("' + block.getFieldValue('DIR') + '",' + value + ', \'block_id_' + block.id + '\');\n';
 };
 
@@ -21,8 +17,6 @@ Blockly.JavaScript['robot_move'] = function(block) {
   // Generate JavaScript for moving forward or backwards.
   var value = Blockly.JavaScript.valueToCode(block, 'VALUE',
       Blockly.JavaScript.ORDER_NONE) || '0';
-//  return 'Robot.' + block.getFieldValue('DIR') + '(' + value + ', \'block_id_' + block.id + '\');\n';
-//  return 'Robot ' + block.getFieldValue('DIR') + ' ' + value + '\n';
   return 'Robot("' + block.getFieldValue('DIR') + '",' + value + ', \'block_id_' + block.id + '\');\n';
 };
 
@@ -30,9 +24,14 @@ Blockly.JavaScript['robot_turn'] = function(block) {
   // Generate JavaScript for turning left or right.
   var value = Blockly.JavaScript.valueToCode(block, 'VALUE',
       Blockly.JavaScript.ORDER_NONE) || '0';
-//  return 'Robot.' + block.getFieldValue('DIR') + '(' + value + ', \'block_id_' + block.id + '\');\n';
-//  return 'Robot ' + block.getFieldValue('DIR') + ' ' + value + '\n';
   return 'Robot("' + block.getFieldValue('DIR') + '",' + value + ', \'block_id_' + block.id + '\');\n';
+};
+
+Blockly.JavaScript['robot_misc'] = function(block) {
+  // Generate JavaScript for turning left or right.
+  var value = Blockly.JavaScript.valueToCode(block, 'VALUE',
+      Blockly.JavaScript.ORDER_NONE) || '0';
+  return 'Robot("' + block.getFieldValue('TYPE') + '",' + value + ', \'block_id_' + block.id + '\');\n';
 };
 
 Blockly.JavaScript['robot_repeat_internal'] = Blockly.JavaScript['controls_repeat'];

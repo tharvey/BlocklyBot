@@ -23,6 +23,10 @@
             <field name="VALUE">1</field>
             <field name="DIR">turnRight</field>
         </block>
+        <block type="robot_misc">
+            <field name="VALUE">1</field>
+            <field name="TYPE">shake</field>
+        </block>
     </category>
     <category name="Loops" colour="120">
         <block type="robot_repeat_internal">
