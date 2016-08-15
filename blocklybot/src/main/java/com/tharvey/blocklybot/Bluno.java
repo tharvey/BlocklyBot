@@ -44,7 +44,7 @@ public abstract class Bluno {
 	public final int TURN_LEFT = 4;
 
 	public void sendCommand(int command, int value) {
-		mHandler.sendMessage(mHandler.obtainMessage(command, value));
+		mHandler.sendMessage(mHandler.obtainMessage(command, value, 0));
 	}
 
 	private int mBaudrate=115200;	//set the default baud rate to 115200
