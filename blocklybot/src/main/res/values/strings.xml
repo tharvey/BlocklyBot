@@ -25,4 +25,17 @@
 
     <string name="app_name">BlocklyBot</string>
 
+    <!-- Preference items -->
+    <string name="pref_autoattach">AutoAttach</string>
+    <string name="pref_autoattach_summ">Auto Attach to the previously selected device on startup</string>
+    <string name="pref_protocolType">Protocol</string>
+    <string-array name="pref_protocolTypes_entries">
+        <item>Bluetooth 4.0 (BLE)</item>
+        <item>Bluetooth</item>
+    </string-array>
+    <string-array name="pref_protocolTypes_values">
+        <item>ble</item>
+        <item>bluetooth</item>
+    </string-array>
+    <string name="pref_protocolType_default">bluetooth</string>
 </resources>

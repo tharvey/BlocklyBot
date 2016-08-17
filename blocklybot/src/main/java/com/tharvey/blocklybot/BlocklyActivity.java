@@ -190,11 +190,14 @@ public class BlocklyActivity extends AbstractBlocklyActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        return onDemoItemSelected(item, this) || super.onOptionsItemSelected(item);
-    }
-
-    static boolean onDemoItemSelected(MenuItem item, AbstractBlocklyActivity activity) {
-        return false;
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            final Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
+        }
     }
 
     @NonNull

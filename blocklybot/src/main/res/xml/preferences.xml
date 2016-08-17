@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference
+        android:key="pref_sync"
+        android:title="@string/pref_autoattach"
+        android:summary="@string/pref_autoattach_summ"
+        android:defaultValue="true" />
+    <ListPreference
+        android:key="pref_protocolType"
+        android:title="@string/pref_protocolType"
+        android:dialogTitle="@string/pref_protocolType"
+        android:entries="@array/pref_protocolTypes_entries"
+        android:entryValues="@array/pref_protocolTypes_values"
+        android:defaultValue="@string/pref_protocolType_default" />
+</PreferenceScreen>

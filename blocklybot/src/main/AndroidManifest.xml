@@ -52,6 +52,11 @@
             android:windowSoftInputMode="stateHidden">
         </activity>
 
+        <activity
+            android:name=".SettingsActivity"
+            android:label="Settings">
+        </activity>
+
         <service
             android:name=".BluetoothLeService"
             android:enabled="true">
