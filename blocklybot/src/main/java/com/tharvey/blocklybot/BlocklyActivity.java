@@ -112,49 +112,49 @@ public class BlocklyActivity extends AbstractBlocklyActivity {
                     val = 1;
                 switch(cmd.toUpperCase()) {
                     case "MOVEFORWARD":
-                        mRobot.sendCommand(mRobot.MOVE_FORWARD, val);
+                        mRobot.sendCommand(Bluno.commands.MOVE_FORWARD.ordinal(), val);
                         break;
                     case "MOVEBACKWARD":
-                        mRobot.sendCommand(mRobot.MOVE_BACKWARD, val);
+                        mRobot.sendCommand(Bluno.commands.MOVE_BACKWARD.ordinal(), val);
                         break;
                     case "TURNRIGHT":
-                        mRobot.sendCommand(mRobot.TURN_RIGHT, val);
+                        mRobot.sendCommand(Bluno.commands.TURN_RIGHT.ordinal(), val);
                         break;
                     case "TURNLEFT":
-                        mRobot.sendCommand(mRobot.TURN_LEFT, val);
+                        mRobot.sendCommand(Bluno.commands.TURN_LEFT.ordinal(), val);
                         break;
                     case "SHAKEHEAD":
-                        mRobot.sendCommand(mRobot.SHAKE_HEAD, val);
+                        mRobot.sendCommand(Bluno.commands.SHAKE_HEAD.ordinal(), val);
                         break;
                     case "BOUNCE":
-                        mRobot.sendCommand(mRobot.BOUNCE, val);
+                        mRobot.sendCommand(Bluno.commands.BOUNCE.ordinal(), val);
                         break;
                     case "WOBBLE":
-                        mRobot.sendCommand(mRobot.WOBBLE, val);
+                        mRobot.sendCommand(Bluno.commands.WOBBLE.ordinal(), val);
                         break;
                     case "WOBBLELEFT":
-                        mRobot.sendCommand(mRobot.WOBBLE_LEFT, val);
+                        mRobot.sendCommand(Bluno.commands.WOBBLE_LEFT.ordinal(), val);
                         break;
                     case "WOBBLERIGHT":
-                        mRobot.sendCommand(mRobot.WOBBLE_RIGHT, val);
+                        mRobot.sendCommand(Bluno.commands.WOBBLE_RIGHT.ordinal(), val);
                         break;
                     case "TAPFEET":
-                        mRobot.sendCommand(mRobot.TAP_FEET, val);
+                        mRobot.sendCommand(Bluno.commands.TAP_FEET.ordinal(), val);
                         break;
                     case "TAPFOOTLEFT":
-                        mRobot.sendCommand(mRobot.TAP_FOOT_LEFT, val);
+                        mRobot.sendCommand(Bluno.commands.TAP_FOOT_LEFT.ordinal(), val);
                         break;
                     case "TAPFOOTRIGHT":
-                        mRobot.sendCommand(mRobot.TAP_FOOT_RIGHT, val);
+                        mRobot.sendCommand(Bluno.commands.TAP_FOOT_RIGHT.ordinal(), val);
                         break;
                     case "SHAKELEGS":
-                        mRobot.sendCommand(mRobot.SHAKE_LEGS, val);
+                        mRobot.sendCommand(Bluno.commands.SHAKE_LEGS.ordinal(), val);
                         break;
                     case "SHAKELEGLEFT":
-                        mRobot.sendCommand(mRobot.SHAKE_LEG_LEFT, val);
+                        mRobot.sendCommand(Bluno.commands.SHAKE_LEG_LEFT.ordinal(), val);
                         break;
                     case "SHAKELEGRIGHT":
-                        mRobot.sendCommand(mRobot.SHAKE_LEG_RIGHT, val);
+                        mRobot.sendCommand(Bluno.commands.SHAKE_LEG_RIGHT.ordinal(), val);
                         break;
                     default:
                         System.err.println("Unrecognized cmd:" + cmd);

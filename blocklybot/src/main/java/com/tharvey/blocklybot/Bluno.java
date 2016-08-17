@@ -38,22 +38,27 @@ public abstract class Bluno {
 	}
 
 	// Standard Walk Commands
-	public final int MOVE_FORWARD = 1;
-	public final int MOVE_BACKWARD = 2;
-	public final int TURN_RIGHT = 3;
-	public final int TURN_LEFT = 4;
-	// Fun Animation Commands
-	public final int SHAKE_HEAD = 5;
-	public final int BOUNCE = 6;
-	public final int WOBBLE = 7;
-	public final int WOBBLE_LEFT = 8;
-	public final int WOBBLE_RIGHT = 9;
-	public final int TAP_FEET = 10;
-	public final int TAP_FOOT_LEFT = 11;
-	public final int TAP_FOOT_RIGHT = 12;
-	public final int SHAKE_LEGS = 13;
-	public final int SHAKE_LEG_LEFT = 14;
-	public final int SHAKE_LEG_RIGHT = 15;
+	public enum commands {
+		MOVE_FORWARD,
+		MOVE_BACKWARD,
+		TURN_RIGHT,
+		TURN_LEFT,
+		SHAKE_HEAD,
+		BOUNCE,
+		WOBBLE,
+		WOBBLE_LEFT,
+		WOBBLE_RIGHT,
+		TAP_FEET,
+		TAP_FOOT_LEFT,
+		TAP_FOOT_RIGHT,
+		SHAKE_LEGS,
+		SHAKE_LEG_LEFT,
+		SHAKE_LEG_RIGHT,
+		CMD_MAX,
+	};
+	String[] command_str = { "FW", "BW", "LT", "RT", "SX", "BX",
+							 "WX", "WY", "WZ", "TX", "TY", "TZ",
+							 "LX", "LY", "LZ"};
 
 	public void sendCommand(int command, int value) {
 		mHandler.sendMessage(mHandler.obtainMessage(command, value, 0));
@@ -100,35 +105,15 @@ public abstract class Bluno {
 		mHandler = new Handler(handlerThread.getLooper()) {
 			@Override
 			public void handleMessage(Message msg) {
-				String cmd;
-				// Process messages here
-				System.out.println("Message:" + mCommands + ":" + msg);
-				mCommands++;
-				switch (msg.what) {
-					case MOVE_FORWARD: cmd = "FW"; break;
-					case MOVE_BACKWARD: cmd = "BW"; break;
-					case TURN_LEFT: cmd = "LT"; break;
-					case TURN_RIGHT: cmd = "RT"; break;
-					case SHAKE_HEAD: cmd = "SX"; break;
-					case BOUNCE: cmd = "BX"; break;
-					case WOBBLE: cmd = "WX"; break;
-					case WOBBLE_LEFT: cmd = "WY"; break;
-					case WOBBLE_RIGHT: cmd = "WZ"; break;
-					case TAP_FEET: cmd = "TX"; break;
-					case TAP_FOOT_LEFT: cmd = "TY"; break;
-					case TAP_FOOT_RIGHT: cmd = "TZ"; break;
-					case SHAKE_LEGS: cmd = "LX"; break;
-					case SHAKE_LEG_LEFT: cmd = "LY"; break;
-					case SHAKE_LEG_RIGHT: cmd = "LZ"; break;
-					default:
-						return;
+				if (msg.what < commands.CMD_MAX.ordinal()) {
+					String cmd = command_str[msg.what];
+					System.out.println("Bluno cmd:" + cmd + " val:" + msg.arg1);
+					serialSend("<" + cmd + "," + msg.arg1 + ">");
+					while (!mLastRX.equals("<" + cmd + ">")) {
+						SystemClock.sleep(100);
+					}
+					System.out.println("done " + cmd);
 				}
-				System.out.println("Bluno cmd:" + cmd + " val:" + msg.arg1);
-				serialSend("<" + cmd + "," + msg.arg1 + ">");
-				while (!mLastRX.equals("<" + cmd + ">")) {
-					SystemClock.sleep(100);
-				}
-				System.out.println("done " + cmd);
 			}
 		};
 	}

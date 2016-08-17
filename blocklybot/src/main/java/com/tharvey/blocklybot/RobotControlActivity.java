@@ -73,15 +73,15 @@ public class RobotControlActivity extends Activity {
     }
 
     public void onClickLeft(View v) {
-        mRobot.sendCommand(mRobot.TURN_LEFT, 1);
+        mRobot.sendCommand(Bluno.commands.TURN_LEFT.ordinal(), 1);
     }
     public void onClickRight(View v) {
-        mRobot.sendCommand(mRobot.TURN_RIGHT, 1);
+        mRobot.sendCommand(Bluno.commands.TURN_RIGHT.ordinal(), 1);
     }
     public void onClickUp(View v) {
-        mRobot.sendCommand(mRobot.MOVE_FORWARD, 1);
+        mRobot.sendCommand(Bluno.commands.MOVE_FORWARD.ordinal(), 1);
     }
     public void onClickDown(View v) {
-        mRobot.sendCommand(mRobot.MOVE_BACKWARD, 1);
+        mRobot.sendCommand(Bluno.commands.MOVE_BACKWARD.ordinal(), 1);
     }
 }
