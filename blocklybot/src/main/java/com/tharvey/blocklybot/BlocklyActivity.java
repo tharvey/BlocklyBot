@@ -41,53 +41,15 @@ import java.util.List;
 public class BlocklyActivity extends AbstractBlocklyActivity {
     private static final String TAG = "BlocklyActivity";
 
-    public static final String EXTRAS_DEVICE_NAME = "DEVICE_NAME";
-    public static final String EXTRAS_DEVICE_ADDRESS = "DEVICE_ADDRESS";
-
-    private String mDeviceName;
-    private String mDeviceAddress;
-    private class Robot extends Bluno {
-
-        public Robot(Activity activity, String name, String address) {
-            super(activity, name, address);
-        }
-
-        @Override
-        public void onConectionStateChange(connectionStateEnum theConnectionState) {
-            switch (theConnectionState) {
-                case isConnected:
-                    System.out.println("Connected");
-                    break;
-                case isConnecting:
-                    System.out.println("Connecting");
-                    break;
-                case isToScan:
-                    System.out.println("Scan");
-                    break;
-                case isScanning:
-                    System.out.println("Scanning");
-                    break;
-                case isDisconnecting:
-                    System.out.println("isDisconnecting");
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-
-    static private Robot mRobot;
+    static private Mobbob mRobot;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         final Intent intent = getIntent();
-        mDeviceName = intent.getStringExtra(EXTRAS_DEVICE_NAME);
-        mDeviceAddress = intent.getStringExtra(EXTRAS_DEVICE_ADDRESS);
-        System.out.println("RobotControl Connecting to '" + mDeviceName + "':'" + mDeviceAddress + "'");
-
-        mRobot = new Robot(this, mDeviceName, mDeviceAddress);
+        mRobot = Mobbob.getMobob();
+        System.out.println("Blockly connected to " + mRobot.getName() + ":" + mRobot.getAddress());
 
         // getActionBar() returns null when using blocklyTheme
 //        getActionBar().setTitle(mDeviceName + ":" + mDeviceAddress);

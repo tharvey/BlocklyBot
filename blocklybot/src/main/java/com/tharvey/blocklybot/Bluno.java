@@ -20,14 +20,52 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Bluno {
-	public abstract void onConectionStateChange(connectionStateEnum theconnectionStateEnum);
+public class Bluno extends Mobbob {
+	private final static String TAG = Bluno.class.getSimpleName();
+	private int mBaudrate=115200;	//set the default baud rate to 115200
+	private String mPassword="AT+PASSWOR=DFRobot\r\n";
+	private String mBaudrateBuffer = "AT+CURRUART="+mBaudrate+"\r\n";
+	private static BluetoothGattCharacteristic mSCharacteristic;
+	private static BluetoothGattCharacteristic mModelNumberCharacteristic;
+	private static BluetoothGattCharacteristic mSerialPortCharacteristic;
+	private static BluetoothGattCharacteristic mCommandCharacteristic;
+	BluetoothLeService mBluetoothLeService;
+	private ArrayList<ArrayList<BluetoothGattCharacteristic>> mGattCharacteristics =
+			new ArrayList<ArrayList<BluetoothGattCharacteristic>>();
+	private BluetoothAdapter mBluetoothAdapter;
+	private boolean mScanning =false;
+	private static final int REQUEST_ENABLE_BT = 1;
+	public boolean mConnected = false;
 
-	private String mLastRX = "";
-	protected void onSerialReceived(String theString) {
-		theString = theString.replace("\r\n", "");
-		System.out.println(">> " + theString);
-		mLastRX = theString;
+	public Bluno(Activity activity, String name, String address) {
+		super(name, address);
+
+		activity.registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+
+		Intent gattServiceIntent = new Intent(activity, BluetoothLeService.class);
+		activity.bindService(gattServiceIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
+	}
+
+	public void onConectionStateChange(connectionStateEnum theConnectionState) {
+		switch (theConnectionState) {
+			case isConnected:
+				System.out.println("Connected");
+				break;
+			case isConnecting:
+				System.out.println("Connecting");
+				break;
+			case isToScan:
+				System.out.println("Scan");
+				break;
+			case isScanning:
+				System.out.println("Scanning");
+				break;
+			case isDisconnecting:
+				System.out.println("isDisconnecting");
+				break;
+			default:
+				break;
+		}
 	}
 
 	public void serialSend(String theString){
@@ -37,99 +75,9 @@ public abstract class Bluno {
 		}
 	}
 
-	// Standard Walk Commands
-	public enum commands {
-		MOVE_FORWARD,
-		MOVE_BACKWARD,
-		TURN_RIGHT,
-		TURN_LEFT,
-		SHAKE_HEAD,
-		BOUNCE,
-		WOBBLE,
-		WOBBLE_LEFT,
-		WOBBLE_RIGHT,
-		TAP_FEET,
-		TAP_FOOT_LEFT,
-		TAP_FOOT_RIGHT,
-		SHAKE_LEGS,
-		SHAKE_LEG_LEFT,
-		SHAKE_LEG_RIGHT,
-		CMD_MAX,
-	};
-	String[] command_str = { "FW", "BW", "LT", "RT", "SX", "BX",
-							 "WX", "WY", "WZ", "TX", "TY", "TZ",
-							 "LX", "LY", "LZ"};
-
-	public void sendCommand(int command, int value) {
-		mHandler.sendMessage(mHandler.obtainMessage(command, value, 0));
-	}
-
-	private int mBaudrate=115200;	//set the default baud rate to 115200
-	private String mPassword="AT+PASSWOR=DFRobot\r\n";
-	private String mBaudrateBuffer = "AT+CURRUART="+mBaudrate+"\r\n";
-	
 	public void serialBegin(int baud){
 		mBaudrate=baud;
 		mBaudrateBuffer = "AT+CURRUART="+mBaudrate+"\r\n";
-	}
-
-    private static BluetoothGattCharacteristic mSCharacteristic;
-	private static BluetoothGattCharacteristic mModelNumberCharacteristic;
-	private static BluetoothGattCharacteristic mSerialPortCharacteristic;
-	private static BluetoothGattCharacteristic mCommandCharacteristic;
-    BluetoothLeService mBluetoothLeService;
-    private ArrayList<ArrayList<BluetoothGattCharacteristic>> mGattCharacteristics =
-		new ArrayList<ArrayList<BluetoothGattCharacteristic>>();
-	private BluetoothAdapter mBluetoothAdapter;
-	private boolean mScanning =false;
-	private String mDeviceName;
-	private String mDeviceAddress;
-	public enum connectionStateEnum {
-		isNull,
-		isScanning,
-		isToScan,
-		isConnecting,
-		isConnected,
-		isDisconnecting
-	};
-	public connectionStateEnum mConnectionState = connectionStateEnum.isNull;
-	private static final int REQUEST_ENABLE_BT = 1;
-
-	Handler mHandler;
-	int mCommands = 0;
-	void start() {
-		HandlerThread handlerThread = new HandlerThread("HandlerThread");
-		handlerThread.start();
-
-		// Create a handler attached to the HandlerThread's Looper
-		mHandler = new Handler(handlerThread.getLooper()) {
-			@Override
-			public void handleMessage(Message msg) {
-				if (msg.what < commands.CMD_MAX.ordinal()) {
-					String cmd = command_str[msg.what];
-					System.out.println("Bluno cmd:" + cmd + " val:" + msg.arg1);
-					serialSend("<" + cmd + "," + msg.arg1 + ">");
-					while (!mLastRX.equals("<" + cmd + ">")) {
-						SystemClock.sleep(100);
-					}
-					System.out.println("done " + cmd);
-				}
-			}
-		};
-	}
-
-	public boolean mConnected = false;
-
-	private final static String TAG = Bluno.class.getSimpleName();
-
-	public Bluno(Activity activity, String name, String address) {
-		mDeviceAddress = address;
-		mDeviceName = name;
-
-		activity.registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
-
-		Intent gattServiceIntent = new Intent(activity, BluetoothLeService.class);
-		activity.bindService(gattServiceIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
 	}
 
     private Runnable mConnectingOverTimeRunnable = new Runnable() {
@@ -212,7 +160,7 @@ public abstract class Bluno {
 				}
 			}
 		}
-    };
+	    };
 
 	// Code to manage Service lifecycle.
 	ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -224,7 +172,7 @@ public abstract class Bluno {
 			if (!mBluetoothLeService.initialize()) {
 				Log.e(TAG, "Unable to initialize Bluetooth");
 			}
-			mBluetoothLeService.connect(mDeviceAddress);
+			mBluetoothLeService.connect(getAddress());
 		}
 
 		@Override
@@ -267,7 +215,6 @@ public abstract class Bluno {
 			}
 			mGattCharacteristics.add(charas);
 		}
-
 
 		if (mModelNumberCharacteristic==null || mSerialPortCharacteristic==null || mCommandCharacteristic==null) {
 			mConnectionState = connectionStateEnum.isToScan;
