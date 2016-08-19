@@ -47,7 +47,5 @@ public abstract class Robot {
     public String getName() {
         return mDeviceName;
     }
-
-
 }
 

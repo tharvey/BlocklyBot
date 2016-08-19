@@ -16,7 +16,7 @@
 <resources>
     <string name="ble_not_supported">BLE is not supported</string>
     <string name="error_bluetooth_not_supported">Bluetooth not supported.</string>
-
+    <string name="title_devices">Devices</string>
     <string name="unknown_device">Unknown device</string>
 
     <!-- Menu items -->

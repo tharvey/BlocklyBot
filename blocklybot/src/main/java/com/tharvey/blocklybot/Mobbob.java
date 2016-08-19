@@ -8,10 +8,7 @@ import android.os.SystemClock;
 public abstract class Mobbob extends Robot {
     private final static String TAG = Mobbob.class.getSimpleName();
 
-    public boolean mConnected = false;
     Handler mHandler;
-    int mCommands = 0;
-
     static Mobbob mContext;
 
     static Mobbob getMobob() {
@@ -42,14 +39,10 @@ public abstract class Mobbob extends Robot {
             "WX", "WY", "WZ", "TX", "TY", "TZ",
             "LX", "LY", "LZ"};
 
-    public Mobbob() {
-        super();
-        mContext = this;
-    }
-
-    public Mobbob(String name, String address) {
+    public Mobbob(Handler handler, String name, String address) {
         super(name, address);
         mContext = this;
+        start();
     }
 
     public void sendCommand(int command, int value) {
@@ -66,7 +59,7 @@ public abstract class Mobbob extends Robot {
             public void handleMessage(Message msg) {
                 if (msg.what < commands.CMD_MAX.ordinal()) {
                     String cmd = command_str[msg.what];
-                    System.out.println("Bluno cmd:" + cmd + " val:" + msg.arg1);
+                    System.out.println("Mobob cmd:" + cmd + " val:" + msg.arg1);
                     serialSend("<" + cmd + "," + msg.arg1 + ">");
                     while (!mLastRX.equals("<" + cmd + ">")) {
                         SystemClock.sleep(100);

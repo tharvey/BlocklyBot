@@ -16,7 +16,6 @@ package com.tharvey.blocklybot;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.MenuItem;
@@ -24,7 +23,6 @@ import android.widget.Toast;
 
 import com.google.blockly.android.AbstractBlocklyActivity;
 import com.google.blockly.android.codegen.CodeGenerationRequest;
-import com.google.blockly.android.control.BlocklyController;
 import com.google.blockly.android.ui.BlockViewFactory;
 import com.google.blockly.android.ui.WorkspaceHelper;
 import com.google.blockly.android.ui.vertical.VerticalBlockViewFactory;
@@ -49,7 +47,9 @@ public class BlocklyActivity extends AbstractBlocklyActivity {
 
         final Intent intent = getIntent();
         mRobot = Mobbob.getMobob();
-        System.out.println("Blockly connected to " + mRobot.getName() + ":" + mRobot.getAddress());
+        if (mRobot != null) {
+            System.out.println("Blockly connected to " + mRobot.getName() + ":" + mRobot.getAddress());
+        }
 
         // getActionBar() returns null when using blocklyTheme
 //        getActionBar().setTitle(mDeviceName + ":" + mDeviceAddress);
@@ -67,6 +67,8 @@ public class BlocklyActivity extends AbstractBlocklyActivity {
 
 
     private final int parseCode(String generatedCode) {
+        if (mRobot == null)
+            return 0;
         JSContext context = new JSContext();
         JSFunction Robot = new JSFunction(context,"Robot") {
             public Integer Robot(String cmd, Integer val) {

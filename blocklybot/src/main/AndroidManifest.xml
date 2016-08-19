@@ -1,4 +1,4 @@
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~  Copyright 2015 Google Inc. All Rights Reserved.
   ~  Licensed under the Apache License, Version 2.0 (the "License");
   ~  you may not use this file except in compliance with the License.
@@ -11,11 +11,10 @@
   ~  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   ~  See the License for the specific language governing permissions and
   ~  limitations under the License.
-  -->
-
+-->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.tharvey.blocklybot"
-          xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.tharvey.blocklybot">
 
     <uses-feature
         android:name="android.hardware.bluetooth_le"
@@ -27,41 +26,41 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
-        tools:replace="android:theme"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:supportsRtl="true" >
+        tools:replace="android:theme">
 
         <activity
-            android:name=".DeviceScanActivity"
+            android:name=".MainActivity"
             android:label="@string/app_name"
-            android:taskAffinity="com.google.blockly.DeviceScanActivity"
+            android:taskAffinity="com.google.blockly.MainActivity"
             android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+        <activity
+            android:name=".BluetoothScanActivity"
+            android:label="Bluetooth"></activity>
+        <activity
+            android:name=".BLEScanActivity"
+            android:label="Bluetooth Low Energy"></activity>
         <activity
             android:name=".BlocklyActivity"
             android:label="Blockly"
             android:taskAffinity="com.google.blockly.BlocklyActivity"
-            android:windowSoftInputMode="stateHidden">
-        </activity>
-
+            android:windowSoftInputMode="stateHidden"></activity>
         <activity
             android:name=".SettingsActivity"
-            android:label="Settings">
-        </activity>
+            android:label="Settings"></activity>
 
         <service
             android:name=".BluetoothLeService"
-            android:enabled="true">
-        </service>
-
+            android:enabled="true"></service>
     </application>
 
 </manifest>

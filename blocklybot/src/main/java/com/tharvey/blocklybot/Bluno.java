@@ -1,7 +1,7 @@
 package com.tharvey.blocklybot;
 
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.content.BroadcastReceiver;
@@ -11,10 +11,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.Message;
 import android.os.IBinder;
-import android.os.SystemClock;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -29,21 +26,20 @@ public class Bluno extends Mobbob {
 	private static BluetoothGattCharacteristic mModelNumberCharacteristic;
 	private static BluetoothGattCharacteristic mSerialPortCharacteristic;
 	private static BluetoothGattCharacteristic mCommandCharacteristic;
+	private final Handler mHandler;
 	BluetoothLeService mBluetoothLeService;
 	private ArrayList<ArrayList<BluetoothGattCharacteristic>> mGattCharacteristics =
 			new ArrayList<ArrayList<BluetoothGattCharacteristic>>();
-	private BluetoothAdapter mBluetoothAdapter;
-	private boolean mScanning =false;
-	private static final int REQUEST_ENABLE_BT = 1;
 	public boolean mConnected = false;
 
-	public Bluno(Activity activity, String name, String address) {
-		super(name, address);
+	public Bluno(Context context, Handler handler, BluetoothDevice device) {
+		super(handler, device.getName(), device.getAddress());
+		mHandler = handler;
 
-		activity.registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+		context.registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
 
-		Intent gattServiceIntent = new Intent(activity, BluetoothLeService.class);
-		activity.bindService(gattServiceIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
+		Intent gattServiceIntent = new Intent(context, BluetoothLeService.class);
+		context.bindService(gattServiceIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
 	}
 
 	public void onConectionStateChange(connectionStateEnum theConnectionState) {
@@ -70,14 +66,10 @@ public class Bluno extends Mobbob {
 
 	public void serialSend(String theString){
 		if (mConnectionState == connectionStateEnum.isConnected) {
+			System.out.println(">> " + theString);
 			mSCharacteristic.setValue(theString);
 			mBluetoothLeService.writeCharacteristic(mSCharacteristic);
 		}
-	}
-
-	public void serialBegin(int baud){
-		mBaudrate=baud;
-		mBaudrateBuffer = "AT+CURRUART="+mBaudrate+"\r\n";
 	}
 
     private Runnable mConnectingOverTimeRunnable = new Runnable() {
