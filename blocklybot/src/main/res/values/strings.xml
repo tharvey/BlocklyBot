@@ -38,4 +38,14 @@
         <item>bluetooth</item>
     </string-array>
     <string name="pref_protocolType_default">bluetooth</string>
+    <string name="pref_controlType">Controller</string>
+    <string-array name="pref_controlTypes_entries">
+        <item>Blockly</item>
+        <item>Button Panel</item>
+    </string-array>
+    <string-array name="pref_controlTypes_values">
+        <item>blockly</item>
+        <item>panel</item>
+    </string-array>
+    <string name="pref_controlType_default">bluetooth</string>
 </resources>
