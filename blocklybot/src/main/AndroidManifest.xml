@@ -51,6 +51,10 @@
             android:label="Bluetooth Low Energy"
             android:theme="@android:style/Theme.Holo.Light" />
         <activity
+            android:name=".RobotControlActivity"
+            android:label="Robot Control Panel"
+            android:theme="@android:style/Theme.Holo.Light" />
+        <activity
             android:name=".BlocklyActivity"
             android:label="Blockly"
             android:theme="@style/AppTheme"

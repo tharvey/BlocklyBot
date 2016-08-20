@@ -3,6 +3,8 @@ package com.tharvey.blocklybot;
 import android.content.Intent;
 import android.os.Bundle;
 import android.app.Activity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 public class RobotControlActivity extends Activity {
@@ -18,9 +20,8 @@ public class RobotControlActivity extends Activity {
         final Intent intent = getIntent();
         mRobot = Mobbob.getMobob();
 
-        // getActionBar() returns null when using blocklyTheme
-//        getActionBar().setTitle(mDeviceName + ":" + mDeviceAddress);
-//        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setTitle("Control Panel: " + mRobot.getName());
+        getActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     public void onClickLeft(View v) {
@@ -35,4 +36,27 @@ public class RobotControlActivity extends Activity {
     public void onClickDown(View v) {
         mRobot.sendCommand(Bluno.commands.MOVE_BACKWARD.ordinal(), 1);
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_settings:
+                final Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.menu_about:
+                AboutDialog about = new AboutDialog(this);
+                about.setTitle("About this app");
+                about.show();
+                break;
+        }
+        return true;
+    }
+
 }

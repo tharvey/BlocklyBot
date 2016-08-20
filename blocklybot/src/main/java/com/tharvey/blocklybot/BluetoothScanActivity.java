@@ -26,10 +26,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -116,8 +118,16 @@ public class BluetoothScanActivity extends Activity {
                         }
                     }
                     System.out.println("Connected");
-                    final Intent intent = new Intent(m_Activity, BlocklyActivity.class);
-                    startActivity(intent);
+                    SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(m_Activity);
+                    String controller = sharedPref.getString("pref_controlType", "");
+                    System.out.println("Controller:" + controller);
+                    if (controller.equals("blockly")) {
+                        final Intent intent = new Intent(m_Activity, BlocklyActivity.class);
+                        startActivity(intent);
+                    } else if (controller.equals("panel")) {
+                        final Intent intent = new Intent(m_Activity, RobotControlActivity.class);
+                        startActivity(intent);
+                    }
                 }
             };
             thread.start();
