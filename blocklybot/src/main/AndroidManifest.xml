@@ -29,13 +29,12 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        tools:replace="android:theme">
+        android:supportsRtl="true">
 
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
+            android:theme="@android:style/Theme.Holo.Light"
             android:taskAffinity="com.google.blockly.MainActivity"
             android:windowSoftInputMode="stateHidden">
             <intent-filter>
@@ -45,18 +44,22 @@
         </activity>
         <activity
             android:name=".BluetoothScanActivity"
-            android:label="Bluetooth"></activity>
+            android:label="Bluetooth"
+            android:theme="@android:style/Theme.Holo.Light" />
         <activity
             android:name=".BLEScanActivity"
-            android:label="Bluetooth Low Energy"></activity>
+            android:label="Bluetooth Low Energy"
+            android:theme="@android:style/Theme.Holo.Light" />
         <activity
             android:name=".BlocklyActivity"
             android:label="Blockly"
+            android:theme="@style/AppTheme"
             android:taskAffinity="com.google.blockly.BlocklyActivity"
-            android:windowSoftInputMode="stateHidden"></activity>
+            android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".SettingsActivity"
-            android:label="Settings"></activity>
+            android:label="Settings"
+            android:theme="@android:style/Theme.Holo.Light" />
 
         <service
             android:name=".BluetoothLeService"
