@@ -66,6 +66,7 @@ public class BLEScanActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_devicelist);
         m_Activity = this;
+        mHandler = new Handler();
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
@@ -99,8 +100,6 @@ public class BLEScanActivity extends Activity {
             finish();
         }
 
-        mHandler = new Handler();
-
 //        getActionBar().setTitle(R.string.title_devices);
         m_listView = (ListView) findViewById(R.id.listView);
         m_listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -111,14 +110,26 @@ public class BLEScanActivity extends Activity {
                 mBluetoothAdapter.stopLeScan(mLeScanCallback);
                 mScanning = false;
             }
-
             Toast.makeText(getApplicationContext(),
-                    "Connecting to " + device.getName() + ":" + device.getAddress(),
-                    Toast.LENGTH_LONG).show();
-            Bluno mRobot = new Bluno(m_Activity, mHandler, device);
-            // TODO: wait for robot to be connected
-            final Intent intent = new Intent(m_Activity, BlocklyActivity.class);
-            startActivity(intent);
+                "Connecting to " + device.getName() + ":" + device.getAddress(),
+                Toast.LENGTH_LONG).show();
+            Thread thread = new Thread() {
+                @Override
+                public void run() {
+                    Bluno mRobot = new Bluno(m_Activity, mHandler, device);
+                    while(mRobot.mConnectionState != Robot.connectionStateEnum.isConnected) {
+                        try {
+                            sleep(500);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    System.out.println("Connected");
+                    final Intent intent = new Intent(m_Activity, BlocklyActivity.class);
+                    startActivity(intent);
+                }
+            };
+            thread.start();
             }
         });
     }
@@ -225,9 +236,9 @@ public class BLEScanActivity extends Activity {
             mHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    mScanning = false;
-                    mBluetoothAdapter.stopLeScan(mLeScanCallback);
-                    invalidateOptionsMenu();
+                mScanning = false;
+                mBluetoothAdapter.stopLeScan(mLeScanCallback);
+                invalidateOptionsMenu();
                 }
             }, SCAN_PERIOD);
 

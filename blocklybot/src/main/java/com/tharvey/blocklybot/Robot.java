@@ -40,6 +40,11 @@ public abstract class Robot {
         mDeviceName = name;
     }
 
+    protected void setState(connectionStateEnum state) {
+        mConnectionState = state;
+        onConectionStateChange(state);
+    }
+
     public String getAddress() {
         return mDeviceAddress;
     }

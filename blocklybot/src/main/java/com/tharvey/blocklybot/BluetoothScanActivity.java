@@ -37,7 +37,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -105,10 +104,23 @@ public class BluetoothScanActivity extends Activity {
             Toast.makeText(getApplicationContext(),
                 "Connecting to " + device.getName() + ":" + device.getAddress(),
                 Toast.LENGTH_LONG).show();
-            Bluetooth mRobot = new Bluetooth(m_Activity, mHandler, device);
-            // TODO: wait for robot to be connected
-            final Intent intent = new Intent(m_Activity, BlocklyActivity.class);
-            startActivity(intent);
+            Thread thread = new Thread() {
+                @Override
+                public void run() {
+                    Bluetooth mRobot = new Bluetooth(m_Activity, mHandler, device);
+                    while(mRobot.mConnectionState != Robot.connectionStateEnum.isConnected) {
+                        try {
+                            sleep(500);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    System.out.println("Connected");
+                    final Intent intent = new Intent(m_Activity, BlocklyActivity.class);
+                    startActivity(intent);
+                }
+            };
+            thread.start();
             }
         });
     }
