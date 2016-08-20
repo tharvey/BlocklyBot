@@ -17,6 +17,7 @@ public abstract class Mobbob extends Robot {
 
     // Standard Walk Commands
     public enum commands {
+        STOP,
         MOVE_FORWARD,
         MOVE_BACKWARD,
         TURN_RIGHT,
@@ -35,7 +36,7 @@ public abstract class Mobbob extends Robot {
         CMD_MAX,
     };
 
-    private String[] command_str = { "FW", "BW", "LT", "RT", "SX", "BX",
+    private String[] command_str = { "ST", "FW", "BW", "LT", "RT", "SX", "BX",
             "WX", "WY", "WZ", "TX", "TY", "TZ",
             "LX", "LY", "LZ"};
 

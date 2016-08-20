@@ -129,6 +129,7 @@ public class BlocklyActivity extends AbstractBlocklyActivity {
         };
         context.property("Robot", Robot);
         context.evaluateScript(generatedCode);
+        mRobot.sendCommand(Mobbob.commands.STOP.ordinal(), 0);
         return 0;
     }
 
