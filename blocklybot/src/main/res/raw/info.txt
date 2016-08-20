@@ -1,0 +1,6 @@
+<h3>BlocklyBot</h3>
+Version 0.1<br>
+Copyright 2016<br>
+Tim Harvey harvey.tim@gmail.com<br>
+<b>www.github.com/tharvey/BlocklyBot/wiki</b><br>
+<br>
