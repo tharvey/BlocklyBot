@@ -28,6 +28,11 @@
             <field name="TYPE">shake</field>
         </block>
     </category>
+    <category name="Speech" colour="140">
+        <block type="speech_speak">
+            <field name="TEXT">hello</field>
+        </block>
+    </category>
     <category name="Loops" colour="120">
         <block type="robot_repeat_internal">
             <field name="TIMES">4</field>

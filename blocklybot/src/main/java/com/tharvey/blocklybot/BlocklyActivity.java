@@ -28,9 +28,6 @@ import com.google.blockly.android.ui.BlockViewFactory;
 import com.google.blockly.android.ui.WorkspaceHelper;
 import com.google.blockly.android.ui.vertical.VerticalBlockViewFactory;
 
-import org.liquidplayer.webkit.javascriptcore.JSContext;
-import org.liquidplayer.webkit.javascriptcore.JSFunction;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -46,8 +43,7 @@ public class BlocklyActivity extends AbstractBlocklyActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        final Intent intent = getIntent();
-        mParser = new JSParser();
+        mParser = new JSParser(this);
         mRobot = Mobbob.getMobob();
     }
 
@@ -55,6 +51,7 @@ public class BlocklyActivity extends AbstractBlocklyActivity {
 
     private static final List<String> BLOCK_DEFINITIONS = Arrays.asList(new String[]{
             "robot_blocks.json",
+            "speech_blocks.json"
     });
     private static final List<String> JAVASCRIPT_GENERATORS = Arrays.asList(new String[]{
             "robot_generators.js"
@@ -152,6 +149,7 @@ public class BlocklyActivity extends AbstractBlocklyActivity {
 
     @Override
     protected void onPause() {
+        super.onPause();
         Log.d(TAG, "onPause()");
         super.onPause();
         if (mRobot != null)

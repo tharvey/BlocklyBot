@@ -1,5 +1,6 @@
 package com.tharvey.blocklybot;
 
+import android.app.Activity;
 import android.util.Log;
 
 import org.liquidplayer.webkit.javascriptcore.JSContext;
@@ -10,6 +11,12 @@ import org.liquidplayer.webkit.javascriptcore.JSFunction;
  */
 public class JSParser {
     private final static String TAG = JSParser.class.getSimpleName();
+
+    private Speak mSpeak;
+
+    public JSParser(Activity activity) {
+        mSpeak = new Speak(activity);
+    }
 
     public final int parseCode(final Mobbob robot, String generatedCode) {
         JSContext context = new JSContext();
@@ -75,9 +82,19 @@ public class JSParser {
             }
         };
         context.property("Robot", Robot);
+
+        JSFunction Speech = new JSFunction(context,"Speech") {
+            public Integer Speech(String text) {
+                Log.i(TAG, "speech(" + text + ")");
+                mSpeak.speak(text);
+                return 0;
+            }
+        };
+        context.property("Speech", Speech);
+
         context.evaluateScript(generatedCode);
-        robot.sendCommand(Mobbob.commands.STOP.ordinal(), 0);
+        if (robot != null)
+            robot.sendCommand(Mobbob.commands.STOP.ordinal(), 0);
         return 0;
     }
-
 }

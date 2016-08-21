@@ -36,6 +36,10 @@ Blockly.JavaScript['robot_misc'] = function(block) {
 
 Blockly.JavaScript['robot_repeat_internal'] = Blockly.JavaScript['controls_repeat'];
 
+// Extensions to Blockly's language and JavaScript generator.
+Blockly.JavaScript['speech_speak'] = function(block) {
+  return 'Speech("' + block.getFieldValue('TEXT') + '", \'block_id_' + block.id + '\');\n';
+};
 
 /**
  * The generated code for robot blocks includes block ID strings.  These are useful for
