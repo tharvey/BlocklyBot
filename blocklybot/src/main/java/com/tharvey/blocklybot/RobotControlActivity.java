@@ -20,21 +20,65 @@ public class RobotControlActivity extends Activity {
         final Intent intent = getIntent();
         mRobot = Mobbob.getMobob();
 
-        getActionBar().setTitle("Control Panel: " + mRobot.getName());
+        if (mRobot != null)
+            getActionBar().setTitle("Control Panel: " + mRobot.getName());
         getActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
-    public void onClickLeft(View v) {
-        mRobot.sendCommand(Bluno.commands.TURN_LEFT.ordinal(), 1);
-    }
-    public void onClickRight(View v) {
-        mRobot.sendCommand(Bluno.commands.TURN_RIGHT.ordinal(), 1);
-    }
-    public void onClickUp(View v) {
-        mRobot.sendCommand(Bluno.commands.MOVE_FORWARD.ordinal(), 1);
-    }
-    public void onClickDown(View v) {
-        mRobot.sendCommand(Bluno.commands.MOVE_BACKWARD.ordinal(), 1);
+    public void onClick(View v) {
+        int cmd;
+        System.out.println("onClick:" + v.getId());
+        switch (v.getId()) {
+            case R.id.up:
+                cmd = Mobbob.commands.MOVE_FORWARD.ordinal();
+                break;
+            case R.id.right:
+                cmd = Mobbob.commands.TURN_RIGHT.ordinal();
+                break;
+            case R.id.left:
+                cmd = Mobbob.commands.TURN_LEFT.ordinal();
+                break;
+            case R.id.down:
+                cmd = Mobbob.commands.MOVE_BACKWARD.ordinal();
+                break;
+            case R.id.shake:
+                cmd = Mobbob.commands.SHAKE_HEAD.ordinal();
+                break;
+            case R.id.bounce:
+                cmd = Mobbob.commands.BOUNCE.ordinal();
+                break;
+            case R.id.wobble:
+                cmd = Mobbob.commands.WOBBLE.ordinal();
+                break;
+            case R.id.wobble_right:
+                cmd = Mobbob.commands.WOBBLE_RIGHT.ordinal();
+                break;
+            case R.id.wobble_left:
+                cmd = Mobbob.commands.WOBBLE_LEFT.ordinal();
+                break;
+            case R.id.tap_feet:
+                cmd = Mobbob.commands.TAP_FEET.ordinal();
+                break;
+            case R.id.tap_right:
+                cmd = Mobbob.commands.TAP_FOOT_RIGHT.ordinal();
+                break;
+            case R.id.tap_left:
+                cmd = Mobbob.commands.TAP_FOOT_LEFT.ordinal();
+                break;
+            case R.id.shake_legs:
+                cmd = Mobbob.commands.SHAKE_LEGS.ordinal();
+                break;
+            case R.id.shake_right:
+                cmd = Mobbob.commands.SHAKE_LEG_RIGHT.ordinal();
+                break;
+            case R.id.shake_left:
+                cmd = Mobbob.commands.SHAKE_LEG_LEFT.ordinal();
+                break;
+            default:
+                cmd = Mobbob.commands.STOP.ordinal();
+                break;
+        }
+        mRobot.sendCommand(cmd, 1);
     }
 
     @Override
