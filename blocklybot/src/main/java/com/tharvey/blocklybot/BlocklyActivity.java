@@ -160,6 +160,11 @@ public class BlocklyActivity extends AbstractBlocklyActivity {
             final Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
             return true;
+        } else if (id == R.id.action_about) {
+            AboutDialog about = new AboutDialog(this);
+            about.setTitle("About this app");
+            about.show();
+            return true;
         } else {
             return super.onOptionsItemSelected(item);
         }
