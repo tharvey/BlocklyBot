@@ -2,8 +2,10 @@ package com.tharvey.blocklybot;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.app.Activity;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,8 +30,16 @@ public class MainActivity extends Activity {
     }
 
     public void onClickNC(View v) {
-        final Intent intent = new Intent(this, BlocklyActivity.class);
-        startActivity(intent);
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        String controller = sharedPref.getString("pref_controlType", "");
+        System.out.println("Controller:" + controller);
+        if (controller.equals("panel")) {
+            final Intent intent = new Intent(this, RobotControlActivity.class);
+            startActivity(intent);
+        } else {
+            final Intent intent = new Intent(this, BlocklyActivity.class);
+            startActivity(intent);
+        }
     }
 
     @Override

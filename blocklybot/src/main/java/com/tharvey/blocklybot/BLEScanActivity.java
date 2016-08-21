@@ -130,11 +130,11 @@ public class BLEScanActivity extends Activity {
                     SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(m_Activity);
                     String controller = sharedPref.getString("pref_controlType", "");
                     System.out.println("Controller:" + controller);
-                    if (controller.equals("blockly")) {
-                        final Intent intent = new Intent(m_Activity, BlocklyActivity.class);
-                        startActivity(intent);
-                    } else if (controller.equals("panel")) {
+                    if (controller.equals("panel")) {
                         final Intent intent = new Intent(m_Activity, RobotControlActivity.class);
+                        startActivity(intent);
+                    } else {
+                        final Intent intent = new Intent(m_Activity, BlocklyActivity.class);
                         startActivity(intent);
                     }
                 }

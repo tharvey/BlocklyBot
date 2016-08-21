@@ -18,5 +18,5 @@
         android:dialogTitle="@string/pref_controlType"
         android:entries="@array/pref_controlTypes_entries"
         android:entryValues="@array/pref_controlTypes_values"
-        android:defaultValue="@string/pref_controlType_default" />
+        android:defaultValue="blockly" />
 </PreferenceScreen>

@@ -47,5 +47,5 @@
         <item>blockly</item>
         <item>panel</item>
     </string-array>
-    <string name="pref_controlType_default">bluetooth</string>
+    <string name="pref_controlType_default">blockly</string>
 </resources>
