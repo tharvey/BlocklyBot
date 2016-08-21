@@ -9,13 +9,22 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.tharvey.blocklybot.MainActivity">
 
+    <ImageView
+        android:id="@+id/imageView"
+        android:src="@mipmap/ic_launcher"
+        android:layout_width="100dp"
+        android:layout_height="150dp"
+        android:scaleType="fitXY"
+        android:adjustViewBounds="true"
+        android:layout_centerHorizontal="true" />
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Bluetooth Low Energy"
         android:id="@+id/button_ble"
         android:onClick="onClickBLE"
-        android:layout_below="@+id/editText"
+        android:layout_below="@+id/imageView"
         android:layout_centerHorizontal="true" />
 
     <Button
