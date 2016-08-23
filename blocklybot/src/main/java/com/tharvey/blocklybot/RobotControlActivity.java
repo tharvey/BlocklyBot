@@ -3,6 +3,7 @@ package com.tharvey.blocklybot;
 import android.content.Intent;
 import android.os.Bundle;
 import android.app.Activity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -102,4 +103,17 @@ public class RobotControlActivity extends Activity {
         return true;
     }
 
+    @Override
+    protected void onPause() {
+        Log.d(TAG, "onPause()");
+        super.onPause();
+        mRobot.disconnect();
+    }
+
+    @Override
+    protected void onResume() {
+        Log.d(TAG, "onResume()");
+        super.onResume();
+        mRobot.connect();
+    }
 }
