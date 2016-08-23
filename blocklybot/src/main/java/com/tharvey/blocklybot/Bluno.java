@@ -40,28 +40,6 @@ public class Bluno extends Mobbob {
 		context.bindService(gattServiceIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
 	}
 
-	public void onConectionStateChange(connectionStateEnum theConnectionState) {
-		switch (theConnectionState) {
-			case isConnected:
-				Log.i(TAG, "Connected");
-				break;
-			case isConnecting:
-				Log.i(TAG, "Connecting");
-				break;
-			case isToScan:
-				Log.i(TAG, "Scan");
-				break;
-			case isScanning:
-				Log.i(TAG, "Scanning");
-				break;
-			case isDisconnecting:
-				Log.i(TAG, "isDisconnecting");
-				break;
-			default:
-				break;
-		}
-	}
-
 	public void serialSend(String theString) {
 		if (mConnectionState == connectionStateEnum.isConnected) {
 			Log.d(TAG, ">> " + theString);
