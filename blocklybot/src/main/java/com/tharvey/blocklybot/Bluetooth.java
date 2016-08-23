@@ -16,22 +16,20 @@ import java.util.UUID;
 public class Bluetooth extends Mobbob {
     private final static String TAG = Bluetooth.class.getSimpleName();
 
-    private static final UUID HC05_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    // Well-known SPP UUID
+    private static final UUID SPP_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    private BluetoothSocket mmSocket = null;
 
     private class ConnectThread extends Thread {
-        private final BluetoothSocket mmSocket;
-        private final BluetoothDevice mmDevice;
-        private String mSocketType;
 
         public ConnectThread(BluetoothDevice device) {
             // Use a temporary object that is later assigned to mmSocket,
             // because mmSocket is final
             BluetoothSocket tmp = null;
-            mmDevice = device;
 
-            // Get a BluetoothSocket to connect with the given BluetoothDevice
+            // Get a BluetoothSocket to connect with the device using SDP lookup of UUID
             try {
-                tmp = device.createRfcommSocketToServiceRecord(HC05_UUID);
+                tmp = device.createRfcommSocketToServiceRecord(SPP_UUID);
             } catch (IOException e) {
                 Log.e(TAG, "Socket create() failed", e);
             }
@@ -57,7 +55,7 @@ public class Bluetooth extends Mobbob {
             }
 
             // Start the connected thread
-            connected(mmSocket, mmDevice);
+            connected(mmSocket, mDevice);
         }
 
         /** Will cancel an in-progress connection, and close the socket */
@@ -74,7 +72,7 @@ public class Bluetooth extends Mobbob {
         private final OutputStream mmOutStream;
 
         public ConnectedThread(BluetoothSocket socket) {
-            System.out.println("ConnectedThread");
+            Log.d(TAG, "ConnectedThread");
             mmSocket = socket;
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
@@ -105,7 +103,7 @@ public class Bluetooth extends Mobbob {
                     String chunk = new String(buffer, 0, bytes);
                     if (chunk.contains("\r\n")) {
                         inString += chunk;
-                        System.out.println("Sending '" + inString + "'");
+                        Log.d(TAG, "Sending '" + inString + "'");
                         onSerialReceived(inString);
                     } else {
                         inString += chunk;
@@ -144,19 +142,19 @@ public class Bluetooth extends Mobbob {
     public void onConectionStateChange(connectionStateEnum theConnectionState) {
         switch (theConnectionState) {
             case isConnected:
-                System.out.println("Connected");
+                Log.i(TAG, "Connected");
                 break;
             case isConnecting:
-                System.out.println("Connecting");
+                Log.i(TAG, "Connecting");
                 break;
             case isToScan:
-                System.out.println("Scan");
+                Log.i(TAG, "Scan");
                 break;
             case isScanning:
-                System.out.println("Scanning");
+                Log.i(TAG, "Scanning");
                 break;
             case isDisconnecting:
-                System.out.println("isDisconnecting");
+                Log.i(TAG, "isDisconnecting");
                 break;
             default:
                 break;
@@ -165,12 +163,10 @@ public class Bluetooth extends Mobbob {
 
     private ConnectThread mConnectThread;
     private ConnectedThread mConnectedThread;
-    private final Handler mHandler;
     private BluetoothDevice mDevice;
 
     public Bluetooth(Context context, Handler handler, BluetoothDevice device) {
         super(handler, device.getName(), device.getAddress());
-        mHandler = handler;
         mDevice = device;
 
         // Cancel any thread attempting to make a connection
@@ -186,11 +182,11 @@ public class Bluetooth extends Mobbob {
         }
 
         setState(connectionStateEnum.isScanning);
-        connect(device);
+        connect();
     }
 
-    public synchronized void connect(BluetoothDevice device) {
-        Log.d(TAG, "connect to: " + device);
+    public synchronized int connect() {
+        Log.d(TAG, "connect " + toString());
 
         // Cancel any thread attempting to make a connection
         if (mConnectionState == connectionStateEnum.isConnecting) {
@@ -210,6 +206,33 @@ public class Bluetooth extends Mobbob {
         mConnectThread = new ConnectThread(mDevice);
         mConnectThread.start();
         setState(connectionStateEnum.isConnecting);
+        return 0;
+    }
+
+    public synchronized void disconnect() {
+        Log.d(TAG, "disconnect " + toString());
+
+        // Cancel any thread attempting to make a connection
+        if (mConnectionState == connectionStateEnum.isConnecting) {
+            if (mConnectThread != null) {
+                mConnectThread.cancel();
+                mConnectThread = null;
+            }
+        }
+
+        // Cancel any thread currently running a connection
+        if (mConnectedThread != null) {
+            mConnectedThread.cancel();
+            mConnectedThread = null;
+        }
+
+        // close connection
+        try {
+            mmSocket.close();
+        } catch (IOException e) {
+            Log.e(TAG, "Socket close() failed", e);
+        }
+        setState(connectionStateEnum.isNull);
     }
 
     /**
@@ -242,9 +265,8 @@ public class Bluetooth extends Mobbob {
 
     public void serialSend(String theString){
         if (mConnectionState == connectionStateEnum.isConnected) {
-            System.out.println(">> " + theString);
+            Log.d(TAG, ">> " + theString);
             mConnectedThread.write(theString.getBytes());
         }
     }
-
 }

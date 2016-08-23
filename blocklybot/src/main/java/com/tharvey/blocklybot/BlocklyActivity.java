@@ -209,4 +209,18 @@ public class BlocklyActivity extends AbstractBlocklyActivity {
     protected void onInitBlankWorkspace() {
         // Initialize variable names.
     }
+
+    @Override
+    protected void onPause() {
+        Log.d(TAG, "onPause()");
+        super.onPause();
+        mRobot.disconnect();
+    }
+
+    @Override
+    protected void onResume() {
+        Log.d(TAG, "onResume()");
+        super.onResume();
+        mRobot.connect();
+    }
 }

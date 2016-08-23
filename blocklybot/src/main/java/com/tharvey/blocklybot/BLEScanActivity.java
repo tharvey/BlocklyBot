@@ -216,19 +216,25 @@ public class BLEScanActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    // Stops scanning after a pre-defined scan period.
+    Runnable scanStopHandler = new Runnable() {
+        @Override
+        public void run() {
+            Log.d(TAG, "scanStopHandler");
+            if (mScanning) {
+                mScanning = false;
+                mBluetoothAdapter.stopLeScan(mLeScanCallback);
+                invalidateOptionsMenu();
+            }
+        }
+    };
+
     // perform BLE scan for SCAN_PERIOD
     private void scanLeDevice(final boolean enable) {
+        Log.d(TAG, "scanLeDevice(" + enable + ") scanning:" + mScanning);
+        mHandler.removeCallbacks(scanStopHandler);
         if (enable && !mScanning) {
-            // Stops scanning after a pre-defined scan period.
-            mHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mScanning = false;
-                    mBluetoothAdapter.stopLeScan(mLeScanCallback);
-                    invalidateOptionsMenu();
-                }
-            }, SCAN_PERIOD);
-
+            mHandler.postDelayed(scanStopHandler, SCAN_PERIOD);
             mScanning = true;
             mBluetoothAdapter.startLeScan(mLeScanCallback);
         } else if (mScanning) {

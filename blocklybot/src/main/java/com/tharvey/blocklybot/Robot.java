@@ -20,6 +20,8 @@ public abstract class Robot {
     private String mDeviceName;
     private String mDeviceAddress;
     public abstract void onConectionStateChange(connectionStateEnum theconnectionStateEnum);
+    public abstract void disconnect();
+    public abstract int connect();
     protected String mLastRX = "";
     protected void onSerialReceived(String theString) {
         theString = theString.replace("\r\n", "");
@@ -51,6 +53,10 @@ public abstract class Robot {
 
     public String getName() {
         return mDeviceName;
+    }
+
+    public String toString() {
+        return mDeviceName + ":" + mDeviceAddress;
     }
 }
 

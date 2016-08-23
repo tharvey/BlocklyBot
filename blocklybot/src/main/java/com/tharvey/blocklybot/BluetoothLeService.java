@@ -161,6 +161,7 @@ public class BluetoothLeService extends Service {
                 intentAction = ACTION_GATT_DISCONNECTED;
                 mConnectionState = STATE_DISCONNECTED;
                 Log.i(TAG, "Disconnected from GATT server.");
+                gatt.close();
                 broadcastUpdate(intentAction);
             }
         }
@@ -412,11 +413,14 @@ public class BluetoothLeService extends Service {
             Log.w(TAG, "Device not found.  Unable to connect.");
             return false;
         }
-        // We want to directly connect to the device, so we are setting the autoConnect
-        // parameter to false.
-        mBluetoothGatt = device.connectGatt(this, false, mGattCallback);
-        Log.d(TAG, "Trying to create a new connection.");
-        mConnectionState = STATE_CONNECTING;
+
+        if (mConnectionState != STATE_CONNECTED) {
+            // We want to directly connect to the device, so we are setting the autoConnect
+            // parameter to false.
+            mBluetoothGatt = device.connectGatt(this, false, mGattCallback);
+            Log.d(TAG, "Trying to create a new connection.");
+            mConnectionState = STATE_CONNECTING;
+        }
         return true;
     }
 
@@ -427,6 +431,7 @@ public class BluetoothLeService extends Service {
      * callback.
      */
     public void disconnect() {
+        Log.d(TAG, "disconnect");
         if (mBluetoothAdapter == null || mBluetoothGatt == null) {
             Log.w(TAG, "BluetoothAdapter not initialized");
             return;
