@@ -48,7 +48,7 @@ public class BlocklyActivity extends AbstractBlocklyActivity {
         final Intent intent = getIntent();
         mRobot = Mobbob.getMobob();
         if (mRobot != null) {
-            System.out.println("Blockly connected to " + mRobot.getName() + ":" + mRobot.getAddress());
+            Log.i(TAG, "Blockly connected to " + mRobot.toString());
         }
 
         // getActionBar() returns null when using blocklyTheme
@@ -121,7 +121,7 @@ public class BlocklyActivity extends AbstractBlocklyActivity {
                         mRobot.sendCommand(Mobbob.commands.SHAKE_LEG_RIGHT.ordinal(), val);
                         break;
                     default:
-                        System.err.println("Unrecognized cmd:" + cmd);
+                        Log.e(TAG, "Unrecognized cmd:" + cmd);
                         break;
                 }
                 return 0;

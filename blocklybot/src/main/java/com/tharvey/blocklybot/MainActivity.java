@@ -6,12 +6,14 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.app.Activity;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
+    private final static String TAG = MainActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +34,7 @@ public class MainActivity extends Activity {
     public void onClickNC(View v) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         String controller = sharedPref.getString("pref_controlType", "");
-        System.out.println("Controller:" + controller);
+        Log.i(TAG, "Controller:" + controller);
         if (controller.equals("panel")) {
             final Intent intent = new Intent(this, RobotControlActivity.class);
             startActivity(intent);

@@ -4,6 +4,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
 import android.os.SystemClock;
+import android.util.Log;
 
 public abstract class Mobbob extends Robot {
     private final static String TAG = Mobbob.class.getSimpleName();
@@ -60,12 +61,12 @@ public abstract class Mobbob extends Robot {
             public void handleMessage(Message msg) {
                 if (msg.what < commands.CMD_MAX.ordinal()) {
                     String cmd = command_str[msg.what];
-                    System.out.println("Mobob cmd:" + cmd + " val:" + msg.arg1);
+                    Log.d(TAG, "Mobob cmd:" + cmd + " val:" + msg.arg1);
                     serialSend("<" + cmd + "," + msg.arg1 + ">");
                     while (!mLastRX.equals("<" + cmd + ">")) {
                         SystemClock.sleep(100);
                     }
-                    System.out.println("done " + cmd);
+                    Log.d(TAG, "done " + cmd);
                 }
             }
         };

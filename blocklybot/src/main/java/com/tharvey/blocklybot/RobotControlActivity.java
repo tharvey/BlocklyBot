@@ -27,7 +27,6 @@ public class RobotControlActivity extends Activity {
 
     public void onClick(View v) {
         int cmd;
-        System.out.println("onClick:" + v.getId());
         switch (v.getId()) {
             case R.id.up:
                 cmd = Mobbob.commands.MOVE_FORWARD.ordinal();
