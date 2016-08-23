@@ -166,6 +166,9 @@ public class Bluetooth extends Mobbob {
     public synchronized int connect() {
         Log.d(TAG, "connect " + toString());
 
+        if (mConnectionState == connectionStateEnum.isConnected)
+            return 0;
+
         // Cancel any thread attempting to make a connection
         if (mConnectionState == connectionStateEnum.isConnecting) {
             if (mConnectThread != null) {
