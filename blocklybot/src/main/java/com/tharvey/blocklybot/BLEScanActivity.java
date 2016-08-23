@@ -21,17 +21,15 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -88,7 +86,7 @@ public class BLEScanActivity extends Activity {
                 builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
                     @Override
                     public void onDismiss(DialogInterface dialog) {
-                    requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_COARSE_LOCATION);
+                        requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_COARSE_LOCATION);
                     }
                 });
                 builder.show();
@@ -102,50 +100,51 @@ public class BLEScanActivity extends Activity {
             finish();
         }
 
-//        getActionBar().setTitle(R.string.title_devices);
         m_listView = (ListView) findViewById(R.id.listView);
         m_listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            final BluetoothDevice device = mDeviceListAdapter.getDevice(position);
-            if (mScanning) {
-                mBluetoothAdapter.stopLeScan(mLeScanCallback);
-                mScanning = false;
-            }
-            Toast.makeText(getApplicationContext(),
-                "Connecting to " + device.getName() + ":" + device.getAddress(),
-                Toast.LENGTH_LONG).show();
-            Thread thread = new Thread() {
-                @Override
-                public void run() {
-                    Bluno mRobot = new Bluno(m_Activity, mHandler, device);
-                    while(mRobot.mConnectionState != Robot.connectionStateEnum.isConnected) {
-                        try {
-                            sleep(500);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    System.out.println("Connected");
-                    SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(m_Activity);
-                    String controller = sharedPref.getString("pref_controlType", "");
-                    System.out.println("Controller:" + controller);
-                    if (controller.equals("panel")) {
-                        final Intent intent = new Intent(m_Activity, RobotControlActivity.class);
-                        startActivity(intent);
-                    } else {
-                        final Intent intent = new Intent(m_Activity, BlocklyActivity.class);
-                        startActivity(intent);
-                    }
-                }
-            };
-            thread.start();
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                connect(mDeviceListAdapter.getDevice(position));
             }
         });
+
+        // Initializes list view adapter.
+        mDeviceListAdapter = new DeviceListAdapter();
+        m_listView.setAdapter(mDeviceListAdapter);
     }
 
-    public void scan(View v) {
-        scanDevice(true);
+    // Connect to a robot
+    private int connect(final BluetoothDevice device) {
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                Bluno mRobot = new Bluno(m_Activity, mHandler, device);
+                while(mRobot.mConnectionState != Robot.connectionStateEnum.isConnected) {
+                    try {
+                        sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                Log.i(TAG, "Connected to " + device.getName() + ":" + device.getAddress());
+                SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(m_Activity);
+                String controller = sharedPref.getString("pref_controlType", "");
+                if (controller.equals("panel")) {
+                    final Intent intent = new Intent(m_Activity, RobotControlActivity.class);
+                    startActivity(intent);
+                } else {
+                    final Intent intent = new Intent(m_Activity, BlocklyActivity.class);
+                    startActivity(intent);
+                }
+            }
+        };
+
+        scanLeDevice(false);
+        Toast.makeText(getApplicationContext(),
+                "Connecting to " + device.getName() + ":" + device.getAddress(),
+                Toast.LENGTH_LONG).show();
+        thread.start();
+        return 0;
     }
 
     @Override
@@ -168,17 +167,29 @@ public class BLEScanActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_scan:
-                scanDevice(true);
+                if (!mScanning) {
+                    mDeviceListAdapter.clear();
+                    scanLeDevice(true);
+                }
                 break;
             case R.id.menu_stop:
-                scanDevice(false);
+                scanLeDevice(false);
                 break;
         }
+        invalidateOptionsMenu();
         return true;
     }
 
     @Override
+    protected void onPause() {
+        Log.d(TAG, "onPause()");
+        super.onPause();
+        scanLeDevice(false);
+    }
+
+    @Override
     protected void onResume() {
+        Log.d(TAG, "onResume()");
         super.onResume();
 
         // Ensures Bluetooth is enabled on the device.  If Bluetooth is not currently enabled,
@@ -189,20 +200,12 @@ public class BLEScanActivity extends Activity {
                 startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
             }
         }
-
-        // Initializes list view adapter.
-        mDeviceListAdapter = new DeviceListAdapter();
-        m_listView.setAdapter(mDeviceListAdapter);
-        scanDevice(true);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        scanDevice(false);
         mDeviceListAdapter.clear();
+        scanLeDevice(true);
+        invalidateOptionsMenu();
     }
 
+    // handle result of enable bluetooth request (above)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // User chose not to enable Bluetooth.
@@ -213,52 +216,25 @@ public class BLEScanActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    private void scanDevice(final boolean enable) {
-        mDeviceListAdapter.clear();
-        scanLeDevice(enable);
-    }
-
-    private void scanBluetoothDevice(final boolean enable) {
-        // Create a BroadcastReceiver for ACTION_FOUND
-        final BroadcastReceiver mReceiver = new BroadcastReceiver() {
-            public void onReceive(Context context, Intent intent) {
-                String action = intent.getAction();
-                // When discovery finds a device
-                if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-                    // Get the BluetoothDevice object from the Intent
-                    BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                    // Add the name and address to an array adapter to show in a ListView
-                    mDeviceListAdapter.addDevice(device);
-                    mDeviceListAdapter.notifyDataSetChanged();
-                } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
-                    System.out.println("Discovery finished");
-                }
-            }
-        };
-        // Register the BroadcastReceiver
-        registerReceiver(mReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND)); // Don't forget to unregister during onDestroy
-        registerReceiver(mReceiver, new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED)); // Don't forget to unregister during onDestroy
-    }
-
+    // perform BLE scan for SCAN_PERIOD
     private void scanLeDevice(final boolean enable) {
-        if (enable) {
+        if (enable && !mScanning) {
             // Stops scanning after a pre-defined scan period.
             mHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                mScanning = false;
-                mBluetoothAdapter.stopLeScan(mLeScanCallback);
-                invalidateOptionsMenu();
+                    mScanning = false;
+                    mBluetoothAdapter.stopLeScan(mLeScanCallback);
+                    invalidateOptionsMenu();
                 }
             }, SCAN_PERIOD);
 
             mScanning = true;
             mBluetoothAdapter.startLeScan(mLeScanCallback);
-        } else {
+        } else if (mScanning) {
             mScanning = false;
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
         }
-        invalidateOptionsMenu();
     }
 
     // Device scan callback.
@@ -277,12 +253,11 @@ public class BLEScanActivity extends Activity {
         }
     };
 
+    // Adapter for holding devices found through scanning.
     static class ViewHolder {
         TextView deviceName;
         TextView deviceAddress;
     }
-
-    // Adapter for holding devices found through scanning.
     private class DeviceListAdapter extends BaseAdapter {
         private ArrayList<BluetoothDevice> mDevices;
         private LayoutInflater mInflator;

@@ -32,6 +32,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -53,7 +54,6 @@ public class BluetoothScanActivity extends Activity {
 
     private DeviceListAdapter mDeviceListAdapter;
     private BluetoothAdapter mBluetoothAdapter;
-    private boolean mScanning;
     private Handler mHandler;
     private ListView m_listView;
     private Activity m_Activity;
@@ -93,56 +93,84 @@ public class BluetoothScanActivity extends Activity {
             }
         }
 
-//        getActionBar().setTitle(R.string.title_devices);
         m_listView = (ListView) findViewById(R.id.listView);
         m_listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            final BluetoothDevice device = mDeviceListAdapter.getDevice(position);
-            if (mScanning) {
-                mBluetoothAdapter.cancelDiscovery();
-                mScanning = false;
-            }
-            Toast.makeText(getApplicationContext(),
-                "Connecting to " + device.getName() + ":" + device.getAddress(),
-                Toast.LENGTH_LONG).show();
-            Thread thread = new Thread() {
-                @Override
-                public void run() {
-                    Bluetooth mRobot = new Bluetooth(m_Activity, mHandler, device);
-                    while(mRobot.mConnectionState != Robot.connectionStateEnum.isConnected) {
-                        try {
-                            sleep(500);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    System.out.println("Connected");
-                    SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(m_Activity);
-                    String controller = sharedPref.getString("pref_controlType", "");
-                    System.out.println("Controller:" + controller);
-                    if (controller.equals("panel")) {
-                        final Intent intent = new Intent(m_Activity, RobotControlActivity.class);
-                        startActivity(intent);
-                    } else {
-                        final Intent intent = new Intent(m_Activity, BlocklyActivity.class);
-                        startActivity(intent);
-                    }
-                }
-            };
-            thread.start();
+                connect(mDeviceListAdapter.getDevice(position));
             }
         });
+
+        // Initializes list view adapter.
+        mDeviceListAdapter = new DeviceListAdapter();
+        m_listView.setAdapter(mDeviceListAdapter);
+/*
+        pairedDevices = mBluetoothAdapter.getBondedDevices();
+        for (BluetoothDevice device : pairedDevices) {
+            mDeviceListAdapter.addDevice(device);
+            mDeviceListAdapter.notifyDataSetChanged();
+        }
+*/
     }
 
-    public void scan(View v) {
-        scanDevice(true);
+    // Connect to a robot
+    private int connect(final BluetoothDevice device) {
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                Bluetooth mRobot = new Bluetooth(m_Activity, mHandler, device);
+                while (mRobot.mConnectionState != Robot.connectionStateEnum.isConnected) {
+                    try {
+                        sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                Log.i(TAG, "Connected to " + device.getName() + ":" + device.getAddress());
+                SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(m_Activity);
+                String controller = sharedPref.getString("pref_controlType", "");
+                if (controller.equals("panel")) {
+                    final Intent intent = new Intent(m_Activity, RobotControlActivity.class);
+                    startActivity(intent);
+                } else {
+                    final Intent intent = new Intent(m_Activity, BlocklyActivity.class);
+                    startActivity(intent);
+                }
+            }
+        };
+
+        mBluetoothAdapter.cancelDiscovery();
+        Toast.makeText(getApplicationContext(),
+                "Connecting to " + device.getName() + ":" + device.getAddress(),
+                Toast.LENGTH_LONG).show();
+        thread.start();
+        return 0;
     }
+
+    // Create a BroadcastReceiver for ACTION_FOUND and ACTION_DISCOVERY_FINISHED
+    final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            // When discovery finds a device
+            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+                // Get the BluetoothDevice object from the Intent
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                // Add the name and address to an array adapter to show in a ListView
+                mDeviceListAdapter.addDevice(device);
+                mDeviceListAdapter.notifyDataSetChanged();
+            }
+            // When discovery is completed
+            else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
+                Log.i(TAG, "Discovery finished");
+                invalidateOptionsMenu();
+            }
+        }
+    };
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.scan, menu);
-        if (!mScanning) {
+        if (!mBluetoothAdapter.isDiscovering()) {
             menu.findItem(R.id.menu_stop).setVisible(false);
             menu.findItem(R.id.menu_scan).setVisible(true);
             menu.findItem(R.id.menu_refresh).setActionView(null);
@@ -159,17 +187,30 @@ public class BluetoothScanActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_scan:
-                scanDevice(true);
+                if (!mBluetoothAdapter.isDiscovering()) {
+                    mDeviceListAdapter.clear();
+                    mBluetoothAdapter.startDiscovery();
+                }
                 break;
             case R.id.menu_stop:
-                scanDevice(false);
+                mBluetoothAdapter.cancelDiscovery();
                 break;
         }
+        invalidateOptionsMenu();
         return true;
     }
 
     @Override
+    protected void onPause() {
+        Log.d(TAG, "onPause()");
+        super.onPause();
+        mBluetoothAdapter.cancelDiscovery();
+        unregisterReceiver(mReceiver);
+    }
+
+    @Override
     protected void onResume() {
+        Log.d(TAG, "onResume()");
         super.onResume();
 
         // Ensures Bluetooth is enabled on the device.  If Bluetooth is not currently enabled,
@@ -181,19 +222,19 @@ public class BluetoothScanActivity extends Activity {
             }
         }
 
-        // Initializes list view adapter.
-        mDeviceListAdapter = new DeviceListAdapter();
-        m_listView.setAdapter(mDeviceListAdapter);
-        scanDevice(true);
-    }
+        // Register the BroadcastReceiver
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(BluetoothDevice.ACTION_FOUND);
+        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
+        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        registerReceiver(mReceiver, filter);
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        scanDevice(false);
         mDeviceListAdapter.clear();
+        mBluetoothAdapter.startDiscovery();
+        invalidateOptionsMenu();
     }
 
+    // handle result of enable bluetooth request (above)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // User chose not to enable Bluetooth.
@@ -204,49 +245,11 @@ public class BluetoothScanActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    private void scanDevice(final boolean enable) {
-        mDeviceListAdapter.clear();
-/*
-        pairedDevices = mBluetoothAdapter.getBondedDevices();
-        for (BluetoothDevice device : pairedDevices) {
-            mDeviceListAdapter.addDevice(device);
-            mDeviceListAdapter.notifyDataSetChanged();
-        }
-        Toast.makeText(getApplicationContext(), "Showing Paired Devices", Toast.LENGTH_SHORT).show();
-*/
-        scanBluetoothDevice(enable);
-    }
-
-    private void scanBluetoothDevice(final boolean enable) {
-        // Create a BroadcastReceiver for ACTION_FOUND
-        final BroadcastReceiver mReceiver = new BroadcastReceiver() {
-            public void onReceive(Context context, Intent intent) {
-                String action = intent.getAction();
-                // When discovery finds a device
-                if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-                    // Get the BluetoothDevice object from the Intent
-                    BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                    // Add the name and address to an array adapter to show in a ListView
-                    mDeviceListAdapter.addDevice(device);
-                    mDeviceListAdapter.notifyDataSetChanged();
-                } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
-                    System.out.println("Discovery finished");
-                }
-            }
-        };
-        // Register the BroadcastReceiver
-        registerReceiver(mReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND)); // Don't forget to unregister during onDestroy
-        registerReceiver(mReceiver, new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED)); // Don't forget to unregister during onDestroy
-        mBluetoothAdapter.startDiscovery();
-        mScanning = true;
-    }
-
+    // Adapter for holding devices found through scanning.
     static class ViewHolder {
         TextView deviceName;
         TextView deviceAddress;
     }
-
-    // Adapter for holding devices found through scanning.
     private class DeviceListAdapter extends BaseAdapter {
         private ArrayList<BluetoothDevice> mDevices;
         private LayoutInflater mInflator;

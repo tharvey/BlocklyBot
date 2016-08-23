@@ -3,37 +3,9 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView android:text="Device Connection" android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/textview"
-        android:textSize="35dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Scan"
-        android:onClick="scan"
-        android:id="@+id/button_scan"
-        android:layout_below="@+id/textview" />
-
     <ListView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/listView"
-        android:layout_alignParentBottom="true"
-        android:layout_alignLeft="@+id/button_scan"
-        android:layout_alignStart="@+id/button_scan"
-        android:layout_below="@+id/textView2" />
+        android:id="@+id/listView" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Devices:"
-        android:id="@+id/textView2"
-        android:textSize="25dp"
-        android:layout_below="@+id/button_scan"
-        android:layout_alignLeft="@+id/listView"
-        android:layout_alignStart="@+id/listView" />
 </RelativeLayout>
