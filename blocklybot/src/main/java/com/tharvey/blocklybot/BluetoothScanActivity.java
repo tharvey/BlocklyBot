@@ -21,6 +21,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -31,6 +32,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -45,6 +47,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * Activity for scanning and displaying available Bluetooth LE devices.
@@ -60,6 +64,8 @@ public class BluetoothScanActivity extends Activity {
 
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
     private static final int REQUEST_ENABLE_BT = 1;
+    private static final String SPP_UUID = "00001101-0000-1000-8000-00805F9B34FB"; /* RFComm Service */
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -104,13 +110,13 @@ public class BluetoothScanActivity extends Activity {
         // Initializes list view adapter.
         mDeviceListAdapter = new DeviceListAdapter();
         m_listView.setAdapter(mDeviceListAdapter);
-/*
-        pairedDevices = mBluetoothAdapter.getBondedDevices();
-        for (BluetoothDevice device : pairedDevices) {
-            mDeviceListAdapter.addDevice(device);
-            mDeviceListAdapter.notifyDataSetChanged();
+        if (false /* show paired devices */) {
+            Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
+            for (BluetoothDevice device : pairedDevices) {
+                mDeviceListAdapter.addDevice(device);
+                mDeviceListAdapter.notifyDataSetChanged();
+            }
         }
-*/
     }
 
     // Connect to a robot
@@ -156,13 +162,36 @@ public class BluetoothScanActivity extends Activity {
                 // Get the BluetoothDevice object from the Intent
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 // Add the name and address to an array adapter to show in a ListView
-                mDeviceListAdapter.addDevice(device);
-                mDeviceListAdapter.notifyDataSetChanged();
+                Log.d(TAG, "Device found: " + device.toString());
+                if (false) {
+                    /* show all discovered bluetooth devices */
+                    mDeviceListAdapter.addDevice(device);
+                    mDeviceListAdapter.notifyDataSetChanged();
+                } else {
+                    /* show only devices matching Rfcomm Service */
+                    device.fetchUuidsWithSdp();
+                }
             }
             // When discovery is completed
             else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 Log.i(TAG, "Discovery finished");
                 invalidateOptionsMenu();
+            }
+            // When SDP records are found from the call to fetchUuidsWithSdp()
+            else if (BluetoothDevice.ACTION_UUID.equals(action)) {
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                Log.i(TAG, "Services discovered for " + device);
+                Parcelable[] uuidExtra = intent.getParcelableArrayExtra(BluetoothDevice.EXTRA_UUID);
+                for (int i=0; i<uuidExtra.length; i++) {
+                    Log.i(TAG, "Service:" + uuidExtra[i].toString());
+                    // Well-known SPP UUID for RFComm
+                    if (uuidExtra[i].toString().equalsIgnoreCase(SPP_UUID)) {
+                        Log.i(TAG, "Found compatible device: " + device);
+                        mDeviceListAdapter.addDevice(device);
+                        mDeviceListAdapter.notifyDataSetChanged();
+                    }
+
+                }
             }
         }
     };
@@ -225,6 +254,7 @@ public class BluetoothScanActivity extends Activity {
         // Register the BroadcastReceiver
         IntentFilter filter = new IntentFilter();
         filter.addAction(BluetoothDevice.ACTION_FOUND);
+        filter.addAction(BluetoothDevice.ACTION_UUID);
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         registerReceiver(mReceiver, filter);
