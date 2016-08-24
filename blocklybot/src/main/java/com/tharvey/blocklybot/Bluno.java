@@ -66,9 +66,12 @@ public class Bluno extends Mobbob {
 		}
 	};
 
-	public static final String SerialPortUUID = "0000dfb1-0000-1000-8000-00805f9b34fb";
-	public static final String CommandUUID = "0000dfb2-0000-1000-8000-00805f9b34fb";
-	public static final String ModelNumberStringUUID = "00002a24-0000-1000-8000-00805f9b34fb";
+	// Services
+	public static final String DFROBOT_BLUNO_SERVICE = "0000dfb0-0000-1000-8000-00805f9b34fb";
+	// Characteristics
+	private static final String SerialPortUUID = "0000dfb1-0000-1000-8000-00805f9b34fb";
+	private static final String CommandUUID = "0000dfb2-0000-1000-8000-00805f9b34fb";
+	private static final String ModelNumberStringUUID = "00002a24-0000-1000-8000-00805f9b34fb";
 
 	// Handles various events fired by the Service:
 	//   ACTION_GATT_CONNECTED: connected to a GATT server.
@@ -79,30 +82,27 @@ public class Bluno extends Mobbob {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			final String action = intent.getAction();
-			Log.d(TAG, "mGattUpdateReceiver->onReceive->action=" + action);
+			//Log.d(TAG, "mGattUpdateReceiver->onReceive->action=" + action);
 			if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
-				Log.i(TAG, "bluno ACTION_GATT_CONNECTED");
+				Log.i(TAG, "ACTION_GATT_CONNECTED");
 				if (mConnectionState != connectionStateEnum.isConnected) {
 					setState(connectionStateEnum.isConnected);
 					start();
 					mHandler.removeCallbacks(mConnectingOverTimeRunnable);
 				}
 			} else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
-				Log.i(TAG, "bluno ACTION_GATT_DISCONNECTED");
+				Log.i(TAG, "ACTION_GATT_DISCONNECTED");
 				if (mConnectionState == connectionStateEnum.isConnected) {
 					setState(connectionStateEnum.isToScan);
 					mHandler.removeCallbacks(mDisonnectingOverTimeRunnable);
 					mBluetoothLeService.close();
 				}
 			} else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
-				// Show all the supported services and characteristics on the user interface.
-				for (BluetoothGattService gattService : mBluetoothLeService.getSupportedGattServices()) {
-					Log.i(TAG, "bluno ACTION_GATT_SERVICES_DISCOVERED  " +
-							gattService.getUuid().toString());
-				}
+				Log.d(TAG, "ACTION_GATT_SERVICES_DISCOVERED");
 				getGattServices(mBluetoothLeService.getSupportedGattServices());
 			} else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
 				if (mSCharacteristic == mModelNumberCharacteristic) {
+					Log.d(TAG, "ACTION_DATA_AVAILABLE: model:" + intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
 					if (intent.getStringExtra(BluetoothLeService.EXTRA_DATA).toUpperCase().startsWith("DF BLUNO")) {
 						mBluetoothLeService.setCharacteristicNotification(mSCharacteristic, false);
 						mSCharacteristic = mCommandCharacteristic;
@@ -117,8 +117,12 @@ public class Bluno extends Mobbob {
 						setState(connectionStateEnum.isToScan);
 					}
 				} else if (mSCharacteristic == mSerialPortCharacteristic) {
-					onSerialReceived(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
+					String received = intent.getStringExtra(BluetoothLeService.EXTRA_DATA);
+					Log.d(TAG, "<< " + received);
+					onSerialReceived(received);
 				}
+			} else {
+				Log.d(TAG, "mGattUpdateReceiver->onReceive->action=" + action);
 			}
 		}
 	};
@@ -156,7 +160,7 @@ public class Bluno extends Mobbob {
 		// Loops through available GATT Services.
 		for (BluetoothGattService gattService : gattServices) {
 			uuid = gattService.getUuid().toString();
-			Log.d(TAG, "displayGattServices + uuid=" + uuid);
+			Log.d(TAG, "service:" + uuid);
 
 			List<BluetoothGattCharacteristic> gattCharacteristics = gattService.getCharacteristics();
 			ArrayList<BluetoothGattCharacteristic> charas = new ArrayList<BluetoothGattCharacteristic>();
@@ -165,6 +169,7 @@ public class Bluno extends Mobbob {
 			for (BluetoothGattCharacteristic gattCharacteristic : gattCharacteristics) {
 				charas.add(gattCharacteristic);
 				uuid = gattCharacteristic.getUuid().toString();
+				Log.d(TAG, "  characteristic:" + uuid);
 				if (uuid.equals(ModelNumberStringUUID)) {
 					mModelNumberCharacteristic = gattCharacteristic;
 				} else if (uuid.equals(SerialPortUUID)) {
