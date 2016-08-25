@@ -78,7 +78,8 @@ public class RobotControlActivity extends Activity {
                 cmd = Mobbob.commands.STOP.ordinal();
                 break;
         }
-        mRobot.sendCommand(cmd, 1);
+        if (mRobot != null)
+            mRobot.sendCommand(cmd, 1);
     }
 
     @Override
@@ -107,13 +108,15 @@ public class RobotControlActivity extends Activity {
     protected void onPause() {
         Log.d(TAG, "onPause()");
         super.onPause();
-        mRobot.disconnect();
+        if (mRobot != null)
+            mRobot.disconnect();
     }
 
     @Override
     protected void onResume() {
         Log.d(TAG, "onResume()");
         super.onResume();
-        mRobot.connect();
+        if (mRobot != null)
+            mRobot.connect();
     }
 }
