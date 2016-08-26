@@ -2,13 +2,13 @@ package com.tharvey.blocklybot;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.app.Activity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-public class RobotControlActivity extends Activity {
+public class RobotControlActivity extends AppCompatActivity {
     private final static String TAG = RobotControlActivity.class.getSimpleName();
 
     private Mobbob mRobot;
@@ -20,10 +20,8 @@ public class RobotControlActivity extends Activity {
 
         final Intent intent = getIntent();
         mRobot = Mobbob.getMobob();
-
         if (mRobot != null)
-            getActionBar().setTitle("Control Panel: " + mRobot.getName());
-        getActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setTitle("Control Panel: " + mRobot.getName());
     }
 
     public void onClick(View v) {

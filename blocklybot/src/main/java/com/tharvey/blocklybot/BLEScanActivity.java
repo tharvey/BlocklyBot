@@ -29,6 +29,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -46,7 +47,7 @@ import java.util.ArrayList;
 /**
  * Activity for scanning and displaying available Bluetooth LE devices.
  */
-public class BLEScanActivity extends Activity {
+public class BLEScanActivity extends AppCompatActivity {
     private final static String TAG = BLEScanActivity.class.getSimpleName();
 
     private DeviceListAdapter mDeviceListAdapter;

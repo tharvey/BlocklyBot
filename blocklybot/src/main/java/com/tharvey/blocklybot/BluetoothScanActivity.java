@@ -34,6 +34,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -53,7 +54,7 @@ import java.util.UUID;
 /**
  * Activity for scanning and displaying available Bluetooth LE devices.
  */
-public class BluetoothScanActivity extends Activity {
+public class BluetoothScanActivity extends AppCompatActivity {
     private final static String TAG = BluetoothScanActivity.class.getSimpleName();
 
     private DeviceListAdapter mDeviceListAdapter;
@@ -65,7 +66,6 @@ public class BluetoothScanActivity extends Activity {
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
     private static final int REQUEST_ENABLE_BT = 1;
     private static final String SPP_UUID = "00001101-0000-1000-8000-00805F9B34FB"; /* RFComm Service */
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
