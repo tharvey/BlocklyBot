@@ -40,12 +40,13 @@ public class BlocklyActivity extends AbstractBlocklyActivity {
     private static final String TAG = "BlocklyActivity";
 
     static private Mobbob mRobot;
+    static private JSParser mParser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         final Intent intent = getIntent();
+        mParser = new JSParser();
         mRobot = Mobbob.getMobob();
         if (mRobot != null) {
             Log.i(TAG, "Blockly connected to " + mRobot.toString());
@@ -65,81 +66,13 @@ public class BlocklyActivity extends AbstractBlocklyActivity {
             "robot_generators.js"
     });
 
-
-    private final int parseCode(String generatedCode) {
-        if (mRobot == null)
-            return 0;
-        JSContext context = new JSContext();
-        JSFunction Robot = new JSFunction(context,"Robot") {
-            public Integer Robot(String cmd, Integer val) {
-                if (val < 1)
-                    val = 1;
-                switch(cmd.toUpperCase()) {
-                    case "MOVEFORWARD":
-                        mRobot.sendCommand(Mobbob.commands.MOVE_FORWARD.ordinal(), val);
-                        break;
-                    case "MOVEBACKWARD":
-                        mRobot.sendCommand(Mobbob.commands.MOVE_BACKWARD.ordinal(), val);
-                        break;
-                    case "TURNRIGHT":
-                        mRobot.sendCommand(Mobbob.commands.TURN_RIGHT.ordinal(), val);
-                        break;
-                    case "TURNLEFT":
-                        mRobot.sendCommand(Mobbob.commands.TURN_LEFT.ordinal(), val);
-                        break;
-                    case "SHAKEHEAD":
-                        mRobot.sendCommand(Mobbob.commands.SHAKE_HEAD.ordinal(), val);
-                        break;
-                    case "BOUNCE":
-                        mRobot.sendCommand(Mobbob.commands.BOUNCE.ordinal(), val);
-                        break;
-                    case "WOBBLE":
-                        mRobot.sendCommand(Mobbob.commands.WOBBLE.ordinal(), val);
-                        break;
-                    case "WOBBLELEFT":
-                        mRobot.sendCommand(Mobbob.commands.WOBBLE_LEFT.ordinal(), val);
-                        break;
-                    case "WOBBLERIGHT":
-                        mRobot.sendCommand(Mobbob.commands.WOBBLE_RIGHT.ordinal(), val);
-                        break;
-                    case "TAPFEET":
-                        mRobot.sendCommand(Mobbob.commands.TAP_FEET.ordinal(), val);
-                        break;
-                    case "TAPFOOTLEFT":
-                        mRobot.sendCommand(Mobbob.commands.TAP_FOOT_LEFT.ordinal(), val);
-                        break;
-                    case "TAPFOOTRIGHT":
-                        mRobot.sendCommand(Mobbob.commands.TAP_FOOT_RIGHT.ordinal(), val);
-                        break;
-                    case "SHAKELEGS":
-                        mRobot.sendCommand(Mobbob.commands.SHAKE_LEGS.ordinal(), val);
-                        break;
-                    case "SHAKELEGLEFT":
-                        mRobot.sendCommand(Mobbob.commands.SHAKE_LEG_LEFT.ordinal(), val);
-                        break;
-                    case "SHAKELEGRIGHT":
-                        mRobot.sendCommand(Mobbob.commands.SHAKE_LEG_RIGHT.ordinal(), val);
-                        break;
-                    default:
-                        Log.e(TAG, "Unrecognized cmd:" + cmd);
-                        break;
-                }
-                return 0;
-            }
-        };
-        context.property("Robot", Robot);
-        context.evaluateScript(generatedCode);
-        mRobot.sendCommand(Mobbob.commands.STOP.ordinal(), 0);
-        return 0;
-    }
-
     private final CodeGenerationRequest.CodeGeneratorCallback mCodeGeneratorCallback =
             new CodeGenerationRequest.CodeGeneratorCallback() {
         @Override
         public void onFinishCodeGeneration(final String generatedCode) {
             Log.i(TAG, "generatedCode:\n" + generatedCode);
             Toast.makeText(getApplicationContext(), generatedCode, Toast.LENGTH_LONG).show();
-            parseCode(generatedCode);
+            mParser.parseCode(mRobot, generatedCode);
         }
     };
 
