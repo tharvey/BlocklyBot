@@ -230,7 +230,7 @@ public class BLEScanActivity extends AppCompatActivity {
                 for (BluetoothGattService gattService : mBluetoothLeService.getSupportedGattServices()) {
                     Log.i(TAG, "service:" + gattService.getUuid().toString());
                     boolean found = false;
-//                    if (gattService.getUuid().equals(UUID.fromString(Bluno.DFROBOT_BLUNO_SERVICE)))
+                    if (gattService.getUuid().equals(UUID.fromString(Bluno.DFROBOT_BLUNO_SERVICE)))
                         found = true;
                     if (found) {
                         Log.i(TAG, "Found supported device:" + mDevice);
