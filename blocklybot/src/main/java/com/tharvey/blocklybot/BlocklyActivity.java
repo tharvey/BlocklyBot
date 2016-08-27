@@ -17,6 +17,7 @@ package com.tharvey.blocklybot;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -48,13 +49,6 @@ public class BlocklyActivity extends AbstractBlocklyActivity {
         final Intent intent = getIntent();
         mParser = new JSParser();
         mRobot = Mobbob.getMobob();
-        if (mRobot != null) {
-            Log.i(TAG, "Blockly connected to " + mRobot.toString());
-        }
-
-        // getActionBar() returns null when using blocklyTheme
-//        getActionBar().setTitle(mDeviceName + ":" + mDeviceAddress);
-//        getActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     public static final String SAVED_WORKSPACE_FILENAME = "robot_workspace.xml";
@@ -84,6 +78,19 @@ public class BlocklyActivity extends AbstractBlocklyActivity {
     @Override
     public void onSaveWorkspace() {
         saveWorkspaceToAppDir(SAVED_WORKSPACE_FILENAME);
+    }
+
+    // override restoreActionBar to set Title (setting it in OnCreate is too early)
+    @Override
+    protected void restoreActionBar() {
+        super.restoreActionBar();
+        ActionBar action = getSupportActionBar();
+        if (action != null) {
+            if (mRobot != null)
+                action.setTitle("Blockly: " + mRobot.getName());
+            else
+                action.setTitle("Blockly: not connected");
+        }
     }
 
     @Override

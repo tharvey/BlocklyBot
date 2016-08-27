@@ -2,6 +2,7 @@ package com.tharvey.blocklybot;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -20,8 +21,13 @@ public class RobotControlActivity extends AppCompatActivity {
 
         final Intent intent = getIntent();
         mRobot = Mobbob.getMobob();
-        if (mRobot != null)
-            getSupportActionBar().setTitle("Control Panel: " + mRobot.getName());
+        final ActionBar action = getSupportActionBar();
+        if (action != null) {
+            if (mRobot != null)
+                action.setTitle("Remote Control: " + mRobot.getName());
+            else
+                action.setTitle("Remote Control: not connected");
+        }
     }
 
     public void onClick(View v) {
