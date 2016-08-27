@@ -182,15 +182,16 @@ public class BluetoothScanActivity extends AppCompatActivity {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 Log.i(TAG, "Services discovered for " + device);
                 Parcelable[] uuidExtra = intent.getParcelableArrayExtra(BluetoothDevice.EXTRA_UUID);
-                for (int i=0; i<uuidExtra.length; i++) {
-                    Log.i(TAG, "Service:" + uuidExtra[i].toString());
-                    // Well-known SPP UUID for RFComm
-                    if (uuidExtra[i].toString().equalsIgnoreCase(SPP_UUID)) {
-                        Log.i(TAG, "Found compatible device: " + device);
-                        mDeviceListAdapter.addDevice(device);
-                        mDeviceListAdapter.notifyDataSetChanged();
+                if (uuidExtra != null) {
+                    for (int i=0; i<uuidExtra.length; i++) {
+                        Log.i(TAG, "Service:" + uuidExtra[i].toString());
+                        // Well-known SPP UUID for RFComm
+                        if (uuidExtra[i].toString().equalsIgnoreCase(SPP_UUID)) {
+                            Log.i(TAG, "Found compatible device: " + device);
+                            mDeviceListAdapter.addDevice(device);
+                            mDeviceListAdapter.notifyDataSetChanged();
+                        }
                     }
-
                 }
             }
         }
