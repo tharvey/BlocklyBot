@@ -13,5 +13,76 @@
     "nextStatement": null,
     "colour": 160,
     "tooltip": "Speaks a word or phrase"
+  },
+  {
+    "type": "speech_listen",
+    "message0": "listen %1 %2 %3",
+    "args0": [
+      {
+        "type": "field_dropdown",
+        "name": "CMD",
+        "options": [
+          [
+            "move forward",
+            "move forward"
+          ],
+          [
+            "move backward",
+            "move backward"
+          ],
+          [
+            "turn right",
+            "turn right"
+          ],
+          [
+            "turn left",
+            "turn left"
+          ],
+          [
+            "stop",
+            "stop"
+          ],
+          [
+            "shake",
+            "shake"
+          ]
+        ]
+      },
+      {
+        "type": "input_dummy"
+      },
+      {
+        "type": "input_statement",
+        "name": "FUNC"
+      }
+    ],
+    "inputsInline": true,
+    "colour": 65,
+    "tooltip": "",
+    "helpUrl": "http://www.example.com/",
+    "blockFactory": "https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#r58gh7"
+  },
+  {
+    "type": "speech_listen_text",
+    "message0": "listen %1 %2 %3",
+    "args0": [
+      {
+        "type": "field_input",
+        "name": "CMD",
+        "text": "command"
+      },
+      {
+        "type": "input_dummy"
+      },
+      {
+        "type": "input_statement",
+        "name": "FUNC"
+      }
+    ],
+    "inputsInline": true,
+    "colour": 65,
+    "tooltip": "",
+    "helpUrl": "http://www.example.com/",
+    "blockFactory": "https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#r58gh7"
   }
 ]

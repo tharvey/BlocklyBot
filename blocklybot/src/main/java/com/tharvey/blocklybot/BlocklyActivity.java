@@ -199,7 +199,15 @@ public class BlocklyActivity extends AbstractBlocklyActivity {
 
     @Override
     protected void onInitBlankWorkspace() {
-        // Initialize variable names.
+        getController().loadWorkspaceContents(
+                "<xml xmlns='http://www.w3.org/1999/xhtml'>\n" +
+                "  <block type='start' id='startblock' " +
+                "    x='0' y='5' " +
+                "    inline='false' " +
+                "    deletable='false' >" +
+                "  </block>" +
+                "</xml>"
+        );
     }
 
     @Override

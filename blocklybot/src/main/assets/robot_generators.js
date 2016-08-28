@@ -41,6 +41,24 @@ Blockly.JavaScript['speech_speak'] = function(block) {
   return 'Speak("' + block.getFieldValue('TEXT') + '", \'block_id_' + block.id + '\');\n';
 };
 
+/*
+ * Event Handlers
+ */
+Blockly.JavaScript['start'] = function(block) {
+    var value = Blockly.JavaScript.statementToCode(block, 'FUNC')
+    return 'function start() {\n' + value + '};\n';
+};
+
+Blockly.JavaScript['speech_listen'] = function(block) {
+    var value = Blockly.JavaScript.statementToCode(block, 'FUNC')
+    return 'Listen("' + block.getFieldValue('CMD') + '", function() {\n' + value + '});';
+};
+
+Blockly.JavaScript['speech_listen_text'] = function(block) {
+    var value = Blockly.JavaScript.statementToCode(block, 'FUNC')
+    return 'Listen("' + block.getFieldValue('CMD') + '", function() {\n' + value + '});';
+};
+
 /**
  * The generated code for robot blocks includes block ID strings.  These are useful for
  * highlighting the currently running block, but that behaviour is not supported in Android Blockly

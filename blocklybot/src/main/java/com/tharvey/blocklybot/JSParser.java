@@ -6,21 +6,73 @@ import android.util.Log;
 import org.liquidplayer.webkit.javascriptcore.JSContext;
 import org.liquidplayer.webkit.javascriptcore.JSFunction;
 
+import java.io.BufferedReader;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Created by tharvey on 8/27/16.
  */
 public class JSParser {
     private final static String TAG = JSParser.class.getSimpleName();
 
-    private Speak mSpeak;
+    private Activity mActivity;
 
     public JSParser(Activity activity) {
-        mSpeak = new Speak(activity);
+        mActivity = activity;
     }
 
     public final int parseCode(final Mobbob mobbob, String generatedCode) {
         final Mobbob robot = mobbob;
-        final String code = generatedCode;
+        final Speak speak = new Speak(mActivity);
+        final HashMap<String, JSFunction> listenMap = new HashMap<String, JSFunction>();
+        final List<String> phrases = new ArrayList<String>();
+
+        /* Preparse code:
+         *  - remove any root blocks that are not start blocks (TODO: get this done by blockly)
+         *  - capture all Listen("<phrase>",*) calls to add phrase to keyword search list
+         *  - add a footer: call start()
+         */
+        BufferedReader bufReader = new BufferedReader(new StringReader(generatedCode));
+        String line = null;
+        String newCode = "";
+        try {
+            while( (line = bufReader.readLine()) != null) {
+                if (line.startsWith("function start()")
+                    || line.startsWith("  ")
+                    || line.startsWith("}")
+                    || line.startsWith("Listen(")
+                    || (line.length() == 0)
+                   )
+                {
+                    Pattern p = Pattern.compile("Listen\\(\"([^\"]*)\",.*");
+                    Matcher m = p.matcher(line);
+                    if (m.find())
+                        phrases.add(m.group(1));
+                    newCode += line + "\n";
+                }
+            }
+        } catch (Exception e) {
+        }
+        newCode += "\nstart();\n";
+        Log.i(TAG, "newCode:\n" + newCode);
+        final String code = newCode;
+
+        final Listen listen = new Listen(mActivity, phrases, new IListen() {
+            @Override
+            public void onResult(String text) {
+                JSFunction func = listenMap.get(text);
+                Log.i(TAG, "Listen result for '" + text + "'");
+                if (func != null) {
+                    Log.i(TAG, "Calling JSFunction");
+                    func.call();
+                }
+            }
+        });
 
         Thread thread = new Thread() {
             @Override
@@ -81,8 +133,8 @@ public class JSParser {
                                 Log.e(TAG, "Unrecognized cmd:" + cmd);
                                 break;
                         }
+                        Log.i(TAG, "robot(" + cmd + "," + val + ")");
                         if (cmd != -1 && robot != null) {
-                            Log.i(TAG, "robot(" + cmd + "," + val + ")");
                             robot.doCommand(cmd, val);
                         }
                         return 0;
@@ -93,11 +145,22 @@ public class JSParser {
                 JSFunction Speak = new JSFunction(context, "Speak") {
                     public Integer Speak(String text) {
                         Log.i(TAG, "speak(" + text + ")");
-                        mSpeak.doCommand(text);
+                        listen.pause();
+                        speak.doCommand(text);
+                        listen.resume();
                         return 0;
                     }
                 };
                 context.property("Speak", Speak);
+
+                JSFunction Listen = new JSFunction(context, "Listen") {
+                    public Integer Listen(String text, JSFunction func) {
+                        Log.i(TAG, "listen(" + text + ")");
+                        listenMap.put(text, func);
+                        return 0;
+                    }
+                };
+                context.property("Listen", Listen);
 
                 context.evaluateScript(code);
                 if (robot != null)

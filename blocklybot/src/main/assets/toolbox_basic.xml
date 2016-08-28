@@ -32,6 +32,12 @@
         <block type="speech_speak">
             <field name="TEXT">hello</field>
         </block>
+        <block type="speech_listen">
+            <field name="CMD">moveForward</field>
+        </block>
+        <block type="speech_listen_text">
+            <field name="CMD">command</field>
+        </block>
     </category>
     <category name="Loops" colour="120">
         <block type="robot_repeat_internal">

@@ -1,5 +1,21 @@
 [
   {
+    "type": "start",
+    "message0": "start %1 %2",
+    "args0": [
+      {
+        "type": "input_dummy"
+      },
+      {
+        "type": "input_statement",
+        "name": "FUNC"
+      }
+    ],
+    "inputsInline": true,
+    "colour": 65,
+    "tooltip": "start block"
+  },
+  {
     "type": "robot_move_internal",
     "message0": "move %1 %2",
     "args0": [
