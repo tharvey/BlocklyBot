@@ -66,7 +66,8 @@ public class BLEScanActivity extends AppCompatActivity {
     private Handler mHandler;
     private ListView m_listView;
     private Activity m_Activity;
-    private BluetoothDevice mDevice;
+    private ArrayList<BluetoothDevice> mQueriedDevices = new ArrayList<BluetoothDevice>();
+    private ArrayList<BluetoothDevice> mQueryQueue = new ArrayList<BluetoothDevice>();
 
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
     private static final int REQUEST_ENABLE_BT = 1;
@@ -117,8 +118,9 @@ public class BLEScanActivity extends AppCompatActivity {
         m_listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                mBluetoothLeService.disconnect();
-                connect(mDeviceListAdapter.getDevice(position));
+                final BluetoothDevice device = mDeviceListAdapter.getDevice(position);
+                Log.i(TAG, "Connecting to " + device.getAddress() + ":" + device.getName());
+                connect(device);
             }
         });
 
@@ -134,8 +136,12 @@ public class BLEScanActivity extends AppCompatActivity {
         public void onServiceConnected(ComponentName componentName, IBinder service) {
             Log.i(TAG, "mServiceConnection onServiceConnected");
             mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
-            if (!mBluetoothLeService.initialize()) {
+            if (mBluetoothLeService.initialize()) {
+                scanLeDevice(true);
+                invalidateOptionsMenu();
+            } else {
                 Log.e(TAG, "Unable to initialize Bluetooth");
+                mBluetoothLeService = null;
             }
         }
 
@@ -149,7 +155,7 @@ public class BLEScanActivity extends AppCompatActivity {
 
     // Connect to a robot
     private int connect(final BluetoothDevice device) {
-        Log.i(TAG, "Connecting to Bluno " + device);
+        Log.i(TAG, "Connecting to Bluno " + device.getAddress() + ":" + device.getName());
         Thread thread = new Thread() {
             @Override
             public void run() {
@@ -161,7 +167,7 @@ public class BLEScanActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }
-                Log.i(TAG, "Connected to " + device.getName() + ":" + device.getAddress());
+                Log.i(TAG, "Connected to " + device.getAddress() + ":" + device.getName());
                 SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(m_Activity);
                 String controller = sharedPref.getString("pref_controlType", "");
                 if (controller.equals("panel")) {
@@ -175,9 +181,11 @@ public class BLEScanActivity extends AppCompatActivity {
         };
 
         scanLeDevice(false);
+        mBluetoothLeService.close();
+        mBluetoothLeService.disconnect();
+
         Toast.makeText(getApplicationContext(),
-                "Connecting to " + device.getName() + ":" + device.getAddress(),
-                Toast.LENGTH_LONG).show();
+                "Connecting to " + device.getName(), Toast.LENGTH_LONG).show();
         thread.start();
         return 0;
     }
@@ -203,7 +211,10 @@ public class BLEScanActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.menu_scan:
                 if (!mScanning) {
+                    mQueriedDevices.clear();
+                    mQueryQueue.clear();
                     mDeviceListAdapter.clear();
+                    mDeviceListAdapter.notifyDataSetChanged();
                     scanLeDevice(true);
                 }
                 break;
@@ -215,6 +226,16 @@ public class BLEScanActivity extends AppCompatActivity {
         return true;
     }
 
+    private void queryNext() {
+        if (mQueryQueue.size() > 0) {
+            BluetoothDevice device = mQueryQueue.get(0);
+            Log.i(TAG, "querying services for " + device.getAddress() + ":" + device.getName());
+            mBluetoothLeService.connect(device.getAddress());
+        } else {
+            Log.i(TAG, "query queue complete");
+        }
+    }
+
     // Handles various events fired by the Service:
     //   ACTION_GATT_CONNECTED: connected to a GATT server.
     //   ACTION_GATT_DISCONNECTED: disconnected from a GATT server.
@@ -224,7 +245,8 @@ public class BLEScanActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
-            Log.d(TAG, "mGattUpdateReceiver->onReceive->action=" + action);
+            BluetoothDevice device = intent.getParcelableExtra(BluetoothLeService.EXTRA_DEVICE);
+            Log.d(TAG, "Received " + action + " from " + device.getAddress() + ":" + device.getName());
             if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 // Show all the supported services and characteristics on the user interface.
                 for (BluetoothGattService gattService : mBluetoothLeService.getSupportedGattServices()) {
@@ -233,8 +255,7 @@ public class BLEScanActivity extends AppCompatActivity {
                     if (gattService.getUuid().equals(UUID.fromString(Bluno.DFROBOT_BLUNO_SERVICE)))
                         found = true;
                     if (found) {
-                        Log.i(TAG, "Found supported device:" + mDevice);
-                        mDeviceListAdapter.addDevice(mDevice);
+                        mDeviceListAdapter.addDevice(device);
                         mDeviceListAdapter.notifyDataSetChanged();
                     }
                     List<BluetoothGattCharacteristic> gattCharacteristics = gattService.getCharacteristics();
@@ -244,10 +265,12 @@ public class BLEScanActivity extends AppCompatActivity {
                         Log.i(TAG, "  char:" + gattCharacteristic.getUuid().toString());
                     }
                 }
+                mBluetoothLeService.disconnect();
+            } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
+                mQueryQueue.remove(device);
+                queryNext();
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
-                Log.d(TAG, "ACTION_DATA_AVAILABLE:" + action + " EXTRA_DATA:" + intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
-            } else {
-                Log.d(TAG, "mGattUpdateReceiver->onReceive->action=" + action);
+                Log.d(TAG, "Data Available: " + intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
             }
         }
     };
@@ -258,7 +281,8 @@ public class BLEScanActivity extends AppCompatActivity {
         super.onStop();
         scanLeDevice(false);
         unbindService(mServiceConnection);
-        unregisterReceiver(mReceiver);
+        if (true)
+            unregisterReceiver(mReceiver);
     }
 
     @Override
@@ -274,20 +298,24 @@ public class BLEScanActivity extends AppCompatActivity {
                 startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
             }
         }
-        mDeviceListAdapter.clear();
 
         // setup characteristic receiver
-        final IntentFilter filter = new IntentFilter();
-        filter.addAction(BluetoothLeService.ACTION_GATT_CONNECTED);
-        filter.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED);
-        filter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED);
-        filter.addAction(BluetoothLeService.ACTION_DATA_AVAILABLE);
-        registerReceiver(mReceiver, filter);
+        if (true) {
+            final IntentFilter filter = new IntentFilter();
+            filter.addAction(BluetoothLeService.ACTION_GATT_CONNECTED);
+            filter.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED);
+            filter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED);
+            filter.addAction(BluetoothLeService.ACTION_DATA_AVAILABLE);
+            registerReceiver(mReceiver, filter);
+        }
+
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
 
-        scanLeDevice(true);
-        invalidateOptionsMenu();
+        mQueriedDevices.clear();
+        mQueryQueue.clear();
+        mDeviceListAdapter.clear();
+        mDeviceListAdapter.notifyDataSetChanged();
     }
 
     // handle result of enable bluetooth request (above)
@@ -319,6 +347,7 @@ public class BLEScanActivity extends AppCompatActivity {
         Log.d(TAG, "scanLeDevice(" + enable + ") scanning:" + mScanning);
         mHandler.removeCallbacks(scanStopHandler);
         if (enable && !mScanning) {
+            Log.d(TAG, "posting delayed stop handler");
             mHandler.postDelayed(scanStopHandler, SCAN_PERIOD);
             mScanning = true;
             // Note that using service filters does not work
@@ -335,9 +364,22 @@ public class BLEScanActivity extends AppCompatActivity {
 
         @Override
         public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
-            Log.i(TAG, "Found device " + device + " - querying services");
-            mDevice = device;
-            mBluetoothLeService.connect(device.getAddress());
+            if (device != null && mBluetoothLeService != null) {
+                if (false) {
+                    mDeviceListAdapter.addDevice(device);
+                    mDeviceListAdapter.notifyDataSetChanged();
+                } else {
+                    if (!mQueriedDevices.contains(device)) {
+                        mQueriedDevices.add(device);
+                        Log.i(TAG, "Found device " + device.getAddress() + ":" + device.getName());
+                        mQueryQueue.add(device);
+                        if (mQueryQueue.size() == 1)
+                            queryNext();
+                    }
+                }
+            } else {
+                Log.e(TAG, "null device");
+            }
         }
     };
 
@@ -358,6 +400,7 @@ public class BLEScanActivity extends AppCompatActivity {
 
         public void addDevice(BluetoothDevice device) {
             if(!mDevices.contains(device)) {
+                Log.i(TAG, "Adding:" + device.getAddress() + ":" + device.getName());
                 mDevices.add(device);
             }
         }
