@@ -83,7 +83,7 @@ public class RobotControlActivity extends AppCompatActivity {
                 break;
         }
         if (mRobot != null)
-            mRobot.sendCommand(cmd, 1);
+            mRobot.doCommand(cmd, 1);
     }
 
     @Override

@@ -47,10 +47,26 @@ public abstract class Mobbob extends Robot {
         start();
     }
 
-    public void sendCommand(int command, int value) {
+    /** synchronous - block until command complete */
+    public void doCommand(int nCmd, int nVal) {
+        if (nCmd < commands.CMD_MAX.ordinal()) {
+            String cmd = command_str[nCmd];
+            Log.i(TAG, "Mobob cmd:" + cmd + " val:" + nVal);
+            mLastRX = "";
+            serialSend("<" + cmd + "," + nVal + ">");
+            while (!mLastRX.equals("<" + cmd + ">")) {
+                SystemClock.sleep(100);
+            }
+            Log.i(TAG, "done " + cmd);
+        }
+    }
+
+    /** async - add command to the queue */
+    public void queueCommand(int command, int value) {
         mHandler.sendMessage(mHandler.obtainMessage(command, value, 0));
     }
 
+    /** create a background thread who's looper plays commands from the queue */
     void start() {
         HandlerThread handlerThread = new HandlerThread("HandlerThread");
         handlerThread.start();
@@ -59,15 +75,7 @@ public abstract class Mobbob extends Robot {
         mHandler = new Handler(handlerThread.getLooper()) {
             @Override
             public void handleMessage(Message msg) {
-                if (msg.what < commands.CMD_MAX.ordinal()) {
-                    String cmd = command_str[msg.what];
-                    Log.d(TAG, "Mobob cmd:" + cmd + " val:" + msg.arg1);
-                    serialSend("<" + cmd + "," + msg.arg1 + ">");
-                    while (!mLastRX.equals("<" + cmd + ">")) {
-                        SystemClock.sleep(100);
-                    }
-                    Log.d(TAG, "done " + cmd);
-                }
+                doCommand(msg.what, msg.arg1);
             }
         };
     }
