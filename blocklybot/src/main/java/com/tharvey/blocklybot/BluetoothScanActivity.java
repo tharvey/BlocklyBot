@@ -113,6 +113,7 @@ public class BluetoothScanActivity extends AppCompatActivity {
         if (false /* show paired devices */) {
             Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
             for (BluetoothDevice device : pairedDevices) {
+                Log.i(TAG, "Adding " + device);
                 mDeviceListAdapter.addDevice(device);
                 mDeviceListAdapter.notifyDataSetChanged();
             }
@@ -165,6 +166,7 @@ public class BluetoothScanActivity extends AppCompatActivity {
                 Log.d(TAG, "Device found: " + device.toString());
                 if (false) {
                     /* show all discovered bluetooth devices */
+                    Log.i(TAG, "clearing list");
                     mDeviceListAdapter.addDevice(device);
                     mDeviceListAdapter.notifyDataSetChanged();
                 } else {
@@ -187,7 +189,7 @@ public class BluetoothScanActivity extends AppCompatActivity {
                         Log.i(TAG, "Service:" + uuidExtra[i].toString());
                         // Well-known SPP UUID for RFComm
                         if (uuidExtra[i].toString().equalsIgnoreCase(SPP_UUID)) {
-                            Log.i(TAG, "Found compatible device: " + device);
+                            Log.i(TAG, "Found compatible device: Adding " + device);
                             mDeviceListAdapter.addDevice(device);
                             mDeviceListAdapter.notifyDataSetChanged();
                         }
@@ -218,7 +220,9 @@ public class BluetoothScanActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.menu_scan:
                 if (!mBluetoothAdapter.isDiscovering()) {
+                    Log.i(TAG, "clearing list");
                     mDeviceListAdapter.clear();
+                    mDeviceListAdapter.notifyDataSetChanged();
                     mBluetoothAdapter.startDiscovery();
                 }
                 break;
@@ -260,7 +264,11 @@ public class BluetoothScanActivity extends AppCompatActivity {
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         registerReceiver(mReceiver, filter);
 
+/* lets leave the list populated
+        Log.i(TAG, "clearing list");
         mDeviceListAdapter.clear();
+        mDeviceListAdapter.notifyDataSetChanged();
+*/
         mBluetoothAdapter.startDiscovery();
         invalidateOptionsMenu();
     }
