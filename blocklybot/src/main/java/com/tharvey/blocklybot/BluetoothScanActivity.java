@@ -113,7 +113,6 @@ public class BluetoothScanActivity extends AppCompatActivity {
         if (false /* show paired devices */) {
             Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
             for (BluetoothDevice device : pairedDevices) {
-                Log.i(TAG, "Adding " + device);
                 mDeviceListAdapter.addDevice(device);
                 mDeviceListAdapter.notifyDataSetChanged();
             }
@@ -163,10 +162,9 @@ public class BluetoothScanActivity extends AppCompatActivity {
                 // Get the BluetoothDevice object from the Intent
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 // Add the name and address to an array adapter to show in a ListView
-                Log.d(TAG, "Device found: " + device.toString());
+                Log.d(TAG, "Device found: " + device.getName() + ":" + device.getAddress());
                 if (false) {
                     /* show all discovered bluetooth devices */
-                    Log.i(TAG, "clearing list");
                     mDeviceListAdapter.addDevice(device);
                     mDeviceListAdapter.notifyDataSetChanged();
                 } else {
@@ -182,14 +180,13 @@ public class BluetoothScanActivity extends AppCompatActivity {
             // When SDP records are found from the call to fetchUuidsWithSdp()
             else if (BluetoothDevice.ACTION_UUID.equals(action)) {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                Log.i(TAG, "Services discovered for " + device);
+                Log.i(TAG, "Services discovered for " + device.getName() + ":" + device.getAddress());
                 Parcelable[] uuidExtra = intent.getParcelableArrayExtra(BluetoothDevice.EXTRA_UUID);
                 if (uuidExtra != null) {
                     for (int i=0; i<uuidExtra.length; i++) {
                         Log.i(TAG, "Service:" + uuidExtra[i].toString());
                         // Well-known SPP UUID for RFComm
                         if (uuidExtra[i].toString().equalsIgnoreCase(SPP_UUID)) {
-                            Log.i(TAG, "Found compatible device: Adding " + device);
                             mDeviceListAdapter.addDevice(device);
                             mDeviceListAdapter.notifyDataSetChanged();
                         }
@@ -301,6 +298,7 @@ public class BluetoothScanActivity extends AppCompatActivity {
 
         public void addDevice(BluetoothDevice device) {
             if(!mDevices.contains(device)) {
+                Log.i(TAG, "Adding:" + device.getAddress() + ":" + device.getName());
                 mDevices.add(device);
             }
         }
