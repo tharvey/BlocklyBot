@@ -66,6 +66,7 @@ public class BLEScanActivity extends AppCompatActivity {
     private Handler mHandler;
     private ListView m_listView;
     private Activity m_Activity;
+    SharedPreferences mPreferences;
     private ArrayList<BluetoothDevice> mQueriedDevices = new ArrayList<BluetoothDevice>();
     private ArrayList<BluetoothDevice> mQueryQueue = new ArrayList<BluetoothDevice>();
 
@@ -81,6 +82,7 @@ public class BLEScanActivity extends AppCompatActivity {
         setContentView(R.layout.activity_devicelist);
         m_Activity = this;
         mHandler = new Handler();
+        mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
@@ -168,8 +170,7 @@ public class BLEScanActivity extends AppCompatActivity {
                     }
                 }
                 Log.i(TAG, "Connected to " + device.getAddress() + ":" + device.getName());
-                SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(m_Activity);
-                String controller = sharedPref.getString("pref_controlType", "");
+                String controller = mPreferences.getString("pref_controlType", "");
                 if (controller.equals("panel")) {
                     final Intent intent = new Intent(m_Activity, RobotControlActivity.class);
                     startActivity(intent);
@@ -281,7 +282,7 @@ public class BLEScanActivity extends AppCompatActivity {
         super.onStop();
         scanLeDevice(false);
         unbindService(mServiceConnection);
-        if (true)
+        if (mPreferences.getBoolean("pref_filterincompatible", false))
             unregisterReceiver(mReceiver);
     }
 
@@ -300,7 +301,7 @@ public class BLEScanActivity extends AppCompatActivity {
         }
 
         // setup characteristic receiver
-        if (true) {
+        if (mPreferences.getBoolean("pref_filterincompatible", false)) {
             final IntentFilter filter = new IntentFilter();
             filter.addAction(BluetoothLeService.ACTION_GATT_CONNECTED);
             filter.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED);
@@ -365,7 +366,7 @@ public class BLEScanActivity extends AppCompatActivity {
         @Override
         public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
             if (device != null && mBluetoothLeService != null) {
-                if (false) {
+                if (!mPreferences.getBoolean("pref_filterincompatible", false)) {
                     mDeviceListAdapter.addDevice(device);
                     mDeviceListAdapter.notifyDataSetChanged();
                 } else {

@@ -5,6 +5,11 @@
         android:title="@string/pref_autoattach"
         android:summary="@string/pref_autoattach_summ"
         android:defaultValue="true" />
+    <CheckBoxPreference
+        android:key="pref_filterincompatible"
+        android:title="@string/pref_filterincompatible"
+        android:summary="@string/pref_filterincompatible_summ"
+        android:defaultValue="false" />
     <ListPreference
         android:key="pref_protocolType"
         android:title="@string/pref_protocolType"

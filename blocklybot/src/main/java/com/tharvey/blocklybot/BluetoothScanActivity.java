@@ -62,6 +62,7 @@ public class BluetoothScanActivity extends AppCompatActivity {
     private Handler mHandler;
     private ListView m_listView;
     private Activity m_Activity;
+    SharedPreferences mPreferences;
 
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
     private static final int REQUEST_ENABLE_BT = 1;
@@ -73,6 +74,7 @@ public class BluetoothScanActivity extends AppCompatActivity {
         setContentView(R.layout.activity_devicelist);
         m_Activity = this;
         mHandler = new Handler();
+        mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
@@ -133,8 +135,7 @@ public class BluetoothScanActivity extends AppCompatActivity {
                     }
                 }
                 Log.i(TAG, "Connected to " + device.getName() + ":" + device.getAddress());
-                SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(m_Activity);
-                String controller = sharedPref.getString("pref_controlType", "");
+                String controller = mPreferences.getString("pref_controlType", "");
                 if (controller.equals("panel")) {
                     final Intent intent = new Intent(m_Activity, RobotControlActivity.class);
                     startActivity(intent);
@@ -163,7 +164,7 @@ public class BluetoothScanActivity extends AppCompatActivity {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 // Add the name and address to an array adapter to show in a ListView
                 Log.d(TAG, "Device found: " + device.getName() + ":" + device.getAddress());
-                if (false) {
+                if (!mPreferences.getBoolean("pref_filterincompatible", false)) {
                     /* show all discovered bluetooth devices */
                     mDeviceListAdapter.addDevice(device);
                     mDeviceListAdapter.notifyDataSetChanged();
