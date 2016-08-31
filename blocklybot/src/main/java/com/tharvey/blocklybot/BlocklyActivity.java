@@ -148,18 +148,17 @@ public class BlocklyActivity extends AbstractBlocklyActivity {
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        Log.d(TAG, "onPause()");
-        super.onPause();
+    protected void onStop() {
+        Log.d(TAG, "onStop()");
+        super.onStop();
         if (mRobot != null)
             mRobot.disconnect();
     }
 
     @Override
-    protected void onResume() {
-        Log.d(TAG, "onResume()");
-        super.onResume();
+    protected void onStart() {
+        Log.d(TAG, "onStart()");
+        super.onStart();
         if (mRobot != null)
             mRobot.connect();
     }

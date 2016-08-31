@@ -109,17 +109,17 @@ public class RobotControlActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onPause() {
-        Log.d(TAG, "onPause()");
-        super.onPause();
+    protected void onStop() {
+        Log.d(TAG, "onStop()");
+        super.onStop();
         if (mRobot != null)
             mRobot.disconnect();
     }
 
     @Override
-    protected void onResume() {
-        Log.d(TAG, "onResume()");
-        super.onResume();
+    protected void onStart() {
+        Log.d(TAG, "onStart()");
+        super.onStart();
         if (mRobot != null)
             mRobot.connect();
     }
