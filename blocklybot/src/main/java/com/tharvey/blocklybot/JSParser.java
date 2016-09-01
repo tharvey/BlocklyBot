@@ -90,14 +90,14 @@ public class JSParser {
                 };
                 context.property("Robot", Robot);
 
-                JSFunction Speech = new JSFunction(context, "Speech") {
-                    public Integer Speech(String text) {
-                        Log.i(TAG, "speech(" + text + ")");
+                JSFunction Speak = new JSFunction(context, "Speak") {
+                    public Integer Speak(String text) {
+                        Log.i(TAG, "speak(" + text + ")");
                         mSpeak.doCommand(text);
                         return 0;
                     }
                 };
-                context.property("Speech", Speech);
+                context.property("Speak", Speak);
 
                 context.evaluateScript(code);
                 if (robot != null)

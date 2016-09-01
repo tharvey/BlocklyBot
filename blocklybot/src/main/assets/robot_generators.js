@@ -38,7 +38,7 @@ Blockly.JavaScript['robot_repeat_internal'] = Blockly.JavaScript['controls_repea
 
 // Extensions to Blockly's language and JavaScript generator.
 Blockly.JavaScript['speech_speak'] = function(block) {
-  return 'Speech("' + block.getFieldValue('TEXT') + '", \'block_id_' + block.id + '\');\n';
+  return 'Speak("' + block.getFieldValue('TEXT') + '", \'block_id_' + block.id + '\');\n';
 };
 
 /**
