@@ -22,6 +22,9 @@
     <!-- Menu items -->
     <string name="menu_scan">Scan</string>
     <string name="menu_stop">Stop</string>
+    <string name="action_new">New</string>
+    <string name="action_switch">Switch</string>
+    <string name="action_rename">Rename Workspace</string>
 
     <string name="app_name">BlocklyBot</string>
 
