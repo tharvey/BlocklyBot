@@ -775,6 +775,9 @@ public class BlocklyController {
     public boolean trashRootBlock(Block block) {
         checkPendingEventsEmpty();
 
+        if (!block.isDeletable())
+            return false;
+
         boolean rootFoundAndRemoved = removeRootBlock(block, true);
         if (rootFoundAndRemoved) {
             mWorkspace.addBlockToTrash(block);
