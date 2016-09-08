@@ -21,6 +21,7 @@ public class JSParser {
     private final static String TAG = JSParser.class.getSimpleName();
 
     private Activity mActivity;
+    private Listen mListen;
 
     public JSParser(Activity activity) {
         mActivity = activity;
@@ -62,7 +63,7 @@ public class JSParser {
         Log.i(TAG, "newCode:\n" + newCode);
         final String code = newCode;
 
-        final Listen listen = new Listen(mActivity, phrases, new IListen() {
+        mListen = new Listen(mActivity, phrases, new IListen() {
             @Override
             public void onResult(String text) {
                 JSFunction func = listenMap.get(text);
@@ -145,9 +146,9 @@ public class JSParser {
                 JSFunction Speak = new JSFunction(context, "Speak") {
                     public Integer Speak(String text) {
                         Log.i(TAG, "speak(" + text + ")");
-                        listen.pause();
+                        mListen.pause();
                         speak.doCommand(text);
-                        listen.resume();
+                        mListen.resume();
                         return 0;
                     }
                 };
@@ -169,5 +170,11 @@ public class JSParser {
         };
         thread.start();
         return 0;
+    }
+
+    public void stop() {
+        Log.i(TAG, "stop()");
+        // TODO: how to stop script?
+        mListen.close();
     }
 }

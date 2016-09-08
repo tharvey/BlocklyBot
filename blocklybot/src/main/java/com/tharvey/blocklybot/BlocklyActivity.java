@@ -157,6 +157,8 @@ public class BlocklyActivity extends AbstractBlocklyActivity {
             onSaveWorkspace();
             alertNew.show();
             return true;
+        } else if (id == R.id.action_stop) {
+            mParser.stop();
         }
 
         return super.onOptionsItemSelected(item);
