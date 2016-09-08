@@ -41,6 +41,14 @@ Blockly.JavaScript['speech_speak'] = function(block) {
   return 'Speak("' + block.getFieldValue('TEXT') + '", \'block_id_' + block.id + '\');\n';
 };
 
+Blockly.JavaScript['audio_play_internal'] = function(block) {
+  return 'Audio("' + block.getFieldValue('SOUND') + '", \'block_id_' + block.id + '\');\n';
+};
+
+Blockly.JavaScript['audio_play'] = function(block) {
+  return 'Audio("' + block.getFieldValue('SOUND') + '", \'block_id_' + block.id + '\');\n';
+};
+
 /*
  * Event Handlers
  */

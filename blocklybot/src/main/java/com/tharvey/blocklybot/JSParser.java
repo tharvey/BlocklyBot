@@ -30,6 +30,7 @@ public class JSParser {
     public final int parseCode(final Mobbob mobbob, String generatedCode) {
         final Mobbob robot = mobbob;
         final Speak speak = new Speak(mActivity);
+        final Audio audio = new Audio(mActivity);
         final HashMap<String, JSFunction> listenMap = new HashMap<String, JSFunction>();
         final List<String> phrases = new ArrayList<String>();
 
@@ -153,6 +154,17 @@ public class JSParser {
                     }
                 };
                 context.property("Speak", Speak);
+
+                JSFunction Audio = new JSFunction(context, "Audio") {
+                    public Integer Audio(String text) {
+                        Log.i(TAG, "audio(" + text + ")");
+                        mListen.pause();
+                        audio.doCommand(text);
+                        mListen.resume();
+                        return 0;
+                    }
+                };
+                context.property("Audio", Audio);
 
                 JSFunction Listen = new JSFunction(context, "Listen") {
                     public Integer Listen(String text, JSFunction func) {

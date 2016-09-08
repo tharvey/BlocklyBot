@@ -47,7 +47,8 @@ public class BlocklyActivity extends AbstractBlocklyActivity {
     public static final String SAVED_WORKSPACE_FILENAME_DEFAULT = "robot_workspace.xml";
     private static final List<String> BLOCK_DEFINITIONS = Arrays.asList(new String[]{
             "robot_blocks.json",
-            "speech_blocks.json"
+            "speech_blocks.json",
+            "audio_blocks.json"
     });
     private static final List<String> JAVASCRIPT_GENERATORS = Arrays.asList(new String[]{
             "robot_generators.js"

@@ -39,6 +39,14 @@
             <field name="CMD">command</field>
         </block>
     </category>
+    <category name="Audio" colour="140">
+        <block type="audio_play">
+            <field name="SOUND">laser</field>
+        </block>
+        <block type="audio_play_internal">
+            <field name="SOUND">laser</field>
+        </block>
+    </category>
     <category name="Loops" colour="120">
         <block type="robot_repeat_internal">
             <field name="TIMES">4</field>
