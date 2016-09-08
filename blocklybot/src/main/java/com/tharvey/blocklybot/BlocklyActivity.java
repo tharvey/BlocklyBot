@@ -104,10 +104,17 @@ public class BlocklyActivity extends AbstractBlocklyActivity {
         }
     };
 
+    private void updateTitlebar() {
+        if (mRobot == null)
+            action.setTitle(workspaceName.replace(".xml", ""));
+        else
+            action.setTitle(mRobot.getName() + " : " + workspaceName.replace(".xml", ""));
+    }
+
     @Override
     public void onLoadWorkspace() {
         loadWorkspaceFromAppDir(workspaceName);
-        action.setTitle(workspaceName.replace(".xml", ""));
+        updateTitlebar();
     }
 
     @Override
@@ -119,9 +126,7 @@ public class BlocklyActivity extends AbstractBlocklyActivity {
     @Override
     protected void restoreActionBar() {
         super.restoreActionBar();
-        if (action != null) {
-            action.setTitle(workspaceName.replace(".xml", ""));
-        }
+        updateTitlebar();
     }
 
     @Override
@@ -232,7 +237,7 @@ public class BlocklyActivity extends AbstractBlocklyActivity {
         @Override
         public void onClick(DialogInterface dialogInterface, int i) {
             workspaceName = editTextNew.getText().toString() + ".xml";
-            action.setTitle(workspaceName.replace(".xml", ""));
+            updateTitlebar();
             onSaveWorkspace();
 
             View view = getCurrentFocus();
@@ -253,7 +258,7 @@ public class BlocklyActivity extends AbstractBlocklyActivity {
             if (from.renameTo(to)) {
                 from.delete();
                 workspaceName = newName;
-                action.setTitle(newName);
+                updateTitlebar();
             }
 
             View view = getCurrentFocus();
