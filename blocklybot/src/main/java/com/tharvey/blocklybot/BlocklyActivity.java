@@ -169,6 +169,10 @@ public class BlocklyActivity extends AbstractBlocklyActivity {
             return true;
         } else if (id == R.id.action_stop) {
             mParser.stop();
+        } else if (id == R.id.action_connect) {
+            DiscoverySelector dialog = new DiscoverySelector(this);
+            dialog.showDialog();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
