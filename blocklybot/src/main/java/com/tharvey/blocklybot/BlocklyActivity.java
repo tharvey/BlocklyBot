@@ -23,7 +23,6 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -58,8 +57,6 @@ public class BlocklyActivity extends AbstractBlocklyActivity {
 
     private ActionBar action;
     private File FILE_DIR;
-    private WorkspaceSelector dialog;
-    private AlertDialog.Builder alertBuilder;
     private AlertDialog alertNew, alertRename;
     private EditText editTextNew, editTextRename;
     private String workspaceName;
@@ -76,7 +73,7 @@ public class BlocklyActivity extends AbstractBlocklyActivity {
         editTextRename = new EditText(this);
 
         /* Text input alertBuilder for rename/new workspace actions */
-        alertBuilder = new AlertDialog.Builder(this);
+        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
         alertBuilder.setView(editTextRename);
         alertBuilder.setCancelable(true);
         alertBuilder.setTitle("Rename Current Workspace");
@@ -150,7 +147,7 @@ public class BlocklyActivity extends AbstractBlocklyActivity {
             return true;
         } else if (id == R.id.action_load) {
             /* Assign workspace selector dialogue for load action */
-            dialog = new WorkspaceSelector(this, FILE_DIR, ".xml");
+            WorkspaceSelector dialog = new WorkspaceSelector(this, FILE_DIR, ".xml");
             dialog.addFileListener(new WorkspaceSelector.FileSelectedListener() {
                 public void fileSelected(File file) {
                     Log.d(TAG, "loading workspace: " + file.toString());
