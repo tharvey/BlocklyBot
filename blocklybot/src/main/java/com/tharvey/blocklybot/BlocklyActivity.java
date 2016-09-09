@@ -149,7 +149,6 @@ public class BlocklyActivity extends AbstractBlocklyActivity {
             about.show();
             return true;
         } else if (id == R.id.action_load) {
-            onSaveWorkspace();
             /* Assign workspace selector dialogue for load action */
             dialog = new WorkspaceSelector(this, FILE_DIR, ".xml");
             dialog.addFileListener(new WorkspaceSelector.FileSelectedListener() {
@@ -166,7 +165,6 @@ public class BlocklyActivity extends AbstractBlocklyActivity {
             alertRename.show();
             return true;
         } else if (id == R.id.action_new) {
-            onSaveWorkspace();
             alertNew.show();
             return true;
         } else if (id == R.id.action_stop) {
@@ -245,7 +243,6 @@ public class BlocklyActivity extends AbstractBlocklyActivity {
         public void onClick(DialogInterface dialogInterface, int i) {
             workspaceName = editTextNew.getText().toString() + ".xml";
             updateTitlebar();
-            onSaveWorkspace();
 
             View view = getCurrentFocus();
             if (view != null) {
