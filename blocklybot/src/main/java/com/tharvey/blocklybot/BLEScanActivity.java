@@ -170,6 +170,7 @@ public class BLEScanActivity extends AppCompatActivity {
                     }
                 }
                 Log.i(TAG, "Connected to " + device.getAddress() + ":" + device.getName());
+                mRobot.serialSend("<FW,1>");
                 String controller = mPreferences.getString("pref_controlType", "");
                 if (controller.equals("panel")) {
                     final Intent intent = new Intent(m_Activity, RobotControlActivity.class);

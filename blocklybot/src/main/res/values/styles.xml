@@ -22,6 +22,12 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="AppCompatAlertDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="colorAccent">#5fa3d0</item>
+        <item name="android:textColorPrimary">#000000</item>
+        <item name="android:background">#FFFFFF</item>
+    </style>
+
     <style name="StylesDemoTheme" parent="BlocklyVerticalTheme">
         <item name="blockTextSize">34sp</item>
         <item name="android:textColorPrimary">@color/styleDemoTextPrimary</item>
