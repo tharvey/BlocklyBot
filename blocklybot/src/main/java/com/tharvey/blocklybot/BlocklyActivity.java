@@ -17,7 +17,9 @@ package com.tharvey.blocklybot;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -63,6 +65,7 @@ public class BlocklyActivity extends AbstractBlocklyActivity {
     private String workspaceName;
     static private Mobbob mRobot;
     static private JSParser mParser;
+    SharedPreferences mPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,8 +88,8 @@ public class BlocklyActivity extends AbstractBlocklyActivity {
         alertBuilder.setPositiveButton("OK", newWorkspace);
         alertNew = alertBuilder.create();
 
-        //TODO: Set a preference to keep track of last opened workspace and use here
-        workspaceName = SAVED_WORKSPACE_FILENAME_DEFAULT;
+        mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        workspaceName = mPreferences.getString("pref_lastWorkspace", SAVED_WORKSPACE_FILENAME_DEFAULT);
 
         mParser = new JSParser(this);
         mRobot = Mobbob.getMobob();
@@ -110,6 +113,9 @@ public class BlocklyActivity extends AbstractBlocklyActivity {
             action.setTitle(workspaceName.replace(".xml", ""));
         else
             action.setTitle(mRobot.getName() + " : " + workspaceName.replace(".xml", ""));
+        SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putString("pref_lastWorkspace", workspaceName);
+        editor.commit();
     }
 
     @Override
