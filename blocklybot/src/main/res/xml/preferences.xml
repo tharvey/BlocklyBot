@@ -9,14 +9,7 @@
         android:key="pref_filterincompatible"
         android:title="@string/pref_filterincompatible"
         android:summary="@string/pref_filterincompatible_summ"
-        android:defaultValue="false" />
-    <ListPreference
-        android:key="pref_protocolType"
-        android:title="@string/pref_protocolType"
-        android:dialogTitle="@string/pref_protocolType"
-        android:entries="@array/pref_protocolTypes_entries"
-        android:entryValues="@array/pref_protocolTypes_values"
-        android:defaultValue="@string/pref_protocolType_default" />
+        android:defaultValue="true" />
     <ListPreference
         android:key="pref_controlType"
         android:title="@string/pref_controlType"
