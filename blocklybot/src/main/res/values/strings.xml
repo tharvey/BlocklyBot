@@ -36,6 +36,10 @@
     <string name="pref_autoattach_summ">Auto Attach to the previously selected device on startup</string>
     <string name="pref_filterincompatible">Filter Device List by compatibility</string>
     <string name="pref_filterincompatible_summ">Filter incompatible devices from discovery (takes longer to scan)</string>
+    <string name="pref_scanBT">Scan Bluetooth</string>
+    <string name="pref_scanBT_summ">Scan for Bluetooth devices</string>
+    <string name="pref_scanBLE">Scan Bluetooth Low Energy</string>
+    <string name="pref_scanBLE_summ">Scan for Bluetooth Low Engergy (BLE) devices</string>
     <string name="pref_controlType">Controller</string>
     <string-array name="pref_controlTypes_entries">
         <item>Blockly</item>
