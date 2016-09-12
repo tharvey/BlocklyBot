@@ -86,16 +86,6 @@ public class MainActivity extends AppCompatActivity {
     }
 */
 
-    public void onClickBLE(View v) {
-        final Intent intent = new Intent(this, BLEScanActivity.class);
-        startActivity(intent);
-    }
-
-    public void onClickBT(View v) {
-        final Intent intent = new Intent(this, BluetoothScanActivity.class);
-        startActivity(intent);
-    }
-
     public void onClickNC(View v) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         String controller = sharedPref.getString("pref_controlType", "");

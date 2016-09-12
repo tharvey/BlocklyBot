@@ -45,12 +45,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".BluetoothScanActivity"
-            android:label="Bluetooth" />
-        <activity
-            android:name=".BLEScanActivity"
-            android:label="Bluetooth Low Energy" />
-        <activity
             android:name=".RobotControlActivity"
             android:label="Robot Control Panel" />
         <activity

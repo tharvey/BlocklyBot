@@ -17,27 +17,9 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Bluetooth Low Energy"
-        android:id="@+id/button_ble"
-        android:onClick="onClickBLE"
-        android:layout_below="@+id/imageView"
-        android:layout_centerHorizontal="true" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Bluetooth"
-        android:id="@+id/button_bt"
-        android:onClick="onClickBT"
-        android:layout_below="@+id/button_ble"
-        android:layout_centerHorizontal="true" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="No Connect"
+        android:text="Blockly"
         android:id="@+id/button_noconnect"
         android:onClick="onClickNC"
-        android:layout_below="@+id/button_bt"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/imageView" />
 </RelativeLayout>
