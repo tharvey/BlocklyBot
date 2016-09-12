@@ -77,7 +77,7 @@ public class DiscoverySelector {
 
         // BluetoothScanner
         if (scanBT) {
-            mBTScan = new BluetoothScan(mActivity, mDeviceListAdapter, mKnownDevs, compatOnly, new DiscoverInterface() {
+            mBTScan = new BluetoothScan(mActivity, mDeviceListAdapter, mKnownDevs, compatOnly, new IDiscover() {
                 @Override
                 public void onDiscover(BluetoothDevice device, Boolean compatible) {
                     cacheDevice(device, compatible);
@@ -94,7 +94,7 @@ public class DiscoverySelector {
 
         // BLEScanner
         if (scanBLE) {
-            mBLEScan = new BLEScan(mActivity, mDeviceListAdapter, mKnownDevs, compatOnly, new DiscoverInterface() {
+            mBLEScan = new BLEScan(mActivity, mDeviceListAdapter, mKnownDevs, compatOnly, new IDiscover() {
                 @Override
                 public void onDiscover(BluetoothDevice device, Boolean compatible) {
                     cacheDevice(device, compatible);

@@ -41,11 +41,11 @@ public class BluetoothScan {
     private static final String SPP_UUID = "00001101-0000-1000-8000-00805F9B34FB"; /* RFComm Service */
     private Context mContext;
     private Boolean mScanning;
-    private DiscoverInterface mCallback;
+    private IDiscover mCallback;
     private ArrayList<BluetoothDevice> mQueryQueue;
     private Map<String, Boolean> mKnownDevs;
 
-    public BluetoothScan(Context context, DeviceListAdapter adapter, Map<String, Boolean> knownDevs, Boolean compatOnly, DiscoverInterface callback) {
+    public BluetoothScan(Context context, DeviceListAdapter adapter, Map<String, Boolean> knownDevs, Boolean compatOnly, IDiscover callback) {
         mContext = context;
         mKnownDevs = knownDevs;
         mDeviceListAdapter = adapter;

@@ -47,7 +47,7 @@ public class BLEScan {
     private Boolean mCompatOnly;
     private ArrayList<BluetoothDevice> mQueriedDevices = new ArrayList<BluetoothDevice>();
     private ArrayList<BluetoothDevice> mQueryQueue = new ArrayList<BluetoothDevice>();
-    private DiscoverInterface mCallback;
+    private IDiscover mCallback;
     // Stops scanning after 15 seconds.
     private static final long SCAN_PERIOD = 15000;
     BluetoothLeService mBluetoothLeService;
@@ -55,7 +55,7 @@ public class BLEScan {
     private Context mContext;
     private Map<String, Boolean> mKnownDevs;
 
-    public BLEScan(Context context, DeviceListAdapter adapter, Map<String, Boolean> knownDevs, Boolean compatOnly, DiscoverInterface callback) {
+    public BLEScan(Context context, DeviceListAdapter adapter, Map<String, Boolean> knownDevs, Boolean compatOnly, IDiscover callback) {
         mHandler = new Handler();
         mKnownDevs = knownDevs;
         mScanning = false;
