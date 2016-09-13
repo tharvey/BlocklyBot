@@ -14,12 +14,4 @@
         android:adjustViewBounds="true"
         android:layout_centerHorizontal="true" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Blockly"
-        android:id="@+id/button_noconnect"
-        android:onClick="onClickNC"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@+id/imageView" />
 </RelativeLayout>

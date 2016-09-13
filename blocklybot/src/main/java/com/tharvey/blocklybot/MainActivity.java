@@ -71,6 +71,17 @@ public class MainActivity extends AppCompatActivity {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         }
+
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        String controller = sharedPref.getString("pref_defaultView", "blockly");
+        Log.i(TAG, "Controller:" + controller);
+        if (controller.equals("panel")) {
+            final Intent intent = new Intent(this, RobotControlActivity.class);
+            startActivity(intent);
+        } else {
+            final Intent intent = new Intent(this, BlocklyActivity.class);
+            startActivity(intent);
+        }
     }
 
     /* handle result of enable bluetooth request (above) */
@@ -85,39 +96,4 @@ public class MainActivity extends AppCompatActivity {
         onActivityResult(requestCode, resultCode, data);
     }
 */
-
-    public void onClickNC(View v) {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        String controller = sharedPref.getString("pref_controlType", "");
-        Log.i(TAG, "Controller:" + controller);
-        if (controller.equals("panel")) {
-            final Intent intent = new Intent(this, RobotControlActivity.class);
-            startActivity(intent);
-        } else {
-            final Intent intent = new Intent(this, BlocklyActivity.class);
-            startActivity(intent);
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_settings:
-                final Intent intent = new Intent(this, SettingsActivity.class);
-                startActivity(intent);
-                break;
-            case R.id.menu_about:
-                AboutDialog about = new AboutDialog(this);
-                about.setTitle("About this app");
-                about.show();
-                break;
-        }
-        return true;
-    }
 }

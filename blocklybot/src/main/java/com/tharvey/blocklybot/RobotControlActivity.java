@@ -1,7 +1,9 @@
 package com.tharvey.blocklybot;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -94,15 +96,25 @@ public class RobotControlActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent;
+
         switch (item.getItemId()) {
             case R.id.menu_settings:
-                final Intent intent = new Intent(this, SettingsActivity.class);
+                intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
                 break;
             case R.id.menu_about:
                 AboutDialog about = new AboutDialog(this);
                 about.setTitle("About this app");
                 about.show();
+                break;
+            case R.id.menu_connect:
+                DiscoverySelector dialog = new DiscoverySelector(this);
+                dialog.showDialog();
+                break;
+            case R.id.menu_blockly:
+                intent = new Intent(this, BlocklyActivity.class);
+                startActivity(intent);
                 break;
         }
         return true;
@@ -119,6 +131,10 @@ public class RobotControlActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         Log.d(TAG, "onStart()");
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString("pref_defaultView", "panel");
+        editor.commit();
         super.onStart();
         if (mRobot != null)
             mRobot.connect();

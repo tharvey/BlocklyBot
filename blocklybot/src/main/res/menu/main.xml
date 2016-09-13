@@ -4,4 +4,8 @@
         android:title="Settings" />
     <item android:id="@+id/menu_about"
         android:title="About" />
+    <item android:id="@+id/menu_connect"
+        android:title="Connect" />
+    <item android:id="@+id/menu_blockly"
+        android:title="Blockly" />
 </menu>

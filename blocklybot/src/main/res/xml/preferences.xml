@@ -20,11 +20,4 @@
         android:title="@string/pref_scanBLE"
         android:summary="@string/pref_scanBLE_summ"
         android:defaultValue="true" />
-    <ListPreference
-        android:key="pref_controlType"
-        android:title="@string/pref_controlType"
-        android:dialogTitle="@string/pref_controlType"
-        android:entries="@array/pref_controlTypes_entries"
-        android:entryValues="@array/pref_controlTypes_values"
-        android:defaultValue="blockly" />
 </PreferenceScreen>

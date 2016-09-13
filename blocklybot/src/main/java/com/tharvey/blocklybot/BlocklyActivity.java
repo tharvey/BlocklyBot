@@ -170,6 +170,9 @@ public class BlocklyActivity extends AbstractBlocklyActivity {
             DiscoverySelector dialog = new DiscoverySelector(this);
             dialog.showDialog();
             return true;
+        } else if (id == R.id.action_panel) {
+            final Intent intent = new Intent(this, RobotControlActivity.class);
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);
@@ -234,6 +237,9 @@ public class BlocklyActivity extends AbstractBlocklyActivity {
     @Override
     protected void onStart() {
         Log.d(TAG, "onStart()");
+        SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putString("pref_defaultView", "blockly");
+        editor.commit();
         super.onStart();
         if (mRobot != null)
             mRobot.connect();
