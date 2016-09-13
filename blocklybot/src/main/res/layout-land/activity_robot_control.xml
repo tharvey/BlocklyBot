@@ -1,23 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:gravity="center_vertical"
-    android:baselineAligned="false">
+    android:orientation="horizontal"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
 
     <LinearLayout
         android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_margin="10dp">
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_gravity="center_vertical">
 
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center_horizontal"
-            android:layout_weight="1">
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="bottom|center_horizontal">
 
             <ImageButton
                 android:layout_width="wrap_content"
@@ -28,17 +27,15 @@
                 android:background="@drawable/roundbutton"
                 android:src="@drawable/ic_arrow_upward_black_24dp"
                 android:onClick="onClick"
-                android:id="@+id/up"
-                android:scaleType="fitXY" />
-
+                android:id="@+id/up" />
         </LinearLayout>
 
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center_horizontal"
-            android:layout_weight="1">
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_vertical|center_horizontal">
 
             <ImageButton
                 android:layout_width="wrap_content"
@@ -49,8 +46,7 @@
                 android:background="@drawable/roundbutton"
                 android:onClick="onClick"
                 android:src="@drawable/ic_arrow_back_black_24dp"
-                android:id="@+id/left"
-                android:scaleType="fitXY" />
+                android:id="@+id/left" />
 
             <ImageButton
                 android:layout_width="wrap_content"
@@ -72,17 +68,15 @@
                 android:background="@drawable/roundbutton"
                 android:src="@drawable/ic_arrow_forward_black_24dp"
                 android:onClick="onClick"
-                android:id="@+id/right"
-                android:scaleType="fitXY" />
-
+                android:id="@+id/right" />
         </LinearLayout>
 
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center_horizontal"
-            android:layout_weight="1">
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="top|center_horizontal">
 
             <ImageButton
                 android:layout_width="wrap_content"
@@ -93,24 +87,25 @@
                 android:background="@drawable/roundbutton"
                 android:onClick="onClick"
                 android:src="@drawable/ic_arrow_downward_black_24dp"
-                android:id="@+id/down"
-                android:scaleType="fitXY" />
+                android:id="@+id/down" />
+
         </LinearLayout>
+
     </LinearLayout>
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_margin="10dp">
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_gravity="center">
 
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="fill_parent"
             android:layout_height="0dp"
-            android:layout_gravity="center_horizontal"
             android:layout_weight="1"
-            android:gravity="center_horizontal">
+            android:gravity="center_horizontal" >
 
             <Button
                 style="?android:attr/buttonStyleSmall"
@@ -143,9 +138,8 @@
             android:orientation="horizontal"
             android:layout_width="fill_parent"
             android:layout_height="0dp"
-            android:layout_gravity="center_horizontal"
             android:layout_weight="1"
-            android:gravity="center_horizontal">
+            android:gravity="center_horizontal" >
 
             <Button
                 style="?android:attr/buttonStyleSmall"
@@ -191,9 +185,8 @@
             android:orientation="horizontal"
             android:layout_width="fill_parent"
             android:layout_height="0dp"
-            android:layout_gravity="center_horizontal"
             android:layout_weight="1"
-            android:gravity="center_horizontal">
+            android:gravity="center_horizontal" >
 
             <Button
                 style="?android:attr/buttonStyleSmall"
@@ -239,9 +232,8 @@
             android:orientation="horizontal"
             android:layout_width="fill_parent"
             android:layout_height="0dp"
-            android:layout_gravity="center_horizontal"
             android:layout_weight="1"
-            android:gravity="center_horizontal">
+            android:gravity="center_horizontal" >
 
             <Button
                 style="?android:attr/buttonStyleSmall"
