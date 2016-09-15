@@ -25,13 +25,15 @@ public class Bluno extends Mobbob {
 	private static BluetoothGattCharacteristic mModelNumberCharacteristic;
 	private static BluetoothGattCharacteristic mSerialPortCharacteristic;
 	private static BluetoothGattCharacteristic mCommandCharacteristic;
-	private final Handler mHandler;
+	private Handler mHandler;
+	private Context mContext;
 	BluetoothLeService mBluetoothLeService;
 	private ArrayList<ArrayList<BluetoothGattCharacteristic>> mGattCharacteristics =
 			new ArrayList<ArrayList<BluetoothGattCharacteristic>>();
 
 	public Bluno(Context context, Handler handler, BluetoothDevice device) {
 		super(handler, device.getName(), device.getAddress());
+		mContext = context;
 		mHandler = handler;
 
 		context.registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
@@ -82,22 +84,20 @@ public class Bluno extends Mobbob {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			final String action = intent.getAction();
-			//Log.d(TAG, "mGattUpdateReceiver->onReceive->action=" + action);
+            BluetoothDevice device = intent.getParcelableExtra(BluetoothLeService.EXTRA_DEVICE);
+            Log.d(TAG, "Received " + action + " from " + device.getAddress() + ":" + device.getName());
 			if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
-				Log.i(TAG, "ACTION_GATT_CONNECTED");
 				if (mConnectionState != connectionStateEnum.isConnected) {
 					start();
 					mHandler.removeCallbacks(mConnectingOverTimeRunnable);
 				}
 			} else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
-				Log.i(TAG, "ACTION_GATT_DISCONNECTED");
 				if (mConnectionState == connectionStateEnum.isConnected) {
 					setState(connectionStateEnum.isToScan);
 					mHandler.removeCallbacks(mDisonnectingOverTimeRunnable);
 					mBluetoothLeService.close();
 				}
 			} else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
-				Log.d(TAG, "ACTION_GATT_SERVICES_DISCOVERED");
 				getGattServices(mBluetoothLeService.getSupportedGattServices());
 			} else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
 				if (mSCharacteristic == mModelNumberCharacteristic) {
@@ -120,8 +120,6 @@ public class Bluno extends Mobbob {
 					Log.d(TAG, "<< " + received);
 					onSerialReceived(received);
 				}
-			} else {
-				Log.d(TAG, "mGattUpdateReceiver->onReceive->action=" + action);
 			}
 		}
 	};
@@ -133,10 +131,12 @@ public class Bluno extends Mobbob {
 		public void onServiceConnected(ComponentName componentName, IBinder service) {
 			Log.i(TAG, "mServiceConnection onServiceConnected");
 			mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
-			if (!mBluetoothLeService.initialize()) {
+			if (mBluetoothLeService.initialize()) {
+				connect();
+			} else {
 				Log.e(TAG, "Unable to initialize Bluetooth");
+                mBluetoothLeService = null;
 			}
-			connect();
 		}
 
 		@Override
@@ -206,5 +206,7 @@ public class Bluno extends Mobbob {
 	public synchronized void disconnect() {
 		Log.d(TAG, "disconnect " + toString());
 		mBluetoothLeService.disconnect();
+		mContext.unbindService(mServiceConnection);
+		mContext.unregisterReceiver(mGattUpdateReceiver);
 	}
 }
