@@ -40,7 +40,7 @@ Blockly.JavaScript['robot_turn_right'] = function(block) {
   return 'Robot("turnRight",' + value + ', \'block_id_' + block.id + '\');\n';
 };
 
-Blockly.JavaScript['robot_misc'] = function(block) {
+Blockly.JavaScript['robot_emote'] = function(block) {
   var value = Blockly.JavaScript.valueToCode(block, 'VALUE', Blockly.JavaScript.ORDER_NONE) || '0';
   return 'Robot("' + block.getFieldValue('TYPE') + '",' + value + ', \'block_id_' + block.id + '\');\n';
 };

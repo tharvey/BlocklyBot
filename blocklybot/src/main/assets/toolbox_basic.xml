@@ -27,7 +27,7 @@
         <block type="robot_turn_left_internal">
             <field name="DIR">turnRight</field>
         </block>
-        <block type="robot_misc">
+        <block type="robot_emote">
             <field name="VALUE">1</field>
             <field name="TYPE">shake</field>
         </block>
