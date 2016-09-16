@@ -6,24 +6,15 @@ public abstract class Robot {
     private final static String TAG = Robot.class.getSimpleName();
 
     static Robot mContext;
-
     static Robot getRobot() {
         return mContext;
     }
 
-    public enum connectionStateEnum {
-        isNull,
-        isScanning,
-        isToScan,
-        isConnecting,
-        isConnected,
-        isDisconnecting
-    };
-
     private String mDeviceName;
     private String mDeviceAddress;
-    protected String mLastRX = "";
-    public connectionStateEnum mConnectionState = connectionStateEnum.isNull;
+    private IConnection.connectionStateEnum mConnectionState = IConnection.connectionStateEnum.isNull;
+    protected String mLastRX;
+    private IConnection mConnectionListener = null;
 
     public abstract void serialSend(String theString);
     public abstract void disconnect();
@@ -37,39 +28,28 @@ public abstract class Robot {
         mContext = this;
         mDeviceAddress = address;
         mDeviceName = name;
+        mLastRX = "";
     }
 
-    protected void setState(connectionStateEnum state) {
+    public IConnection.connectionStateEnum getConnectionState() {
+        return mConnectionState;
+    }
+
+    protected void setConnectionListener(IConnection listener) {
+        Log.i(TAG, "setConnectionListener");
+        mConnectionListener = listener;
+    }
+
+    protected void setState(IConnection.connectionStateEnum state) {
+        Log.i(TAG, "setState:" + state);
         mConnectionState = state;
-        onConnectionStateChange(state);
+        if (mConnectionListener != null)
+            mConnectionListener.connectionStateChanged(state);
     }
 
     protected void onSerialReceived(String theString) {
         theString = theString.replace("\r\n", "");
-        Log.d(TAG, ">> " + theString);
         mLastRX = theString;
-    }
-
-    protected void onConnectionStateChange(connectionStateEnum theConnectionState) {
-        switch (theConnectionState) {
-            case isConnected:
-                Log.i(TAG, "Connected");
-                break;
-            case isConnecting:
-                Log.i(TAG, "Connecting");
-                break;
-            case isToScan:
-                Log.i(TAG, "Scan");
-                break;
-            case isScanning:
-                Log.i(TAG, "Scanning");
-                break;
-            case isDisconnecting:
-                Log.i(TAG, "isDisconnecting");
-                break;
-            default:
-                break;
-        }
     }
 
     public String getAddress() {

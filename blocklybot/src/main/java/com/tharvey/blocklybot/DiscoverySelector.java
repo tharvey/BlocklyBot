@@ -206,7 +206,7 @@ public class DiscoverySelector {
                 else {
                     robot = new Bluetooth(mActivity, mHandler, device);
                 }
-                while (robot.mConnectionState != Robot.connectionStateEnum.isConnected) {
+                while (robot.getConnectionState() != IConnection.connectionStateEnum.isConnected) {
                     if (waittimems > 5000) {
                         Toast.makeText(mActivity.getApplicationContext(),
                                 "Failed Connecting to " + device.getName() + ":" + device.getAddress(),

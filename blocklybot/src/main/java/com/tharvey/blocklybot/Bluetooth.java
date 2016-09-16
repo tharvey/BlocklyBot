@@ -96,7 +96,7 @@ public class Bluetooth extends Mobbob {
             String inString = "";
 
             // Keep listening to the InputStream until an exception occurs
-            while (mConnectionState == connectionStateEnum.isConnected) {
+            while (getConnectionState() == IConnection.connectionStateEnum.isConnected) {
                 try {
                     // Read from the InputStream until we have a CRLF terminated string
                     bytes = mmInStream.read(buffer);
@@ -159,18 +159,18 @@ public class Bluetooth extends Mobbob {
             mConnectedThread = null;
         }
 
-        setState(connectionStateEnum.isScanning);
+        setState(IConnection.connectionStateEnum.isScanning);
         connect();
     }
 
     public synchronized int connect() {
         Log.d(TAG, "connect " + toString());
 
-        if (mConnectionState == connectionStateEnum.isConnected)
+        if (getConnectionState() == IConnection.connectionStateEnum.isConnected)
             return 0;
 
         // Cancel any thread attempting to make a connection
-        if (mConnectionState == connectionStateEnum.isConnecting) {
+        if (getConnectionState() == IConnection.connectionStateEnum.isConnecting) {
             if (mConnectThread != null) {
                 mConnectThread.cancel();
                 mConnectThread = null;
@@ -186,7 +186,7 @@ public class Bluetooth extends Mobbob {
         // Start the thread to connect with the given device
         mConnectThread = new ConnectThread(mDevice);
         mConnectThread.start();
-        setState(connectionStateEnum.isConnecting);
+        setState(IConnection.connectionStateEnum.isConnecting);
         return 0;
     }
 
@@ -194,7 +194,7 @@ public class Bluetooth extends Mobbob {
         Log.d(TAG, "disconnect " + toString());
 
         // Cancel any thread attempting to make a connection
-        if (mConnectionState == connectionStateEnum.isConnecting) {
+        if (getConnectionState() == IConnection.connectionStateEnum.isConnecting) {
             if (mConnectThread != null) {
                 mConnectThread.cancel();
                 mConnectThread = null;
@@ -213,7 +213,7 @@ public class Bluetooth extends Mobbob {
         } catch (IOException e) {
             Log.e(TAG, "Socket close() failed", e);
         }
-        setState(connectionStateEnum.isNull);
+        setState(IConnection.connectionStateEnum.isNull);
     }
 
     /**
@@ -241,11 +241,11 @@ public class Bluetooth extends Mobbob {
         // Start the thread to manage the connection and perform transmissions
         mConnectedThread = new ConnectedThread(socket);
         mConnectedThread.start();
-        setState(connectionStateEnum.isConnected);
+        setState(IConnection.connectionStateEnum.isConnected);
     }
 
     public void serialSend(String theString){
-        if (mConnectionState == connectionStateEnum.isConnected) {
+        if (getConnectionState() == IConnection.connectionStateEnum.isConnected) {
             Log.d(TAG, ">> " + theString);
             mConnectedThread.write(theString.getBytes());
         }

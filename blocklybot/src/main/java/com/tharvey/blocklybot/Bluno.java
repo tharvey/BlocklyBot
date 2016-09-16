@@ -47,7 +47,7 @@ public class Bluno extends Mobbob {
 	}
 
 	public void serialSend(String theString) {
-		if (mConnectionState == connectionStateEnum.isConnected) {
+		if (getConnectionState() == IConnection.connectionStateEnum.isConnected) {
 			Log.d(TAG, ">> " + theString);
 			mSCharacteristic.setValue(theString);
 			mBluetoothLeService.writeCharacteristic(mSCharacteristic);
@@ -57,8 +57,8 @@ public class Bluno extends Mobbob {
 	private Runnable mConnectingOverTimeRunnable = new Runnable() {
 		@Override
 		public void run() {
-			if (mConnectionState == connectionStateEnum.isConnecting)
-				setState(connectionStateEnum.isToScan);
+			if (getConnectionState() == IConnection.connectionStateEnum.isConnecting)
+				setState(IConnection.connectionStateEnum.isToScan);
 			mBluetoothLeService.close();
 		}
 	};
@@ -66,8 +66,8 @@ public class Bluno extends Mobbob {
 	private Runnable mDisonnectingOverTimeRunnable = new Runnable() {
 		@Override
 		public void run() {
-			if (mConnectionState == connectionStateEnum.isDisconnecting)
-				setState(connectionStateEnum.isToScan);
+			if (getConnectionState() == IConnection.connectionStateEnum.isDisconnecting)
+				setState(IConnection.connectionStateEnum.isToScan);
 			mBluetoothLeService.close();
 		}
 	};
@@ -91,13 +91,13 @@ public class Bluno extends Mobbob {
             BluetoothDevice device = intent.getParcelableExtra(BluetoothLeService.EXTRA_DEVICE);
             Log.d(TAG, "Received " + action + " from " + device.getAddress() + ":" + device.getName());
 			if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
-				if (mConnectionState != connectionStateEnum.isConnected) {
+				if (getConnectionState() != IConnection.connectionStateEnum.isConnected) {
 					start();
 					mHandler.removeCallbacks(mConnectingOverTimeRunnable);
 				}
 			} else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
-				if (mConnectionState == connectionStateEnum.isConnected) {
-					setState(connectionStateEnum.isToScan);
+				if (getConnectionState() == IConnection.connectionStateEnum.isConnected) {
+					setState(IConnection.connectionStateEnum.isToScan);
 					mHandler.removeCallbacks(mDisonnectingOverTimeRunnable);
 					mBluetoothLeService.close();
 				}
@@ -115,9 +115,9 @@ public class Bluno extends Mobbob {
 						mBluetoothLeService.writeCharacteristic(mSCharacteristic);
 						mSCharacteristic = mSerialPortCharacteristic;
 						mBluetoothLeService.setCharacteristicNotification(mSCharacteristic, true);
-						setState(connectionStateEnum.isConnected);
+						setState(IConnection.connectionStateEnum.isConnected);
 					} else {
-						setState(connectionStateEnum.isToScan);
+						setState(IConnection.connectionStateEnum.isToScan);
 					}
 				} else if (mSCharacteristic == mSerialPortCharacteristic) {
 					String received = intent.getStringExtra(BluetoothLeService.EXTRA_DATA);
@@ -185,7 +185,7 @@ public class Bluno extends Mobbob {
 		}
 
 		if (mModelNumberCharacteristic == null || mSerialPortCharacteristic == null || mCommandCharacteristic == null) {
-			setState(connectionStateEnum.isToScan);
+			setState(IConnection.connectionStateEnum.isToScan);
 		} else {
 			mSCharacteristic = mModelNumberCharacteristic;
 			mBluetoothLeService.setCharacteristicNotification(mSCharacteristic, true);
