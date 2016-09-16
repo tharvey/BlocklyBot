@@ -147,6 +147,12 @@ public class DiscoverySelector {
 
     /* popup dialog */
     public Dialog showDialog() {
+        Log.i(TAG, "showDialog");
+        // Disconnect from any currently connected Robot
+        Robot robot = Mobbob.getRobot();
+        if (robot != null)
+            robot.disconnect();
+
         // make sure we have bluetooth
         BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
         if (adapter  == null) {
@@ -196,7 +202,9 @@ public class DiscoverySelector {
         Thread thread = new Thread() {
             @Override
             public void run() {
-                Robot robot;
+                Robot robot = Mobbob.getRobot();
+                if (robot != null)
+                    robot.disconnect();
                 int waittimems = 0;
                 // BLE device
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2
@@ -211,9 +219,12 @@ public class DiscoverySelector {
                 robot.setConnectionListener(mListener);
                 while (robot.getConnectionState() != IConnection.connectionStateEnum.isConnected) {
                     if (waittimems > 5000) {
+/*
                         Toast.makeText(mActivity.getApplicationContext(),
                                 "Failed Connecting to " + device.getName() + ":" + device.getAddress(),
                                 Toast.LENGTH_LONG).show();
+*/
+                        Log.e(TAG, "Failed connectting to " + device.getName() + ":" + device.getAddress());
                         // dismiss dialog
                         mDialog.cancel();
                         mDialog.dismiss();
