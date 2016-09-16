@@ -39,6 +39,10 @@ public class Bluno extends Mobbob {
 		context.registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
 
 		Intent gattServiceIntent = new Intent(context, BluetoothLeService.class);
+        try {
+            disconnect();
+        } catch (Exception e) {
+        }
 		context.bindService(gattServiceIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
 	}
 
