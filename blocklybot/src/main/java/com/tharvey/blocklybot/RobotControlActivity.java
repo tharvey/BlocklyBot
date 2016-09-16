@@ -98,7 +98,7 @@ public class RobotControlActivity extends AppCompatActivity implements IConnecti
                 break;
         }
         if (mRobot != null)
-            mRobot.doCommand(cmd, 1);
+            mRobot.queueCommand(cmd, 1);
     }
 
     @Override
