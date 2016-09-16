@@ -131,6 +131,9 @@ public class JSParser {
                             case "SHAKELEGRIGHT":
                                 cmd = Mobbob.commands.SHAKE_LEG_RIGHT.ordinal();
                                 break;
+	                        case "STOP":
+		                        cmd = Mobbob.commands.STOP.ordinal();
+		                        break;
                             default:
                                 Log.e(TAG, "Unrecognized cmd:" + cmd);
                                 break;

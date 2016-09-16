@@ -45,6 +45,10 @@ Blockly.JavaScript['robot_emote'] = function(block) {
   return 'Robot("' + block.getFieldValue('TYPE') + '",' + value + ', \'block_id_' + block.id + '\');\n';
 };
 
+Blockly.JavaScript['robot_stop'] = function(block) {
+  return 'Robot("stop");\n';
+};
+
 Blockly.JavaScript['robot_repeat_internal'] = Blockly.JavaScript['controls_repeat'];
 
 Blockly.JavaScript['speech_speak'] = function(block) {

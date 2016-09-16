@@ -31,6 +31,8 @@
             <field name="VALUE">1</field>
             <field name="TYPE">shake</field>
         </block>
+        <block type="robot_stop">
+        </block>
     </category>
     <category name="Speech" colour="140">
         <block type="speech_speak">
