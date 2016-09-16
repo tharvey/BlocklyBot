@@ -15,12 +15,16 @@
 
 <toolbox>
     <category name="Robot" colour="160">
-        <block type="robot_move_internal">
+        <block type="robot_move_forward_internal">
             <field name="VALUE">1</field>
-            <field name="DIR">moveForward</field>
         </block>
-        <block type="robot_turn_internal">
+        <block type="robot_move_backward_internal">
             <field name="VALUE">1</field>
+        </block>
+        <block type="robot_turn_right_internal">
+            <field name="DIR">turnRight</field>
+        </block>
+        <block type="robot_turn_left_internal">
             <field name="DIR">turnRight</field>
         </block>
         <block type="robot_misc">

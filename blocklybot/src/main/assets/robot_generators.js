@@ -1,42 +1,52 @@
 'use strict';
 
-// Extensions to Blockly's language and JavaScript generator.
-Blockly.JavaScript['robot_move_internal'] = function(block) {
-  // Generate JavaScript for moving forward or backwards.
+Blockly.JavaScript['robot_move_forward_internal'] = function(block) {
   var value = block.getFieldValue('VALUE');
-  return 'Robot("' + block.getFieldValue('DIR') + '",' + value + ', \'block_id_' + block.id + '\');\n';
+  return 'Robot("moveForward",' + value + ', \'block_id_' + block.id + '\');\n';
 };
 
-Blockly.JavaScript['robot_turn_internal'] = function(block) {
-  // Generate JavaScript for turning left or right.
+Blockly.JavaScript['robot_move_backward_internal'] = function(block) {
   var value = block.getFieldValue('VALUE');
-  return 'Robot("' + block.getFieldValue('DIR') + '",' + value + ', \'block_id_' + block.id + '\');\n';
+  return 'Robot("moveBackward",' + value + ', \'block_id_' + block.id + '\');\n';
 };
 
-Blockly.JavaScript['robot_move'] = function(block) {
-  // Generate JavaScript for moving forward or backwards.
-  var value = Blockly.JavaScript.valueToCode(block, 'VALUE',
-      Blockly.JavaScript.ORDER_NONE) || '0';
-  return 'Robot("' + block.getFieldValue('DIR') + '",' + value + ', \'block_id_' + block.id + '\');\n';
+Blockly.JavaScript['robot_turn_left_internal'] = function(block) {
+  var value = block.getFieldValue('VALUE');
+  return 'Robot("turnLeft",' + value + ', \'block_id_' + block.id + '\');\n';
 };
 
-Blockly.JavaScript['robot_turn'] = function(block) {
-  // Generate JavaScript for turning left or right.
-  var value = Blockly.JavaScript.valueToCode(block, 'VALUE',
-      Blockly.JavaScript.ORDER_NONE) || '0';
-  return 'Robot("' + block.getFieldValue('DIR') + '",' + value + ', \'block_id_' + block.id + '\');\n';
+Blockly.JavaScript['robot_turn_right_internal'] = function(block) {
+  var value = block.getFieldValue('VALUE');
+  return 'Robot("turnRight",' + value + ', \'block_id_' + block.id + '\');\n';
+};
+
+Blockly.JavaScript['robot_move_forward'] = function(block) {
+  var value = Blockly.JavaScript.valueToCode(block, 'VALUE', Blockly.JavaScript.ORDER_NONE) || '0';
+  return 'Robot("moveForward",' + value + ', \'block_id_' + block.id + '\');\n';
+};
+
+Blockly.JavaScript['robot_move_backward'] = function(block) {
+  var value = Blockly.JavaScript.valueToCode(block, 'VALUE', Blockly.JavaScript.ORDER_NONE) || '0';
+  return 'Robot("moveBackward",' + value + ', \'block_id_' + block.id + '\');\n';
+};
+
+Blockly.JavaScript['robot_turn_left'] = function(block) {
+  var value = Blockly.JavaScript.valueToCode(block, 'VALUE', Blockly.JavaScript.ORDER_NONE) || '0';
+  return 'Robot("turnLeft",' + value + ', \'block_id_' + block.id + '\');\n';
+};
+
+Blockly.JavaScript['robot_turn_right'] = function(block) {
+  var value = Blockly.JavaScript.valueToCode(block, 'VALUE', Blockly.JavaScript.ORDER_NONE) || '0';
+  return 'Robot("turnRight",' + value + ', \'block_id_' + block.id + '\');\n';
 };
 
 Blockly.JavaScript['robot_misc'] = function(block) {
-  // Generate JavaScript for turning left or right.
-  var value = Blockly.JavaScript.valueToCode(block, 'VALUE',
-      Blockly.JavaScript.ORDER_NONE) || '0';
+  var value = Blockly.JavaScript.valueToCode(block, 'VALUE', Blockly.JavaScript.ORDER_NONE) || '0';
   return 'Robot("' + block.getFieldValue('TYPE') + '",' + value + ', \'block_id_' + block.id + '\');\n';
 };
 
 Blockly.JavaScript['robot_repeat_internal'] = Blockly.JavaScript['controls_repeat'];
 
-// Extensions to Blockly's language and JavaScript generator.
 Blockly.JavaScript['speech_speak'] = function(block) {
   return 'Speak("' + block.getFieldValue('TEXT') + '", \'block_id_' + block.id + '\');\n';
 };
