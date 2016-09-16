@@ -40,9 +40,11 @@ public class DiscoverySelector {
     private ProgressBar mProgress;
     private static final String COMPATDEVS_PREF = "pref_knowncompatibledevs";
     private Map<String, Boolean> mKnownDevs;
+    private IConnection mListener;
 
-    public DiscoverySelector(Activity activity) {
+    public DiscoverySelector(Activity activity, IConnection listener) {
         mActivity = activity;
+        mListener = listener;
         mHandler = new Handler();
         mPreferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
 
@@ -206,6 +208,7 @@ public class DiscoverySelector {
                 else {
                     robot = new Bluetooth(mActivity, mHandler, device);
                 }
+                robot.setConnectionListener(mListener);
                 while (robot.getConnectionState() != IConnection.connectionStateEnum.isConnected) {
                     if (waittimems > 5000) {
                         Toast.makeText(mActivity.getApplicationContext(),

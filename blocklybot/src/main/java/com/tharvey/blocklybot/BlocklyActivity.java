@@ -43,7 +43,7 @@ import java.util.List;
 /**
  * Simplest implementation of AbstractBlocklyActivity.
  */
-public class BlocklyActivity extends AbstractBlocklyActivity {
+public class BlocklyActivity extends AbstractBlocklyActivity implements IConnection {
     private static final String TAG = "BlocklyActivity";
     public static final String SAVED_WORKSPACE_FILENAME_DEFAULT = "robot_workspace.xml";
     private static final List<String> BLOCK_DEFINITIONS = Arrays.asList(new String[]{
@@ -105,11 +105,18 @@ public class BlocklyActivity extends AbstractBlocklyActivity {
         }
     };
 
+    @Override
+    public void connectionStateChanged(connectionStateEnum state) {
+        Log.i(TAG, "connection state changed:" + state);
+        mRobot = Mobbob.getMobob();
+        updateTitlebar();
+    }
+
     private void updateTitlebar() {
-        if (mRobot == null)
-            action.setTitle(workspaceName.replace(".xml", ""));
-        else
+        if (mRobot != null && mRobot.getConnectionState() == connectionStateEnum.isConnected)
             action.setTitle(mRobot.getName() + " : " + workspaceName.replace(".xml", ""));
+        else
+            action.setTitle(workspaceName.replace(".xml", ""));
         SharedPreferences.Editor editor = mPreferences.edit();
         editor.putString("pref_lastWorkspace", workspaceName);
         editor.commit();
@@ -167,7 +174,7 @@ public class BlocklyActivity extends AbstractBlocklyActivity {
         } else if (id == R.id.action_stop) {
             mParser.stop();
         } else if (id == R.id.action_connect) {
-            DiscoverySelector dialog = new DiscoverySelector(this);
+            DiscoverySelector dialog = new DiscoverySelector(this, this);
             dialog.showDialog();
             return true;
         } else if (id == R.id.action_panel) {
@@ -279,4 +286,5 @@ public class BlocklyActivity extends AbstractBlocklyActivity {
             }
         }
     };
+
 }

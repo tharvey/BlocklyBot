@@ -11,7 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-public class RobotControlActivity extends AppCompatActivity {
+public class RobotControlActivity extends AppCompatActivity implements IConnection {
     private final static String TAG = RobotControlActivity.class.getSimpleName();
 
     private Mobbob mRobot;
@@ -20,12 +20,25 @@ public class RobotControlActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_robot_control);
-
-        final Intent intent = getIntent();
         mRobot = Mobbob.getMobob();
+        if (mRobot != null) {
+            mRobot.setConnectionListener(this);
+            updateStatus();
+        }
+    }
+
+    @Override
+    public void connectionStateChanged(IConnection.connectionStateEnum state) {
+        Log.i(TAG, "connection state changed:" + state);
+        mRobot = Mobbob.getMobob();
+        updateStatus();
+    }
+
+    private void updateStatus() {
+        Log.i(TAG, "updateStatus");
         final ActionBar action = getSupportActionBar();
         if (action != null) {
-            if (mRobot != null)
+            if (mRobot != null && mRobot.getConnectionState() == IConnection.connectionStateEnum.isConnected)
                 action.setTitle("Remote Control: " + mRobot.getName());
             else
                 action.setTitle("Remote Control: not connected");
@@ -109,7 +122,7 @@ public class RobotControlActivity extends AppCompatActivity {
                 about.show();
                 break;
             case R.id.menu_connect:
-                DiscoverySelector dialog = new DiscoverySelector(this);
+                DiscoverySelector dialog = new DiscoverySelector(this, this);
                 dialog.showDialog();
                 break;
             case R.id.menu_blockly:
@@ -139,4 +152,5 @@ public class RobotControlActivity extends AppCompatActivity {
         if (mRobot != null)
             mRobot.connect();
     }
+
 }
