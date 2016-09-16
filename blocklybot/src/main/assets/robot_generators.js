@@ -51,24 +51,12 @@ Blockly.JavaScript['robot_stop'] = function(block) {
 
 Blockly.JavaScript['robot_repeat_internal'] = Blockly.JavaScript['controls_repeat'];
 
-Blockly.JavaScript['speech_speak'] = function(block) {
-  return 'Speak("' + block.getFieldValue('TEXT') + '", \'block_id_' + block.id + '\');\n';
-};
-
-Blockly.JavaScript['audio_play_internal'] = function(block) {
-  return 'Audio("' + block.getFieldValue('SOUND') + '", \'block_id_' + block.id + '\');\n';
-};
-
 Blockly.JavaScript['audio_play'] = function(block) {
   return 'Audio("' + block.getFieldValue('SOUND') + '", \'block_id_' + block.id + '\');\n';
 };
 
-/*
- * Event Handlers
- */
-Blockly.JavaScript['start'] = function(block) {
-    var value = Blockly.JavaScript.statementToCode(block, 'FUNC')
-    return 'function start() {\n' + value + '};\n';
+Blockly.JavaScript['speech_speak'] = function(block) {
+  return 'Speak("' + block.getFieldValue('TEXT') + '", \'block_id_' + block.id + '\');\n';
 };
 
 Blockly.JavaScript['speech_listen'] = function(block) {
@@ -79,6 +67,18 @@ Blockly.JavaScript['speech_listen'] = function(block) {
 Blockly.JavaScript['speech_listen_text'] = function(block) {
     var value = Blockly.JavaScript.statementToCode(block, 'FUNC')
     return 'Listen("' + block.getFieldValue('CMD') + '", function() {\n' + value + '});';
+};
+
+/* Assign my control blocks to the ones already defined in blocklylib-core */
+Blockly.JavaScript['control_repeat'] = Blockly.JavaScript['controls_repeat'];
+
+
+/*
+ * Event Handlers
+ */
+Blockly.JavaScript['start'] = function(block) {
+    var value = Blockly.JavaScript.statementToCode(block, 'FUNC')
+    return 'function start() {\n' + value + '};\n';
 };
 
 /**

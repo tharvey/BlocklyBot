@@ -14,7 +14,7 @@
   -->
 
 <toolbox>
-    <category name="Robot" colour="160">
+    <category name="Move" colour="160">
         <block type="robot_move_forward_internal">
             <field name="VALUE">1</field>
         </block>
@@ -34,7 +34,11 @@
         <block type="robot_stop">
         </block>
     </category>
-    <category name="Speech" colour="140">
+
+    <category name="Audio" colour="65">
+        <block type="audio_play">
+            <field name="SOUND">laser</field>
+        </block>
         <block type="speech_speak">
             <field name="TEXT">hello</field>
         </block>
@@ -45,17 +49,46 @@
             <field name="CMD">command</field>
         </block>
     </category>
-    <category name="Audio" colour="140">
-        <block type="audio_play">
-            <field name="SOUND">laser</field>
-        </block>
-        <block type="audio_play_internal">
-            <field name="SOUND">laser</field>
-        </block>
-    </category>
-    <category name="Loops" colour="120">
-        <block type="robot_repeat_internal">
+
+    <category name="Control" colour="120">
+        <block type="control_repeat">
             <field name="TIMES">4</field>
         </block>
+        <block type="controls_repeat_ext">
+            <value name="TIMES">
+                <shadow type="math_number">
+                    <field name="NUM">10</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="controls_whileUntil">
+            <value name="BOOL">
+                <shadow type="logic_boolean">
+                    <field name="BOOL">TRUE</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="controls_for">
+            <value name="FROM">
+                <shadow type="math_number">
+                    <field name="NUM">1</field>
+                </shadow>
+            </value>
+            <value name="TO">
+                <shadow type="math_number">
+                    <field name="NUM">10</field>
+                </shadow>
+            </value>
+            <value name="BY">
+                <shadow type="math_number">
+                    <field name="NUM">1</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="controls_if"></block>
+        <block type="logic_compare"></block>
+        <block type="logic_operation"></block>
+        <block type="logic_negate"></block>
+        <block type="logic_boolean"></block>
     </category>
 </toolbox>

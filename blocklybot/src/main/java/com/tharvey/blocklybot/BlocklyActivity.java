@@ -47,6 +47,10 @@ public class BlocklyActivity extends AbstractBlocklyActivity implements IConnect
     private static final String TAG = "BlocklyActivity";
     public static final String SAVED_WORKSPACE_FILENAME_DEFAULT = "robot_workspace.xml";
     private static final List<String> BLOCK_DEFINITIONS = Arrays.asList(new String[]{
+            "default/loop_blocks.json",
+            "default/logic_blocks.json",
+            "default/math_blocks.json",
+            "control_blocks.json",
             "robot_blocks.json",
             "speech_blocks.json",
             "audio_blocks.json"
