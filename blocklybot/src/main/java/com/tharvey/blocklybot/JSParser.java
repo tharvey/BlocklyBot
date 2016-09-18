@@ -190,6 +190,7 @@ public class JSParser {
     public void stop() {
         Log.i(TAG, "stop()");
         // TODO: how to stop script?
-        mListen.close();
+        if (mListen != null)
+            mListen.close();
     }
 }
