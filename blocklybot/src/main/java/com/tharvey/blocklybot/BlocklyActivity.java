@@ -32,6 +32,7 @@ import android.widget.Toast;
 
 import com.google.blockly.android.AbstractBlocklyActivity;
 import com.google.blockly.android.codegen.CodeGenerationRequest;
+import com.google.blockly.android.control.BlocklyController;
 import com.google.blockly.android.ui.BlockViewFactory;
 import com.google.blockly.android.ui.WorkspaceHelper;
 import com.google.blockly.android.ui.vertical.VerticalBlockViewFactory;
@@ -50,6 +51,7 @@ public class BlocklyActivity extends AbstractBlocklyActivity implements IConnect
             "default/loop_blocks.json",
             "default/logic_blocks.json",
             "default/math_blocks.json",
+            "default/variable_blocks.json",
             "control_blocks.json",
             "robot_blocks.json",
             "speech_blocks.json",
@@ -129,6 +131,7 @@ public class BlocklyActivity extends AbstractBlocklyActivity implements IConnect
     @Override
     public void onLoadWorkspace() {
         loadWorkspaceFromAppDir(workspaceName);
+	    addDefaultVariables(getController());
         updateTitlebar();
     }
 
@@ -235,6 +238,7 @@ public class BlocklyActivity extends AbstractBlocklyActivity implements IConnect
                 "  </block>" +
                 "</xml>"
         );
+	    addDefaultVariables(getController());
     }
 
     @Override
@@ -291,4 +295,12 @@ public class BlocklyActivity extends AbstractBlocklyActivity implements IConnect
         }
     };
 
+	static void addDefaultVariables(BlocklyController controller) {
+		// TODO: (#22) Remove this override when variables are supported properly
+		controller.addVariable("orange");
+		controller.addVariable("apple");
+		controller.addVariable("bannana");
+		controller.addVariable("coconut");
+		controller.addVariable("carrot");
+	}
 }
