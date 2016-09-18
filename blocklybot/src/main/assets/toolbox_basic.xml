@@ -39,6 +39,13 @@
         <block type="audio_play">
             <field name="SOUND">laser</field>
         </block>
+        <block type="audio_tone">
+            <field name="FREQ">1000</field>
+            <field name="TIME">1</field>
+        </block>
+        <block type="audio_note">
+            <field name="NOTE">C</field>
+        </block>
         <block type="speech_speak">
             <field name="TEXT">hello</field>
         </block>

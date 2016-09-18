@@ -63,5 +63,87 @@
     "nextStatement": null,
     "colour": 65,
     "tooltip": "Play a sound"
+  },
+  {
+    "type": "audio_note",
+    "message0": "Note %1",
+    "args0": [
+      {
+        "type": "field_dropdown",
+        "name": "NOTE",
+        "options": [
+          [
+            "C",
+            "C"
+          ],
+          [
+            "C#",
+            "C#"
+          ],
+          [
+            "D",
+            "D"
+          ],
+          [
+            "D#",
+            "D#"
+          ],
+          [
+            "E",
+            "E"
+          ],
+          [
+            "F",
+            "F"
+          ],
+          [
+            "F#",
+            "F#"
+          ],
+          [
+            "G",
+            "G"
+          ],
+          [
+            "G#",
+            "G#"
+          ],
+          [
+            "A",
+            "A"
+          ],
+          [
+            "A#",
+            "A#"
+          ],
+          [
+            "B",
+            "B"
+          ]
+        ]
+      }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 65,
+    "tooltip": "Play a musical note"
+  },
+  {
+    "type": "audio_tone",
+    "message0": "freq %1 Hz duration %2 seconds",
+    "args0": [
+      {
+        "type": "field_input",
+        "name": "FREQ"
+      },
+      {
+        "type": "field_input",
+        "name": "TIME"
+      }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 65,
+    "tooltip": "Play a tone with specified frequency for a specified duration"
   }
 ]

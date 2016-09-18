@@ -1,6 +1,7 @@
 package com.tharvey.blocklybot;
 
 import android.app.Activity;
+import android.os.SystemClock;
 import android.util.Log;
 
 import org.liquidplayer.webkit.javascriptcore.JSContext;
@@ -31,6 +32,7 @@ public class JSParser {
         final Mobbob robot = mobbob;
         final Speak speak = new Speak(mActivity);
         final Audio audio = new Audio(mActivity);
+        final Tone tone = new Tone();
         final HashMap<String, JSFunction> listenMap = new HashMap<String, JSFunction>();
         final List<String> phrases = new ArrayList<String>();
 
@@ -169,7 +171,32 @@ public class JSParser {
                 };
                 context.property("Audio", Audio);
 
-                JSFunction Listen = new JSFunction(context, "Listen") {
+	            JSFunction Tone = new JSFunction(context, "Tone") {
+		            public Integer Tone(int freq, int secs) {
+			            Log.i(TAG, "tone: freq=" + freq + "secs=" + secs);
+			            mListen.pause();
+			            tone.Tone(freq, secs * 1000);
+			            mListen.resume();
+			            return 0;
+		            }
+	            };
+	            context.property("Tone", Tone);
+
+	            JSFunction MusicNote = new JSFunction(context, "Note") {
+		            public Integer Note(String note) {
+			            int octave = 3; /* 3rd octave */
+			            int timems = 1000; /* 1sec duration */
+			            Log.i(TAG, "note(" + note + ")");
+			            mListen.pause();
+			            tone.Tone(Note.valueOf(note + octave), timems);
+			            SystemClock.sleep(100); /* 100ms of silent pause after note */
+			            mListen.resume();
+			            return 0;
+		            }
+	            };
+	            context.property("Note", MusicNote);
+
+	            JSFunction Listen = new JSFunction(context, "Listen") {
                     public Integer Listen(String text, JSFunction func) {
                         Log.i(TAG, "listen(" + text + ")");
                         listenMap.put(text, func);
