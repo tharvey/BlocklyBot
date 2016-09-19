@@ -85,8 +85,8 @@ public class Bluno extends Mobbob {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			final String action = intent.getAction();
-            BluetoothDevice device = intent.getParcelableExtra(BluetoothLeService.EXTRA_DEVICE);
-            Log.d(TAG, "Received " + action + " from " + device.getAddress() + ":" + device.getName());
+			BluetoothDevice device = intent.getParcelableExtra(BluetoothLeService.EXTRA_DEVICE);
+			Log.d(TAG, "Received " + action + " from " + device.getAddress() + ":" + device.getName());
 			if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
 				if (getConnectionState() != IConnection.connectionStateEnum.isConnected) {
 					start();
@@ -136,7 +136,7 @@ public class Bluno extends Mobbob {
 				connect();
 			} else {
 				Log.e(TAG, "Unable to initialize Bluetooth");
-                mBluetoothLeService = null;
+				mBluetoothLeService = null;
 			}
 		}
 

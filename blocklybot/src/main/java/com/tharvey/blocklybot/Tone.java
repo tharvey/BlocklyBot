@@ -19,12 +19,11 @@ public class Tone {
 		SystemClock.sleep(durationMs);
 	}
 
-	static private AudioTrack generateTone(double freqHz, int durationMs)
-	{
-		int count = (int)(44100.0 * 2.0 * (durationMs / 1000.0)) & ~1;
+	static private AudioTrack generateTone(double freqHz, int durationMs) {
+		int count = (int) (44100.0 * 2.0 * (durationMs / 1000.0)) & ~1;
 		short[] samples = new short[count];
-		for(int i = 0; i < count; i += 2){
-			short sample = (short)(Math.sin(2 * Math.PI * i / (44100.0 / freqHz)) * 0x7FFF);
+		for (int i = 0; i < count; i += 2) {
+			short sample = (short) (Math.sin(2 * Math.PI * i / (44100.0 / freqHz)) * 0x7FFF);
 			samples[i + 0] = sample;
 			samples[i + 1] = sample;
 		}

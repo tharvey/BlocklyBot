@@ -3,65 +3,68 @@ package com.tharvey.blocklybot;
 import android.util.Log;
 
 public abstract class Robot {
-    private final static String TAG = Robot.class.getSimpleName();
+	private final static String TAG = Robot.class.getSimpleName();
 
-    static Robot mContext;
-    static Robot getRobot() {
-        return mContext;
-    }
+	static Robot mContext;
 
-    private String mDeviceName;
-    private String mDeviceAddress;
-    private IConnection.connectionStateEnum mConnectionState = IConnection.connectionStateEnum.isNull;
-    protected String mLastRX;
-    private IConnection mConnectionListener = null;
+	static Robot getRobot() {
+		return mContext;
+	}
 
-    public abstract void serialSend(String theString);
-    public abstract void disconnect();
-    public abstract int connect();
+	private String mDeviceName;
+	private String mDeviceAddress;
+	private IConnection.connectionStateEnum mConnectionState = IConnection.connectionStateEnum.isNull;
+	protected String mLastRX;
+	private IConnection mConnectionListener = null;
 
-    public Robot() {
-        mContext = this;
-    }
+	public abstract void serialSend(String theString);
 
-    public Robot(String name, String address) {
-        mContext = this;
-        mDeviceAddress = address;
-        mDeviceName = name;
-        mLastRX = "";
-    }
+	public abstract void disconnect();
 
-    public IConnection.connectionStateEnum getConnectionState() {
-        return mConnectionState;
-    }
+	public abstract int connect();
 
-    protected void setConnectionListener(IConnection listener) {
-        Log.i(TAG, "setConnectionListener");
-        mConnectionListener = listener;
-    }
+	public Robot() {
+		mContext = this;
+	}
 
-    protected void setState(IConnection.connectionStateEnum state) {
-        Log.i(TAG, "setState:" + state);
-        mConnectionState = state;
-        if (mConnectionListener != null)
-            mConnectionListener.connectionStateChanged(state);
-    }
+	public Robot(String name, String address) {
+		mContext = this;
+		mDeviceAddress = address;
+		mDeviceName = name;
+		mLastRX = "";
+	}
 
-    protected void onSerialReceived(String theString) {
-        theString = theString.replace("\r\n", "");
-        mLastRX = theString;
-    }
+	public IConnection.connectionStateEnum getConnectionState() {
+		return mConnectionState;
+	}
 
-    public String getAddress() {
-        return mDeviceAddress;
-    }
+	protected void setConnectionListener(IConnection listener) {
+		Log.i(TAG, "setConnectionListener");
+		mConnectionListener = listener;
+	}
 
-    public String getName() {
-        return mDeviceName;
-    }
+	protected void setState(IConnection.connectionStateEnum state) {
+		Log.i(TAG, "setState:" + state);
+		mConnectionState = state;
+		if (mConnectionListener != null)
+			mConnectionListener.connectionStateChanged(state);
+	}
 
-    public String toString() {
-        return mDeviceName + ":" + mDeviceAddress;
-    }
+	protected void onSerialReceived(String theString) {
+		theString = theString.replace("\r\n", "");
+		mLastRX = theString;
+	}
+
+	public String getAddress() {
+		return mDeviceAddress;
+	}
+
+	public String getName() {
+		return mDeviceName;
+	}
+
+	public String toString() {
+		return mDeviceName + ":" + mDeviceAddress;
+	}
 }
 

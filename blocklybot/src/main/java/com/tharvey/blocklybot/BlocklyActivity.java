@@ -46,259 +46,259 @@ import java.util.List;
  * Simplest implementation of AbstractBlocklyActivity.
  */
 public class BlocklyActivity extends AbstractBlocklyActivity implements IConnection {
-    private static final String TAG = "BlocklyActivity";
-    public static final String SAVED_WORKSPACE_FILENAME_DEFAULT = "robot_workspace.xml";
-    private static final List<String> BLOCK_DEFINITIONS = Arrays.asList(new String[]{
-            "default/loop_blocks.json",
-            "default/logic_blocks.json",
-            "default/math_blocks.json",
-            "default/variable_blocks.json",
-            "control_blocks.json",
-            "robot_blocks.json",
-            "speech_blocks.json",
-            "audio_blocks.json"
-    });
-    private static final List<String> JAVASCRIPT_GENERATORS = Arrays.asList(new String[]{
-            "robot_generators.js"
-    });
+	private static final String TAG = "BlocklyActivity";
+	public static final String SAVED_WORKSPACE_FILENAME_DEFAULT = "robot_workspace.xml";
+	private static final List<String> BLOCK_DEFINITIONS = Arrays.asList(new String[]{
+			"default/loop_blocks.json",
+			"default/logic_blocks.json",
+			"default/math_blocks.json",
+			"default/variable_blocks.json",
+			"control_blocks.json",
+			"robot_blocks.json",
+			"speech_blocks.json",
+			"audio_blocks.json"
+	});
+	private static final List<String> JAVASCRIPT_GENERATORS = Arrays.asList(new String[]{
+			"robot_generators.js"
+	});
 
-    private ActionBar action;
-    private File FILE_DIR;
-    private AlertDialog alertNew, alertRename;
-    private EditText editTextNew, editTextRename;
-    private String workspaceName;
-    static private Mobbob mRobot;
-    static private JSParser mParser;
-    SharedPreferences mPreferences;
+	private ActionBar action;
+	private File FILE_DIR;
+	private AlertDialog alertNew, alertRename;
+	private EditText editTextNew, editTextRename;
+	private String workspaceName;
+	static private Mobbob mRobot;
+	static private JSParser mParser;
+	SharedPreferences mPreferences;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        action = getSupportActionBar();
-        FILE_DIR = getFilesDir();
-        editTextNew = new EditText(this);
-        editTextRename = new EditText(this);
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		action = getSupportActionBar();
+		FILE_DIR = getFilesDir();
+		editTextNew = new EditText(this);
+		editTextRename = new EditText(this);
 
         /* Text input alertBuilder for rename/new workspace actions */
-        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
-        alertBuilder.setView(editTextRename);
-        alertBuilder.setCancelable(true);
-        alertBuilder.setTitle("Rename Current Workspace");
-        alertBuilder.setPositiveButton("OK", renameWorkspace);
-        alertRename = alertBuilder.create();
+		AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
+		alertBuilder.setView(editTextRename);
+		alertBuilder.setCancelable(true);
+		alertBuilder.setTitle("Rename Current Workspace");
+		alertBuilder.setPositiveButton("OK", renameWorkspace);
+		alertRename = alertBuilder.create();
 
-        alertBuilder.setView(editTextNew);
-        alertBuilder.setTitle("Enter New Workspace Name");
-        alertBuilder.setPositiveButton("OK", newWorkspace);
-        alertNew = alertBuilder.create();
+		alertBuilder.setView(editTextNew);
+		alertBuilder.setTitle("Enter New Workspace Name");
+		alertBuilder.setPositiveButton("OK", newWorkspace);
+		alertNew = alertBuilder.create();
 
-        mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        workspaceName = mPreferences.getString("pref_lastWorkspace", SAVED_WORKSPACE_FILENAME_DEFAULT);
+		mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+		workspaceName = mPreferences.getString("pref_lastWorkspace", SAVED_WORKSPACE_FILENAME_DEFAULT);
 
-        mParser = new JSParser(this);
-        mRobot = Mobbob.getMobob();
+		mParser = new JSParser(this);
+		mRobot = Mobbob.getMobob();
 
         /* Autoload last workspace */
-        onLoadWorkspace();
-    }
+		onLoadWorkspace();
+	}
 
-    private final CodeGenerationRequest.CodeGeneratorCallback mCodeGeneratorCallback =
-            new CodeGenerationRequest.CodeGeneratorCallback() {
-        @Override
-        public void onFinishCodeGeneration(final String generatedCode) {
-            Log.i(TAG, "generatedCode:\n" + generatedCode);
-            Toast.makeText(getApplicationContext(), generatedCode, Toast.LENGTH_LONG).show();
-            mParser.parseCode(mRobot, generatedCode);
-        }
-    };
+	private final CodeGenerationRequest.CodeGeneratorCallback mCodeGeneratorCallback =
+			new CodeGenerationRequest.CodeGeneratorCallback() {
+				@Override
+				public void onFinishCodeGeneration(final String generatedCode) {
+					Log.i(TAG, "generatedCode:\n" + generatedCode);
+					Toast.makeText(getApplicationContext(), generatedCode, Toast.LENGTH_LONG).show();
+					mParser.parseCode(mRobot, generatedCode);
+				}
+			};
 
-    @Override
-    public void connectionStateChanged(connectionStateEnum state) {
-        Log.i(TAG, "connection state changed:" + state);
-        mRobot = Mobbob.getMobob();
-        updateTitlebar();
-    }
+	@Override
+	public void connectionStateChanged(connectionStateEnum state) {
+		Log.i(TAG, "connection state changed:" + state);
+		mRobot = Mobbob.getMobob();
+		updateTitlebar();
+	}
 
-    private void updateTitlebar() {
-        if (mRobot != null && mRobot.getConnectionState() == connectionStateEnum.isConnected)
-            action.setTitle(mRobot.getName() + " : " + workspaceName.replace(".xml", ""));
-        else
-            action.setTitle(workspaceName.replace(".xml", ""));
-        SharedPreferences.Editor editor = mPreferences.edit();
-        editor.putString("pref_lastWorkspace", workspaceName);
-        editor.commit();
-    }
+	private void updateTitlebar() {
+		if (mRobot != null && mRobot.getConnectionState() == connectionStateEnum.isConnected)
+			action.setTitle(mRobot.getName() + " : " + workspaceName.replace(".xml", ""));
+		else
+			action.setTitle(workspaceName.replace(".xml", ""));
+		SharedPreferences.Editor editor = mPreferences.edit();
+		editor.putString("pref_lastWorkspace", workspaceName);
+		editor.commit();
+	}
 
-    @Override
-    public void onLoadWorkspace() {
-	    try {
-		    loadWorkspaceFromAppDir(workspaceName);
-	    } catch (BlocklyParserException e) {
-		    // failed to parse xml
-	    }
-	    addDefaultVariables(getController());
-        updateTitlebar();
-    }
+	@Override
+	public void onLoadWorkspace() {
+		try {
+			loadWorkspaceFromAppDir(workspaceName);
+		} catch (BlocklyParserException e) {
+			// failed to parse xml
+		}
+		addDefaultVariables(getController());
+		updateTitlebar();
+	}
 
-    @Override
-    public void onSaveWorkspace() {
-        saveWorkspaceToAppDir(workspaceName);
-    }
+	@Override
+	public void onSaveWorkspace() {
+		saveWorkspaceToAppDir(workspaceName);
+	}
 
-    // override restoreActionBar to set Title (setting it in OnCreate is too early)
-    @Override
-    protected void restoreActionBar() {
-        super.restoreActionBar();
-        updateTitlebar();
-    }
+	// override restoreActionBar to set Title (setting it in OnCreate is too early)
+	@Override
+	protected void restoreActionBar() {
+		super.restoreActionBar();
+		updateTitlebar();
+	}
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            final Intent intent = new Intent(this, SettingsActivity.class);
-            startActivity(intent);
-            return true;
-        } else if (id == R.id.action_about) {
-            AboutDialog about = new AboutDialog(this);
-            about.setTitle("About this app");
-            about.show();
-            return true;
-        } else if (id == R.id.action_load) {
-            /* Assign workspace selector dialogue for load action */
-            WorkspaceSelector dialog = new WorkspaceSelector(this, FILE_DIR, ".xml");
-            dialog.addFileListener(new WorkspaceSelector.FileSelectedListener() {
-                public void fileSelected(File file) {
-                    Log.d(TAG, "loading workspace: " + file.toString());
-                    workspaceName = file.getName();
-                    onLoadWorkspace();
-                }
-            });
-            dialog.showDialog();
-            return true;
-        } else if (id == R.id.action_rename) {
-            editTextRename.setText(workspaceName.replace(".xml", ""));
-            alertRename.show();
-            return true;
-        } else if (id == R.id.action_new) {
-            alertNew.show();
-            return true;
-        } else if (id == R.id.action_stop) {
-            mParser.stop();
-        } else if (id == R.id.action_connect) {
-            DiscoverySelector dialog = new DiscoverySelector(this, this);
-            dialog.showDialog();
-            return true;
-        } else if (id == R.id.action_panel) {
-            final Intent intent = new Intent(this, RobotControlActivity.class);
-            startActivity(intent);
-        }
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		int id = item.getItemId();
+		if (id == R.id.action_settings) {
+			final Intent intent = new Intent(this, SettingsActivity.class);
+			startActivity(intent);
+			return true;
+		} else if (id == R.id.action_about) {
+			AboutDialog about = new AboutDialog(this);
+			about.setTitle("About this app");
+			about.show();
+			return true;
+		} else if (id == R.id.action_load) {
+		    /* Assign workspace selector dialogue for load action */
+			WorkspaceSelector dialog = new WorkspaceSelector(this, FILE_DIR, ".xml");
+			dialog.addFileListener(new WorkspaceSelector.FileSelectedListener() {
+				public void fileSelected(File file) {
+					Log.d(TAG, "loading workspace: " + file.toString());
+					workspaceName = file.getName();
+					onLoadWorkspace();
+				}
+			});
+			dialog.showDialog();
+			return true;
+		} else if (id == R.id.action_rename) {
+			editTextRename.setText(workspaceName.replace(".xml", ""));
+			alertRename.show();
+			return true;
+		} else if (id == R.id.action_new) {
+			alertNew.show();
+			return true;
+		} else if (id == R.id.action_stop) {
+			mParser.stop();
+		} else if (id == R.id.action_connect) {
+			DiscoverySelector dialog = new DiscoverySelector(this, this);
+			dialog.showDialog();
+			return true;
+		} else if (id == R.id.action_panel) {
+			final Intent intent = new Intent(this, RobotControlActivity.class);
+			startActivity(intent);
+		}
 
-        return super.onOptionsItemSelected(item);
-    }
+		return super.onOptionsItemSelected(item);
+	}
 
-    @NonNull
-    @Override
-    protected List<String> getBlockDefinitionsJsonPaths() {
-        return BLOCK_DEFINITIONS;
-    }
+	@NonNull
+	@Override
+	protected List<String> getBlockDefinitionsJsonPaths() {
+		return BLOCK_DEFINITIONS;
+	}
 
-    @Override
-    protected int getActionBarMenuResId() {
-        return R.menu.blockly_actionbar;
-    }
+	@Override
+	protected int getActionBarMenuResId() {
+		return R.menu.blockly_actionbar;
+	}
 
-    @NonNull
-    @Override
-    protected String getToolboxContentsXmlPath() {
-        return "toolbox_basic.xml";
-    }
+	@NonNull
+	@Override
+	protected String getToolboxContentsXmlPath() {
+		return "toolbox_basic.xml";
+	}
 
-    @NonNull
-    @Override
-    protected List<String> getGeneratorsJsPaths() {
-        return JAVASCRIPT_GENERATORS;
-    }
+	@NonNull
+	@Override
+	protected List<String> getGeneratorsJsPaths() {
+		return JAVASCRIPT_GENERATORS;
+	}
 
-    @Override
-    public BlockViewFactory onCreateBlockViewFactory(WorkspaceHelper helper) {
-        return new VerticalBlockViewFactory(this, helper);
-    }
+	@Override
+	public BlockViewFactory onCreateBlockViewFactory(WorkspaceHelper helper) {
+		return new VerticalBlockViewFactory(this, helper);
+	}
 
-    @NonNull
-    @Override
-    protected CodeGenerationRequest.CodeGeneratorCallback getCodeGenerationCallback() {
-        // Uses the same callback for every generation call.
-        return mCodeGeneratorCallback;
-    }
+	@NonNull
+	@Override
+	protected CodeGenerationRequest.CodeGeneratorCallback getCodeGenerationCallback() {
+		// Uses the same callback for every generation call.
+		return mCodeGeneratorCallback;
+	}
 
-    @Override
-    protected void onInitBlankWorkspace() {
-        getController().loadWorkspaceContents(
-                "<xml xmlns='http://www.w3.org/1999/xhtml'>\n" +
-                "  <block type='start' id='startblock' " +
-                "    x='0' y='5' " +
-                "    inline='false' " +
-                "    deletable='false' >" +
-                "  </block>" +
-                "</xml>"
-        );
-	    addDefaultVariables(getController());
-    }
+	@Override
+	protected void onInitBlankWorkspace() {
+		getController().loadWorkspaceContents(
+				"<xml xmlns='http://www.w3.org/1999/xhtml'>\n" +
+						"  <block type='start' id='startblock' " +
+						"    x='0' y='5' " +
+						"    inline='false' " +
+						"    deletable='false' >" +
+						"  </block>" +
+						"</xml>"
+		);
+		addDefaultVariables(getController());
+	}
 
-    @Override
-    protected void onStop() {
-        Log.d(TAG, "onStop()");
-        super.onStop();
-        if (mRobot != null)
-            mRobot.disconnect();
-    }
+	@Override
+	protected void onStop() {
+		Log.d(TAG, "onStop()");
+		super.onStop();
+		if (mRobot != null)
+			mRobot.disconnect();
+	}
 
-    @Override
-    protected void onStart() {
-        Log.d(TAG, "onStart()");
-        SharedPreferences.Editor editor = mPreferences.edit();
-        editor.putString("pref_defaultView", "blockly");
-        editor.commit();
-        super.onStart();
-        if (mRobot != null)
-            mRobot.connect();
-    }
+	@Override
+	protected void onStart() {
+		Log.d(TAG, "onStart()");
+		SharedPreferences.Editor editor = mPreferences.edit();
+		editor.putString("pref_defaultView", "blockly");
+		editor.commit();
+		super.onStart();
+		if (mRobot != null)
+			mRobot.connect();
+	}
 
-    private DialogInterface.OnClickListener newWorkspace = new DialogInterface.OnClickListener() {
-        @Override
-        public void onClick(DialogInterface dialogInterface, int i) {
-            workspaceName = editTextNew.getText().toString() + ".xml";
-            updateTitlebar();
+	private DialogInterface.OnClickListener newWorkspace = new DialogInterface.OnClickListener() {
+		@Override
+		public void onClick(DialogInterface dialogInterface, int i) {
+			workspaceName = editTextNew.getText().toString() + ".xml";
+			updateTitlebar();
 
-            View view = getCurrentFocus();
-            if (view != null) {
-                InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-            }
-        }
-    };
+			View view = getCurrentFocus();
+			if (view != null) {
+				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+			}
+		}
+	};
 
-    private DialogInterface.OnClickListener renameWorkspace = new DialogInterface.OnClickListener() {
-        @Override
-        public void onClick(DialogInterface dialogInterface, int i) {
-            String newName = editTextRename.getText().toString() + ".xml";
-            File from = new File(FILE_DIR, workspaceName);
-            File to = new File(FILE_DIR, newName);
+	private DialogInterface.OnClickListener renameWorkspace = new DialogInterface.OnClickListener() {
+		@Override
+		public void onClick(DialogInterface dialogInterface, int i) {
+			String newName = editTextRename.getText().toString() + ".xml";
+			File from = new File(FILE_DIR, workspaceName);
+			File to = new File(FILE_DIR, newName);
 
-            if (from.renameTo(to)) {
-                from.delete();
-                workspaceName = newName;
-                updateTitlebar();
-            }
+			if (from.renameTo(to)) {
+				from.delete();
+				workspaceName = newName;
+				updateTitlebar();
+			}
 
-            View view = getCurrentFocus();
-            if (view != null) {
-                InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-            }
-        }
-    };
+			View view = getCurrentFocus();
+			if (view != null) {
+				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+			}
+		}
+	};
 
 	static void addDefaultVariables(BlocklyController controller) {
 		// TODO: (#22) Remove this override when variables are supported properly
