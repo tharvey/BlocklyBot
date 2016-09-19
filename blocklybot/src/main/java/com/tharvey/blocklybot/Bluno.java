@@ -27,6 +27,7 @@ public class Bluno extends Mobbob {
 	private static BluetoothGattCharacteristic mCommandCharacteristic;
 	private Handler mHandler;
 	private Context mContext;
+	private boolean mBound;
 	BluetoothLeService mBluetoothLeService;
 	private ArrayList<ArrayList<BluetoothGattCharacteristic>> mGattCharacteristics =
 			new ArrayList<ArrayList<BluetoothGattCharacteristic>>();
@@ -35,15 +36,11 @@ public class Bluno extends Mobbob {
 		super(handler, device.getName(), device.getAddress());
 		mContext = context;
 		mHandler = handler;
-
+		mBound = false;
 		context.registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
-
 		Intent gattServiceIntent = new Intent(context, BluetoothLeService.class);
-        try {
-            disconnect();
-        } catch (Exception e) {
-        }
 		context.bindService(gattServiceIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
+		mBound = true;
 	}
 
 	public void serialSend(String theString) {
@@ -204,13 +201,22 @@ public class Bluno extends Mobbob {
 
 	public synchronized int connect() {
 		Log.d(TAG, "connect " + toString());
+		if (!mBound) {
+			mContext.registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+			Intent gattServiceIntent = new Intent(mContext, BluetoothLeService.class);
+			mContext.bindService(gattServiceIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
+			mBound = true;
+		}
 		return (mBluetoothLeService.connect(getAddress()) ? 0 : 1);
 	}
 
 	public synchronized void disconnect() {
 		Log.d(TAG, "disconnect " + toString());
-		mBluetoothLeService.disconnect();
-		mContext.unbindService(mServiceConnection);
-		mContext.unregisterReceiver(mGattUpdateReceiver);
+		if (mBound) {
+			mBluetoothLeService.disconnect();
+			mContext.unbindService(mServiceConnection);
+			mContext.unregisterReceiver(mGattUpdateReceiver);
+			mBound = false;
+		}
 	}
 }

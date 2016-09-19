@@ -90,6 +90,7 @@ public class BluetoothScan {
                 // query services for this device
                 else if (!mQueryQueue.contains(device)) {
                     Log.d(TAG, "Querying services for " + device);
+                    mCallback.onQuery(device);
                     mQueryQueue.add(device);
                     device.fetchUuidsWithSdp();
                 }

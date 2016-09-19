@@ -41,11 +41,15 @@ public class DiscoverySelector {
     private static final String COMPATDEVS_PREF = "pref_knowncompatibledevs";
     private Map<String, Boolean> mKnownDevs;
     private IConnection mListener;
+    private String mPhase;
+    private int mCount;
 
     public DiscoverySelector(Activity activity, IConnection listener) {
         mActivity = activity;
         mListener = listener;
         mHandler = new Handler();
+        mPhase = "";
+        mCount = 0;
         mPreferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
 
         // Initializes list view adapter.
@@ -86,10 +90,19 @@ public class DiscoverySelector {
                 }
 
                 @Override
+                public void onQuery(BluetoothDevice device) {
+                    mCount++;
+                    updateTitle();
+                }
+
+                @Override
                 public void onDiscoveryComplete() {
                     Log.i(TAG, "BT Discovery Complete");
-                    if (mBLEScan != null)
-                        mBLEScan.start();
+                    if (mBLEScan != null) {
+                        mPhase = "Bluetooth LE";
+                        updateTitle();
+	                    mBLEScan.start();
+                    }
                 }
             });
         }
@@ -103,9 +116,18 @@ public class DiscoverySelector {
                 }
 
                 @Override
+                public void onQuery(BluetoothDevice device) {
+                    mCount++;
+                    updateTitle();
+                }
+
+                @Override
                 public void onDiscoveryComplete() {
                     Log.i(TAG, "BLE Discovery Complete");
                     mProgress.setVisibility(View.INVISIBLE);
+                    mPhase = "";
+                    mCount = 0;
+                    updateTitle();
                 }
             });
         }
@@ -114,8 +136,8 @@ public class DiscoverySelector {
     /* store device in preference cache with compatibility flag for later use */
     private void cacheDevice(BluetoothDevice device, Boolean compatible) {
         Log.i(TAG, "cacheDevice: " + device.getName() + ":" + device.getAddress() +  ":" + compatible);
-        JSONObject json = new JSONObject(mKnownDevs);
         mKnownDevs.put(device.getAddress(), compatible);
+        JSONObject json = new JSONObject(mKnownDevs);
         Log.d(TAG, "Write list of known devs:");
         for (String s : mKnownDevs.keySet())
             Log.d(TAG, s + ":" + mKnownDevs.get(s));
@@ -131,6 +153,9 @@ public class DiscoverySelector {
             mBLEScan.stop();
         if (mBTScan != null)
             mBTScan.stop();
+        mPhase = "";
+        mCount = 0;
+        updateTitle();
         mProgress.setVisibility(View.INVISIBLE);
     }
 
@@ -139,10 +164,21 @@ public class DiscoverySelector {
         Log.i(TAG, "start()");
         mProgress.setVisibility(View.VISIBLE);
         /* if BT enabled, scan it first - BLE will be started when its complete */
-        if (mBTScan != null)
-            mBTScan.start();
-        else if (mBLEScan != null)
-            mBLEScan.start();
+        if (mBTScan != null) {
+	        mPhase = "Bluetooth";
+	        updateTitle();
+	        mBTScan.start();
+        }
+        else if (mBLEScan != null) {
+	        mPhase = "Bluetooth LE";
+	        updateTitle();
+	        mBLEScan.start();
+        }
+    }
+
+    private void updateTitle() {
+        String dots = "...............";
+        mDialog.setTitle("Nearby Robots: " + mPhase + dots.substring(0, mCount));
     }
 
     /* popup dialog */
@@ -197,12 +233,10 @@ public class DiscoverySelector {
     /* Connect to a robot */
     private boolean connect(final BluetoothDevice device) {
         Log.i(TAG, "connecting to " +  device.getName() + ":" + device.getAddress());
-        mProgress.setVisibility(View.VISIBLE);
-        mProgress.setIndeterminate(true);
         Thread thread = new Thread() {
             @Override
             public void run() {
-                Robot robot = Mobbob.getRobot();
+                Mobbob robot = (Mobbob) Mobbob.getRobot();
                 if (robot != null)
                     robot.disconnect();
                 int waittimems = 0;
@@ -219,11 +253,6 @@ public class DiscoverySelector {
                 robot.setConnectionListener(mListener);
                 while (robot.getConnectionState() != IConnection.connectionStateEnum.isConnected) {
                     if (waittimems > 5000) {
-/*
-                        Toast.makeText(mActivity.getApplicationContext(),
-                                "Failed Connecting to " + device.getName() + ":" + device.getAddress(),
-                                Toast.LENGTH_LONG).show();
-*/
                         Log.e(TAG, "Failed connectting to " + device.getName() + ":" + device.getAddress());
                         // dismiss dialog
                         mDialog.cancel();
@@ -247,10 +276,11 @@ public class DiscoverySelector {
                 // dismiss dialog
                 mDialog.cancel();
                 mDialog.dismiss();
-                robot.serialSend("<FW,1>");
+                robot.queueCommand(Mobbob.commands.BOUNCE.ordinal(), 1);
             }
         };
         stop();
+        mProgress.setVisibility(View.VISIBLE);
         Toast.makeText(mActivity.getApplicationContext(),
                 "Connecting to " + device.getName() + ":" + device.getAddress(),
                 Toast.LENGTH_LONG).show();

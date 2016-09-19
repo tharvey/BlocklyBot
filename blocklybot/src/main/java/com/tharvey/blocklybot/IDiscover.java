@@ -7,5 +7,6 @@ import android.bluetooth.BluetoothDevice;
  */
 public interface IDiscover {
     void onDiscover(BluetoothDevice device, Boolean compatible);
+    void onQuery(BluetoothDevice device);
     void onDiscoveryComplete();
 }

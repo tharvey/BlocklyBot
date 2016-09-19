@@ -94,6 +94,7 @@ public class BLEScan {
     private void queryNext() {
         if (mQueryQueue.size() > 0) {
             BluetoothDevice device = mQueryQueue.get(0);
+            mCallback.onQuery(device);
             Log.i(TAG, "querying services for " + device.getAddress() + ":" + device.getName());
             mBluetoothLeService.connect(device.getAddress());
         } else {
@@ -134,6 +135,7 @@ public class BLEScan {
                 mBluetoothLeService.disconnect();
             } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 mQueryQueue.remove(device);
+                mBluetoothLeService.disconnect();
                 queryNext();
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                 Log.d(TAG, "Data Available: " + intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
@@ -174,6 +176,7 @@ public class BLEScan {
 
     /* unregister services */
     protected void done() {
+        mBluetoothLeService.disconnect();
         mBluetoothAdapter.stopLeScan(mLeScanCallback);
         mContext.unbindService(mServiceConnection);
         mContext.unregisterReceiver(mReceiver);
@@ -233,6 +236,7 @@ public class BLEScan {
                 mDeviceListAdapter.addDevice(device);
             } else {
                 Log.i(TAG, "Adding to query queue");
+                mCallback.onQuery(device);
                 mQueryQueue.add(device);
                 if (mQueryQueue.size() == 1)
                     queryNext();
