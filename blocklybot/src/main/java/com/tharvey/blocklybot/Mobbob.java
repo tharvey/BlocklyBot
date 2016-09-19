@@ -37,7 +37,7 @@ public abstract class Mobbob extends Robot {
         CMD_MAX,
     };
 
-    private String[] command_str = { "ST", "FW", "BW", "LT", "RT", "SX", "BX",
+    private String[] command_str = { "ST", "FW", "BW", "RT", "LT", "SX", "BX",
             "WX", "WY", "WZ", "TX", "TY", "TZ",
             "LX", "LY", "LZ"};
 
