@@ -36,6 +36,7 @@ import com.google.blockly.android.control.BlocklyController;
 import com.google.blockly.android.ui.BlockViewFactory;
 import com.google.blockly.android.ui.WorkspaceHelper;
 import com.google.blockly.android.ui.vertical.VerticalBlockViewFactory;
+import com.google.blockly.model.BlocklyParserException;
 
 import java.io.File;
 import java.util.Arrays;
@@ -130,7 +131,11 @@ public class BlocklyActivity extends AbstractBlocklyActivity implements IConnect
 
     @Override
     public void onLoadWorkspace() {
-        loadWorkspaceFromAppDir(workspaceName);
+	    try {
+		    loadWorkspaceFromAppDir(workspaceName);
+	    } catch (BlocklyParserException e) {
+		    // failed to parse xml
+	    }
 	    addDefaultVariables(getController());
         updateTitlebar();
     }
