@@ -1,0 +1,86 @@
+<xml xmlns="http://www.w3.org/1999/xhtml">
+    <block type="start" id="startblock" x="-97" y="-48" deletable="false" inline="false">
+        <statement name="FUNC">
+            <block type="speech_speak" id="7dd699f7-b009-41b0-a00d-fb7111eba8ef">
+                <field name="TEXT">hello</field>
+                <next>
+                    <block type="audio_note" id="c8ced057-6774-43de-9775-277676aa58a6">
+                        <field name="NOTE">C</field>
+                        <next>
+                            <block type="audio_note" id="2634de6f-3729-4d5e-9349-24e0c319e3a7">
+                                <field name="NOTE">C#</field>
+                                <next>
+                                    <block type="audio_note" id="2634de6f-3729-4d5e-9349-24e0c319e3a8">
+                                        <field name="NOTE">D</field>
+                                        <next>
+                                            <block type="audio_note" id="2634de6f-3729-4d5e-9349-24e0c319e3a9">
+                                                <field name="NOTE">D#</field>
+                                                <next>
+                                                    <block type="audio_note" id="2634de6f-3729-4d5e-9349-24e0c319e3aa">
+                                                        <field name="NOTE">E</field>
+                                                        <next>
+                                                            <block type="audio_note" id="2634de6f-3729-4d5e-9349-24e0c319e3ab">
+                                                                <field name="NOTE">F</field>
+                                                                <next>
+                                                                    <block type="audio_note" id="2634de6f-3729-4d5e-9349-24e0c319e3ac">
+                                                                        <field name="NOTE">F#</field>
+                                                                        <next>
+                                                                            <block type="audio_note" id="2634de6f-3729-4d5e-9349-24e0c319e3ad">
+                                                                                <field name="NOTE">G</field>
+                                                                                <next>
+                                                                                    <block type="audio_note" id="2634de6f-3729-4d5e-9349-24e0c319e3ae">
+                                                                                        <field name="NOTE">G#</field>
+                                                                                        <next>
+                                                                                            <block type="audio_note" id="2634de6f-3729-4d5e-9349-24e0c319e3af">
+                                                                                                <field name="NOTE">A</field>
+                                                                                                <next>
+                                                                                                    <block type="audio_note" id="2634de6f-3729-4d5e-9349-24e0c319e3b0">
+                                                                                                        <field name="NOTE">A#</field>
+                                                                                                        <next>
+                                                                                                            <block type="audio_note" id="2634de6f-3729-4d5e-9349-24e0c319e3b1">
+                                                                                                                <field name="NOTE">B</field>
+                                                                                                                <next>
+                                                                                                                    <block type="audio_tone" id="85a8ee89-0da1-4e22-ae06-d25d845bbf73">
+                                                                                                                        <field name="FREQ">1000</field>
+                                                                                                                        <field name="TIME">1</field>
+                                                                                                                        <next>
+                                                                                                                            <block type="audio_tone" id="d34e3d4b-a21b-46d7-a6a4-717f0ee334de">
+                                                                                                                                <field name="FREQ">400</field>
+                                                                                                                                <field name="TIME">2</field>
+                                                                                                                                <next>
+                                                                                                                                    <block type="audio_play" id="2a69a0da-a593-4bfa-ab0a-f1a7c166b1b2" inline="true">
+                                                                                                                                        <field name="SOUND">laser</field>
+                                                                                                                                    </block>
+                                                                                                                                </next>
+                                                                                                                            </block>
+                                                                                                                        </next>
+                                                                                                                    </block>
+                                                                                                                </next>
+                                                                                                            </block>
+                                                                                                        </next>
+                                                                                                    </block>
+                                                                                                </next>
+                                                                                            </block>
+                                                                                        </next>
+                                                                                    </block>
+                                                                                </next>
+                                                                            </block>
+                                                                        </next>
+                                                                    </block>
+                                                                </next>
+                                                            </block>
+                                                        </next>
+                                                    </block>
+                                                </next>
+                                            </block>
+                                        </next>
+                                    </block>
+                                </next>
+                            </block>
+                        </next>
+                    </block>
+                </next>
+            </block>
+        </statement>
+    </block>
+</xml>

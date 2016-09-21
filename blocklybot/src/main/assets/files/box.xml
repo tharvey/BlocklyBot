@@ -1,0 +1,24 @@
+<xml xmlns="http://www.w3.org/1999/xhtml">
+    <block type="start" id="startblock" x="-97" y="-48" deletable="false" inline="false">
+        <statement name="FUNC">
+            <block type="speech_speak" id="7dd699f7-b009-41b0-a00d-fb7111eba8ef">
+                <field name="TEXT">hello</field>
+                <next>
+                    <block type="control_repeat" id="91379513-8e1a-4641-9741-bb755a3c9c59">
+                        <field name="TIMES">4</field>
+                        <statement name="DO">
+                            <block type="robot_move_forward_internal" id="223033ec-9ab9-4bfa-9ae8-c8edaf84042f">
+                                <field name="VALUE">1</field>
+                                <next>
+                                    <block type="robot_turn_right_internal" id="6f7bfaa7-84ad-46f3-9e05-c4df4a60c092">
+                                        <field name="VALUE">4</field>
+                                    </block>
+                                </next>
+                            </block>
+                        </statement>
+                    </block>
+                </next>
+            </block>
+        </statement>
+    </block>
+</xml>

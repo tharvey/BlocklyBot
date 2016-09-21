@@ -1,0 +1,48 @@
+<xml xmlns="http://www.w3.org/1999/xhtml">
+    <block type="start" id="startblock" x="-97" y="-48" deletable="false" inline="false">
+        <statement name="FUNC">
+            <block type="speech_speak" id="7dd699f7-b009-41b0-a00d-fb7111eba8ef">
+                <field name="TEXT">hello</field>
+            </block>
+        </statement>
+    </block>
+    <block type="speech_listen" id="56736faf-db48-41bc-b1c9-489189878dbf" x="90" y="-38">
+        <field name="CMD">move forward</field>
+        <statement name="FUNC">
+            <block type="speech_speak" id="1052b9a2-85ab-4081-9fb6-343a38c8d74b">
+                <field name="TEXT">moving forward</field>
+                <next>
+                    <block type="robot_move_forward_internal" id="82a630f1-b05d-412c-92ed-fd7e6aaf0afa">
+                        <field name="VALUE">1</field>
+                    </block>
+                </next>
+            </block>
+        </statement>
+    </block>
+    <block type="speech_listen" id="8072479f-5a00-4765-b732-7738091297f1" x="95" y="149">
+        <field name="CMD">move backward</field>
+        <statement name="FUNC">
+            <block type="speech_speak" id="f15e99fb-6ab2-4b08-b078-0265fed1c577">
+                <field name="TEXT">backing up</field>
+                <next>
+                    <block type="robot_move_backward_internal" id="2b3ec1e8-621d-41b3-aa5d-68abdd8dc4d4">
+                        <field name="VALUE">1</field>
+                    </block>
+                </next>
+            </block>
+        </statement>
+    </block>
+    <block type="speech_listen" id="8072479f-5a00-4765-b732-7738091297f2" x="95" y="149">
+        <field name="CMD">Stop</field>
+        <statement name="FUNC">
+            <block type="speech_speak" id="f15e99fb-6ab2-4b08-b078-0265fed1c572">
+                <field name="TEXT">Stoping</field>
+                <next>
+                    <block type="robot_stop" id="2b3ec1e8-621d-41b3-aa5d-68abdd8dc4d2">
+                        <field name="VALUE">1</field>
+                    </block>
+                </next>
+            </block>
+        </statement>
+    </block>
+</xml>

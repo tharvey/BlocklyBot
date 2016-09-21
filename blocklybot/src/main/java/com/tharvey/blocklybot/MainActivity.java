@@ -6,11 +6,18 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 public class MainActivity extends AppCompatActivity {
 	private final static String TAG = MainActivity.class.getSimpleName();
@@ -68,6 +75,12 @@ public class MainActivity extends AppCompatActivity {
 		}
 
 		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+		if (sharedPref.getBoolean("installed", false)) {
+			Log.i(TAG, "Copying example files on first run...");
+			sharedPref.edit().putBoolean("installed", true).commit();
+			copyAssetFolder(getAssets(), "files", getFilesDir().getPath() /*+ "/samples"*/);
+		}
+
 		String controller = sharedPref.getString("pref_defaultView", "blockly");
 		Log.i(TAG, "Controller:" + controller);
 		if (controller.equals("panel")) {
@@ -79,16 +92,56 @@ public class MainActivity extends AppCompatActivity {
 		}
 	}
 
-    /* handle result of enable bluetooth request (above) */
-/* We don't really care right now if user chose to not enable Bluetooth
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // User chose not to enable Bluetooth.
-        if (requestCode == REQUEST_ENABLE_BT && resultCode == this.RESULT_CANCELED) {
-//            finish();
-            return;
-        }
-        onActivityResult(requestCode, resultCode, data);
-    }
-*/
+	private static boolean copyAssetFolder(AssetManager assetManager,
+	                                       String fromAssetPath, String toPath) {
+		try {
+			String[] files = assetManager.list(fromAssetPath);
+			new File(toPath).mkdirs();
+			boolean res = true;
+			for (String file : files) {
+				Log.i(TAG, file);
+				if (file.contains("."))
+					res &= copyAsset(assetManager,
+							fromAssetPath + "/" + file,
+							toPath + "/" + file);
+				else
+					res &= copyAssetFolder(assetManager,
+							fromAssetPath + "/" + file,
+							toPath + "/" + file);
+			}
+			return res;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	private static boolean copyAsset(AssetManager assetManager,
+	                                 String fromAssetPath, String toPath) {
+		InputStream in = null;
+		OutputStream out = null;
+		try {
+			in = assetManager.open(fromAssetPath);
+			new File(toPath).createNewFile();
+			out = new FileOutputStream(toPath);
+			copyFile(in, out);
+			in.close();
+			in = null;
+			out.flush();
+			out.close();
+			out = null;
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	private static void copyFile(InputStream in, OutputStream out) throws IOException {
+		byte[] buffer = new byte[1024];
+		int read;
+		while ((read = in.read(buffer)) != -1) {
+			out.write(buffer, 0, read);
+		}
+	}
 }
