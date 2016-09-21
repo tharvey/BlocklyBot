@@ -23,7 +23,7 @@ public class Tone {
 		int count = (int) (44100.0 * 2.0 * (durationMs / 1000.0)) & ~1;
 		short[] samples = new short[count];
 		for (int i = 0; i < count; i += 2) {
-			short sample = (short) (Math.sin(2 * Math.PI * i / (44100.0 / freqHz)) * 0x7FFF);
+			short sample = (short) (Math.sin(2 * Math.PI * i / (44100.0 / freqHz)) * 0x7FFF * .75);
 			samples[i + 0] = sample;
 			samples[i + 1] = sample;
 		}

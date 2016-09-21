@@ -40,7 +40,7 @@
             <field name="SOUND">laser</field>
         </block>
         <block type="audio_tone">
-            <field name="FREQ">1000</field>
+            <field name="FREQ">400</field>
             <field name="TIME">1</field>
         </block>
         <block type="audio_note">
