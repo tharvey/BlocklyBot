@@ -124,6 +124,7 @@ public class WorkspaceSelector {
 				public boolean accept(File dir, String filename) {
 					File sel = new File(dir, filename);
 					if (!sel.canRead()) return false;
+					if (sel.getName().equals("instant-run")) return false;
 					if (selectDirectoryOption) return sel.isDirectory();
 					if (filename.endsWith(".xml")) return true;
 					else {
