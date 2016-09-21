@@ -202,7 +202,11 @@ public class JSParser {
 				};
 				context.property("Listen", Listen);
 
-				context.evaluateScript(code);
+				try {
+					context.evaluateScript(code);
+				} catch (Exception e) {
+					Log.e(TAG, "Error evaluating script: " + e);
+				}
 				if (robot != null)
 					robot.doCommand(Mobbob.commands.STOP.ordinal(), 0);
 			}
