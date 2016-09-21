@@ -18,6 +18,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -78,6 +79,9 @@ public class BlocklyActivity extends AbstractBlocklyActivity implements IConnect
 		FILE_DIR = getFilesDir();
 		editTextNew = new EditText(this);
 		editTextRename = new EditText(this);
+
+		// Set audio stream for volume control
+		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         /* Text input alertBuilder for rename/new workspace actions */
 		AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
