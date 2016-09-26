@@ -38,8 +38,11 @@ import com.google.blockly.android.ui.BlockViewFactory;
 import com.google.blockly.android.ui.WorkspaceHelper;
 import com.google.blockly.android.ui.vertical.VerticalBlockViewFactory;
 import com.google.blockly.model.BlocklyParserException;
+import com.google.blockly.model.BlocklySerializerException;
+import com.google.blockly.model.Workspace;
 
 import java.io.File;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
 
@@ -146,6 +149,23 @@ public class BlocklyActivity extends AbstractBlocklyActivity implements IConnect
 
 	@Override
 	public void onSaveWorkspace() {
+		OutputStream output = new OutputStream() {
+			private StringBuilder string = new StringBuilder();
+			@Override
+			public void write(int b) {
+				this.string.append((char) b );
+			}
+			public String toString() {
+				return this.string.toString();
+			}
+		};
+		Workspace workspace = mWorkspaceFragment.getWorkspace();
+		try {
+			workspace.serializeToXml(output);
+			Log.i(TAG, "saving:" + workspaceName + ":\n" + output);
+		} catch (BlocklySerializerException e) {
+			Log.e(TAG, "error:" + e);
+		}
 		saveWorkspaceToAppDir(workspaceName);
 	}
 
