@@ -56,7 +56,9 @@ Blockly.JavaScript['audio_play'] = function(block) {
 };
 
 Blockly.JavaScript['audio_note'] = function(block) {
-  return 'Note("' + block.getFieldValue('NOTE') + '", \'block_id_' + block.id + '\');\n';
+  var note = block.getFieldValue('NOTE');
+  var dur = block.getFieldValue('TIME');
+  return 'Note("' + note + '",' + dur + ', \'block_id_' + block.id + '\');\n';
 };
 
 Blockly.JavaScript['audio_note_dur'] = function(block) {

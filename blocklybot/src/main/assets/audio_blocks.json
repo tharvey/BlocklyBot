@@ -66,7 +66,7 @@
   },
   {
     "type": "audio_note",
-    "message0": "Note %1",
+    "message0": "Note %1 %2",
     "args0": [
       {
         "type": "field_dropdown",
@@ -119,6 +119,24 @@
           [
             "B",
             "B"
+          ]
+        ]
+      },
+      {
+        "type": "field_dropdown",
+        "name": "TIME",
+        "options": [
+          [
+            "Quarter",
+            "125"
+          ],
+          [
+            "Half",
+            "250"
+          ],
+          [
+            "Full",
+            "500"
           ]
         ]
       }

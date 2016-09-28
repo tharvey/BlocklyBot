@@ -182,13 +182,11 @@ public class JSParser {
 				context.property("Tone", Tone);
 
 				JSFunction MusicNote = new JSFunction(context, "Note") {
-					public Integer Note(String note) {
+					public Integer Note(String note, int timems) {
 						int octave = 3; /* 3rd octave */
-						int timems = 1000; /* 1sec duration */
 						Log.i(TAG, "note(" + note + ")");
 						mListen.pause();
 						tone.Tone(Note.valueOf(note + octave), timems);
-						SystemClock.sleep(100); /* 100ms of silent pause after note */
 						mListen.resume();
 						return 0;
 					}
