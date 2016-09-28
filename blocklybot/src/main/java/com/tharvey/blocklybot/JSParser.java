@@ -35,6 +35,9 @@ public class JSParser {
 		final Tone tone = new Tone();
 		final HashMap<String, JSFunction> listenMap = new HashMap<String, JSFunction>();
 		final List<String> phrases = new ArrayList<String>();
+		final Display display = new Display(mActivity);
+
+		display.showFace("default");
 
         /* Preparse code:
          *  - remove any root blocks that are not start blocks (TODO: get this done by blockly)
@@ -152,7 +155,9 @@ public class JSParser {
 					public Integer Speak(String text) {
 						Log.i(TAG, "speak(" + text + ")");
 						mListen.pause();
+						display.setSpeaking(true);
 						speak.doCommand(text);
+						display.setSpeaking(false);
 						mListen.resume();
 						return 0;
 					}
@@ -204,11 +209,13 @@ public class JSParser {
 
 				try {
 					context.evaluateScript(code);
+					Log.i(TAG, "Code generation complete");
 				} catch (Exception e) {
 					Log.e(TAG, "Error evaluating script: " + e);
 				}
 				if (robot != null)
 					robot.doCommand(Mobbob.commands.STOP.ordinal(), 0);
+				display.hideFace();
 			}
 		};
 		thread.start();
