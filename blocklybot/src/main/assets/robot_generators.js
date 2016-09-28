@@ -70,6 +70,10 @@ Blockly.JavaScript['audio_tone'] = function(block) {
   return 'Tone(' + freq + ',' + dur + ', \'block_id_' + block.id + '\');\n';
 };
 
+Blockly.JavaScript['wait_time'] = function(block) {
+  var dur = block.getFieldValue('TIME');
+  return 'Wait(' + dur + ', \'block_id_' + block.id + '\');\n';
+};
 
 /* Assign my control blocks to the ones already defined in blocklylib-core */
 Blockly.JavaScript['control_repeat'] = Blockly.JavaScript['controls_repeat'];

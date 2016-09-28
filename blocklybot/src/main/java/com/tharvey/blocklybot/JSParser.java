@@ -207,6 +207,15 @@ public class JSParser {
 				};
 				context.property("Listen", Listen);
 
+				JSFunction Wait = new JSFunction(context, "Wait") {
+					public Integer Wait(int times) {
+						Log.i(TAG, "Wait(" + times + ")");
+						SystemClock.sleep(1000 * times);
+						return 0;
+					}
+				};
+				context.property("Wait", Wait);
+
 				try {
 					context.evaluateScript(code);
 					Log.i(TAG, "Code generation complete");

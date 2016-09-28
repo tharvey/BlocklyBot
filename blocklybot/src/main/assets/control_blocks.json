@@ -34,5 +34,19 @@
     "nextStatement": null,
     "colour": 120,
     "tooltip": "Repeat a set of statements several times"
+  },
+  {
+    "type": "wait_time",
+    "message0": "wait %1 seconds",
+    "args0": [
+      {
+        "type": "field_input",
+        "name": "TIME"
+      }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 120,
+    "tooltip": "Wait for a number of seconds"
   }
 ]
