@@ -29,10 +29,12 @@ public class Listen implements RecognitionListener {
 	private HashMap<String, Integer> captions;
 	private Activity mActivity;
 	private IListen mCallback;
+	private boolean mSetup;
 
 	public Listen(Activity activity, final List<String> phrases, IListen callback) {
 		mActivity = activity;
 		mCallback = callback;
+		mSetup = false;
 
 		// Recognizer initialization is a time-consuming and it involves IO,
 		// so we execute it in async task
@@ -44,6 +46,7 @@ public class Listen implements RecognitionListener {
 					File assetDir = assets.syncAssets();
 					setupRecognizer(assetDir, phrases);
 				} catch (IOException e) {
+					Log.e(TAG, "Error setting up recognizer:" + e);
 					return e;
 				}
 				return null;
@@ -51,6 +54,7 @@ public class Listen implements RecognitionListener {
 
 			@Override
 			protected void onPostExecute(Exception result) {
+				Log.i(TAG, "onPostExecute:" + result);
 				if (result != null) {
 					Log.e(TAG, "Failed to init recognizer " + result);
 				} else {
@@ -59,6 +63,10 @@ public class Listen implements RecognitionListener {
 				}
 			}
 		}.execute();
+	}
+
+	public boolean isSetup() {
+		return mSetup;
 	}
 
 	public void pause() {
@@ -123,9 +131,9 @@ public class Listen implements RecognitionListener {
 	}
 
 	private void setupRecognizer(File assetsDir, List<String> phrases) throws IOException {
+		Log.i(TAG, "setupRecognizer");
 		// The recognizer can be configured to perform multiple searches
 		// of different kind and switch between them
-
 		recognizer = SpeechRecognizerSetup.defaultSetup()
 				.setAcousticModel(new File(assetsDir, "en-us-ptm"))
 		        /* The dictionary is a text file with words and their phonetic pronounciation */
@@ -151,6 +159,7 @@ public class Listen implements RecognitionListener {
 			Log.e(TAG, "error: " + e);
 		}
 		Log.i(TAG, "setup complete");
+		mSetup = true;
 	}
 
 	@Override

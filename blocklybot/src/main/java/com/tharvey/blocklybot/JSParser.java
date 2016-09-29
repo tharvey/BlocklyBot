@@ -83,6 +83,9 @@ public class JSParser {
 		Thread thread = new Thread() {
 			@Override
 			public void run() {
+				/* wait for Listen class */
+				while (mListen != null && mListen.isSetup())
+					SystemClock.sleep(100);
 				JSContext context = new JSContext();
 				JSFunction Robot = new JSFunction(context, "Robot") {
 					public Integer Robot(String str, Integer val) {
