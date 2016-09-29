@@ -73,6 +73,7 @@ public class Audio {
 			public void onCompletion(MediaPlayer mp) {
 				Log.d(TAG, "complete: " + mPlaying);
 				mPlaying = null;
+				mp.release();
 			}
 		});
 		mPlayer.start();
