@@ -33,7 +33,7 @@ public class JSParser {
 		final Speak speak = new Speak(mActivity);
 		final Audio audio = new Audio(mActivity);
 		final Tone tone = new Tone();
-		final HashMap<String, JSFunction> listenMap = new HashMap<String, JSFunction>();
+		final HashMap<String, JSFunction> eventMap = new HashMap<String, JSFunction>();
 		final List<String> phrases = new ArrayList<String>();
 		final Display display = new Display(mActivity);
 
@@ -42,6 +42,7 @@ public class JSParser {
         /* Preparse code:
          *  - remove any root blocks that are not start blocks (TODO: get this done by blockly)
          *  - capture all Listen("<phrase>",*) calls to add phrase to keyword search list
+         *  - capture all Wait("<event>",*) calls to add event to function mapping
          *  - add a footer: call start()
          */
 		BufferedReader bufReader = new BufferedReader(new StringReader(generatedCode));
@@ -53,6 +54,7 @@ public class JSParser {
 						|| line.startsWith("  ")
 						|| line.startsWith("}")
 						|| line.startsWith("Listen(")
+						|| line.startsWith("Wait(")
 						|| (line.length() == 0)
 						) {
 					Pattern p = Pattern.compile("Listen\\(\"([^\"]*)\",.*");
@@ -68,21 +70,30 @@ public class JSParser {
 		Log.i(TAG, "newCode:\n" + newCode);
 		final String code = newCode;
 
-		mListen = new Listen(mActivity, phrases, new IListen() {
+		/* create and register eventListener for various event generator s*/
+		IEventListener eventListener = new IEventListener() {
 			@Override
-			public void onResult(String text) {
-				final JSFunction func = listenMap.get(text);
-				// these come in on UI thread which we must not block on, so use a thread
-				Log.i(TAG, "Listen result for '" + text + "'");
-				Thread thread = new Thread() {
-					@Override
-					public void run() {
-						func.call();
-					}
-				};
-				thread.start();
+			public boolean onEvent(String type, String param) {
+				final String map = type + ":" + param;
+				final JSFunction func = eventMap.get(map);
+				Log.i(TAG, "Event: " + map);
+				if (func != null) {
+					// these come in on UI thread which we must not block on, so use a thread
+					Thread thread = new Thread() {
+						@Override
+						public void run() {
+							func.call();
+						}
+					};
+					thread.start();
+					return true;
+				}
+				Log.e(TAG, "unhandled: " + map);
+				return false;
 			}
-		});
+		};
+		display.setListener(eventListener);
+		mListen = new Listen(mActivity, phrases, eventListener);
 
 		Thread thread = new Thread() {
 			@Override
@@ -208,16 +219,25 @@ public class JSParser {
 				JSFunction Listen = new JSFunction(context, "Listen") {
 					public Integer Listen(String text, JSFunction func) {
 						Log.i(TAG, "listen(" + text + ")");
-						listenMap.put(text, func);
+						eventMap.put("listen:" + text, func);
 						return 0;
 					}
 				};
 				context.property("Listen", Listen);
 
-				JSFunction Wait = new JSFunction(context, "Wait") {
-					public Integer Wait(int times) {
-						Log.i(TAG, "Wait(" + times + ")");
+				JSFunction Sleep = new JSFunction(context, "Sleep") {
+					public Integer Sleep(int times) {
+						Log.i(TAG, "Sleep(" + times + ")");
 						SystemClock.sleep(1000 * times);
+						return 0;
+					}
+				};
+				context.property("Sleep", Sleep);
+
+				JSFunction Wait = new JSFunction(context, "Wait") {
+					public Integer Wait(String event, JSFunction func) {
+						Log.i(TAG, "Wait(" + event + ")");
+						eventMap.put(event, func);
 						return 0;
 					}
 				};

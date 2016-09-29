@@ -72,7 +72,7 @@ Blockly.JavaScript['audio_tone'] = function(block) {
 
 Blockly.JavaScript['wait_time'] = function(block) {
   var dur = block.getFieldValue('TIME');
-  return 'Wait(' + dur + ', \'block_id_' + block.id + '\');\n';
+  return 'Sleep(' + dur + ', \'block_id_' + block.id + '\');\n';
 };
 
 /* Assign my control blocks to the ones already defined in blocklylib-core */
@@ -98,6 +98,11 @@ Blockly.JavaScript['speech_listen'] = function(block) {
 Blockly.JavaScript['speech_listen_text'] = function(block) {
     var value = Blockly.JavaScript.statementToCode(block, 'FUNC')
     return 'Listen("' + block.getFieldValue('CMD') + '", function() {\n' + value + '});';
+};
+
+Blockly.JavaScript['wait_event'] = function(block) {
+    var value = Blockly.JavaScript.statementToCode(block, 'FUNC')
+    return 'Wait("' + block.getFieldValue('EVENT') + '", function() {\n' + value + '});';
 };
 
 /**

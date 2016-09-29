@@ -28,12 +28,12 @@ public class Listen implements RecognitionListener {
 	private SpeechRecognizer recognizer;
 	private HashMap<String, Integer> captions;
 	private Activity mActivity;
-	private IListen mCallback;
+	private IEventListener mEventListener;
 	private boolean mSetup;
 
-	public Listen(Activity activity, final List<String> phrases, IListen callback) {
+	public Listen(Activity activity, final List<String> phrases, IEventListener callback) {
 		mActivity = activity;
-		mCallback = callback;
+		mEventListener = callback;
 		mSetup = false;
 
 		// Recognizer initialization is a time-consuming and it involves IO,
@@ -102,7 +102,7 @@ public class Listen implements RecognitionListener {
 			return;
 		String text = hypothesis.getHypstr().trim();
 		Log.d(TAG, "onPartialResult:" + text);
-		mCallback.onResult(text);
+		mEventListener.onEvent("listen", text);
 	}
 
 	/**

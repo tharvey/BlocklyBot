@@ -27,10 +27,22 @@ public class Display {
 	private ImageView mMouth;
 	private ObjectAnimator mSpeakAnimation;
 	private boolean mSpeaking;
+	private IEventListener mEventListener;
 
 	public Display(Activity activity)
 	{
 		mActivity = activity;
+	}
+
+	public void setListener(IEventListener callback) {
+		mEventListener = callback;
+	}
+
+	private boolean onEvent(String elem) {
+		Log.i(TAG, "onEvent: touch " + elem);
+		if (mEventListener != null)
+			return mEventListener.onEvent("touch", elem);
+		return false;
 	}
 
 	public void showFace(String style) {
@@ -45,13 +57,28 @@ public class Display {
 				WindowManager.LayoutParams.MATCH_PARENT,true);
 		mPopup.showAtLocation(mLayout, Gravity.NO_GRAVITY, 100, 100);
 
+		mEyeL.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				return onEvent("eye");
+			}
+		});
+		mEyeR.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				return onEvent("eye");
+			}
+		});
+		mMouth.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				return onEvent("mouth");
+			}
+		});
 		mLayout.setOnTouchListener(new View.OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
-				Log.i(TAG, "onTouch");
-//				hideFace();
-				setSpeaking(!mSpeaking);
-				return false;
+				return onEvent("face");
 			}
 		});
 

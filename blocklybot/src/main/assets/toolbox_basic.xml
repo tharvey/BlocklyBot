@@ -61,6 +61,9 @@
         <block type="wait_time">
             <field name="TIME">1</field>
         </block>
+        <block type="wait_event">
+            <field name="EVENT">Touch</field>
+        </block>
         <block type="control_repeat">
             <field name="TIMES">4</field>
         </block>
