@@ -29,7 +29,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.google.blockly.android.AbstractBlocklyActivity;
 import com.google.blockly.android.codegen.CodeGenerationRequest;
@@ -114,7 +113,6 @@ public class BlocklyActivity extends AbstractBlocklyActivity implements IConnect
 				@Override
 				public void onFinishCodeGeneration(final String generatedCode) {
 					Log.i(TAG, "generatedCode:\n" + generatedCode);
-					Toast.makeText(getApplicationContext(), generatedCode, Toast.LENGTH_LONG).show();
 					mParser.parseCode(mRobot, generatedCode);
 				}
 			};
