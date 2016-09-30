@@ -1,12 +1,12 @@
 <xml xmlns="http://www.w3.org/1999/xhtml">
-    <block type="start" id="startblock" x="-97" y="-48" deletable="false" inline="false">
+    <block type="start" id="startblock" x="0" y="0" deletable="false" inline="false">
         <statement name="FUNC">
             <block type="speech_speak" id="7dd699f7-b009-41b0-a00d-fb7111eba8ef">
                 <field name="TEXT">hello</field>
             </block>
         </statement>
     </block>
-    <block type="speech_listen" id="56736faf-db48-41bc-b1c9-489189878dbf" x="90" y="-38">
+    <block type="speech_listen" id="56736faf-db48-41bc-b1c9-489189878dbf" x="330" y="0">
         <field name="CMD">move forward</field>
         <statement name="FUNC">
             <block type="speech_speak" id="1052b9a2-85ab-4081-9fb6-343a38c8d74b">
@@ -19,7 +19,7 @@
             </block>
         </statement>
     </block>
-    <block type="speech_listen" id="8072479f-5a00-4765-b732-7738091297f1" x="95" y="149">
+    <block type="speech_listen" id="8072479f-5a00-4765-b732-7738091297f1" x="330" y="200">
         <field name="CMD">move backward</field>
         <statement name="FUNC">
             <block type="speech_speak" id="f15e99fb-6ab2-4b08-b078-0265fed1c577">
@@ -32,16 +32,66 @@
             </block>
         </statement>
     </block>
-    <block type="speech_listen" id="8072479f-5a00-4765-b732-7738091297f2" x="95" y="149">
-        <field name="CMD">Stop</field>
+    <block type="speech_listen" id="8072479f-5a00-4765-b732-7738091297f2" x="330" y="400">
+        <field name="CMD">stop</field>
         <statement name="FUNC">
             <block type="speech_speak" id="f15e99fb-6ab2-4b08-b078-0265fed1c572">
                 <field name="TEXT">Stoping</field>
                 <next>
-                    <block type="robot_stop" id="2b3ec1e8-621d-41b3-aa5d-68abdd8dc4d2">
+                    <block type="robot_stop" id="2b3ec1e8-621d-41b3-aa5d-68abdd8dc4d2" />
+                </next>
+            </block>
+        </statement>
+    </block>
+    <block type="speech_listen" id="9a1d3f72-b7a6-4269-8e76-373c0c4d5e01" x="330" y="600">
+        <field name="CMD">turn right</field>
+        <statement name="FUNC">
+            <block type="speech_speak" id="687c78a3-b2fc-41d0-a9bd-d1df10a7099f">
+                <field name="TEXT">turning to my right</field>
+                <next>
+                    <block type="robot_turn_right_internal" id="750b2358-f493-482d-8c1e-def77e3d37c2">
                         <field name="VALUE">1</field>
                     </block>
                 </next>
+            </block>
+        </statement>
+    </block>
+    <block type="speech_listen" id="e1bd4860-5075-4d80-8926-deedc06381eb" x="330" y="800">
+        <field name="CMD">turn left</field>
+        <statement name="FUNC">
+            <block type="speech_speak" id="e4895b88-44a7-44bc-939c-c130e1de9982">
+                <field name="TEXT">left it is</field>
+                <next>
+                    <block type="robot_turn_left_internal" id="dc71aafe-159f-4c88-a1f9-148acdf45ec9">
+                        <field name="VALUE">1</field>
+                    </block>
+                </next>
+            </block>
+        </statement>
+    </block>
+    <block type="speech_listen_text" id="84347b09-a5d8-491f-aef0-61a37198917f" x="0" y="150" inline="false">
+        <field name="CMD">music</field>
+        <statement name="FUNC">
+            <block type="controls_repeat_ext" id="5037f32d-0cb6-484c-9473-130f30960363" inline="true">
+                <value name="TIMES">
+                    <shadow type="math_number" id="621757c4-6231-4691-9818-01d1f5a25454">
+                        <field name="NUM">5.0</field>
+                    </shadow>
+                </value>
+                <statement name="DO">
+                    <block type="audio_note" id="c5d76501-5fff-4a13-b941-5c873c367c86">
+                        <field name="NOTE">C</field>
+                        <field name="TIME">125</field>
+                    </block>
+                </statement>
+            </block>
+        </statement>
+    </block>
+    <block type="speech_listen_text" id="307aba96-abd8-4a32-b546-fc6510ddda3f" x="0" y="380" inline="false">
+        <field name="CMD">fire</field>
+        <statement name="FUNC">
+            <block type="audio_play" id="9f567bac-109f-416f-88f3-5e444cc31832" inline="true">
+                <field name="SOUND">laser</field>
             </block>
         </statement>
     </block>
