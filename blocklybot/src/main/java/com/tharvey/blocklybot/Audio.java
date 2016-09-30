@@ -53,8 +53,6 @@ public class Audio {
 			id = R.raw.beep3;
 		else if (resource.equals("beep4"))
 			id = R.raw.beep4;
-		else if (resource.equals("beep5"))
-			id = R.raw.beep5;
 		else if (resource.equals("cheer"))
 			id = R.raw.cheer;
 		else if (resource.equals("cheer1"))
