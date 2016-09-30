@@ -71,12 +71,16 @@ public class JSParser {
 		mListen = new Listen(mActivity, phrases, new IListen() {
 			@Override
 			public void onResult(String text) {
-				JSFunction func = listenMap.get(text);
+				final JSFunction func = listenMap.get(text);
+				// these come in on UI thread which we must not block on, so use a thread
 				Log.i(TAG, "Listen result for '" + text + "'");
-				if (func != null) {
-					Log.i(TAG, "Calling JSFunction");
-					func.call();
-				}
+				Thread thread = new Thread() {
+					@Override
+					public void run() {
+						func.call();
+					}
+				};
+				thread.start();
 			}
 		});
 
