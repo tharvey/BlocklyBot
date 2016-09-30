@@ -121,7 +121,12 @@ public class BlocklyActivity extends AbstractBlocklyActivity implements IConnect
 	public void connectionStateChanged(connectionStateEnum state) {
 		Log.i(TAG, "connection state changed:" + state);
 		mRobot = Mobbob.getMobob();
-		updateTitlebar();
+		this.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				updateTitlebar();
+			}
+		});
 	}
 
 	private void updateTitlebar() {
