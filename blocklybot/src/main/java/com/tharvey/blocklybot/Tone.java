@@ -9,12 +9,12 @@ import android.util.Log;
 /**
  * Created by tharvey on 9/17/16.
  */
-public class Tone {
+public class Tone implements IFunction {
 	private final static String TAG = Tone.class.getSimpleName();
 
 	static private boolean mPlaying;
 
-	static void Tone(double freqHz, int durationMs) {
+	public boolean doFunction(String p1, int freqHz, int durationMs) {
 		Log.i(TAG, "Tone: " + freqHz + "Hz " + durationMs + "ms");
 		AudioTrack tone = generateTone(freqHz, durationMs);
 		tone.setPlaybackPositionUpdateListener(new AudioTrack.OnPlaybackPositionUpdateListener() {
@@ -25,14 +25,16 @@ public class Tone {
 			@Override
 			public void onMarkerReached(AudioTrack track) {
 				mPlaying = false;
+				track.release();
 			}
 		});
 		mPlaying = true;
 		tone.play();
-		while (mPlaying)
-			SystemClock.sleep(10);
-		SystemClock.sleep(10);
-		tone.release();
+		return true;
+	}
+
+	public boolean isBusy() {
+		return mPlaying;
 	}
 
 	static private AudioTrack generateTone(double freqHz, int durationMs) {

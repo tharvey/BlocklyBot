@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
@@ -274,7 +275,9 @@ public class DiscoverySelector {
 				// dismiss dialog
 				mDialog.cancel();
 				mDialog.dismiss();
-				robot.queueCommand(Mobbob.commands.BOUNCE.ordinal(), 1);
+				robot.doFunction(null, Mobbob.commands.BOUNCE.ordinal(), 1);
+				while(robot.isBusy())
+					SystemClock.sleep(100);
 			}
 		};
 		stop();

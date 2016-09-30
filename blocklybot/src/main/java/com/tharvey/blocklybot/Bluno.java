@@ -89,7 +89,6 @@ public class Bluno extends Mobbob {
 			Log.d(TAG, "Received " + action + " from " + device.getAddress() + ":" + device.getName());
 			if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
 				if (getConnectionState() != IConnection.connectionStateEnum.isConnected) {
-					start();
 					mHandler.removeCallbacks(mConnectingOverTimeRunnable);
 				}
 			} else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {

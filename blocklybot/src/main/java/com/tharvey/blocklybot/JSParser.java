@@ -23,21 +23,38 @@ public class JSParser {
 
 	private Activity mActivity;
 	private Listen mListen;
+	private Speak mSpeak;
+	private Audio mAudio;
+	private Tone mTone;
+	private Display mDisplay;
 
 	public JSParser(Activity activity) {
 		mActivity = activity;
+		mSpeak = new Speak(mActivity);
+		mAudio = new Audio(mActivity);
+		mDisplay = new Display(mActivity);
+		mTone = new Tone();
+		mListen = null;
+	}
+
+	private int doFunction(IFunction f, String p1, int p2, int p3)
+	{
+		if (mListen != null)
+			mListen.pause();
+		f.doFunction(p1, p2, p3);
+		while (f.isBusy())
+			SystemClock.sleep(10);
+		if (mListen != null)
+			mListen.resume();
+		return 0;
 	}
 
 	public final int parseCode(final Mobbob mobbob, String generatedCode) {
 		final Mobbob robot = mobbob;
-		final Speak speak = new Speak(mActivity);
-		final Audio audio = new Audio(mActivity);
-		final Tone tone = new Tone();
 		final HashMap<String, JSFunction> eventMap = new HashMap<String, JSFunction>();
 		final List<String> phrases = new ArrayList<String>();
-		final Display display = new Display(mActivity);
 
-		display.showFace("default");
+		mDisplay.showFace("default");
 
         /* Preparse code:
          *  - remove any root blocks that are not start blocks (TODO: get this done by blockly)
@@ -92,8 +109,11 @@ public class JSParser {
 				return false;
 			}
 		};
-		display.setListener(eventListener);
-		mListen = new Listen(mActivity, phrases, eventListener);
+		mDisplay.setListener(eventListener);
+		if (phrases.size() > 0)
+			mListen = new Listen(mActivity, phrases, eventListener);
+		else
+			mListen = null;
 
 		Thread thread = new Thread() {
 			@Override
@@ -104,66 +124,11 @@ public class JSParser {
 				JSContext context = new JSContext();
 				JSFunction Robot = new JSFunction(context, "Robot") {
 					public Integer Robot(String str, Integer val) {
-						int cmd = -1;
 						if (val < 1)
 							val = 1;
-						switch (str.toUpperCase()) {
-							case "MOVEFORWARD":
-								cmd = Mobbob.commands.MOVE_FORWARD.ordinal();
-								break;
-							case "MOVEBACKWARD":
-								cmd = Mobbob.commands.MOVE_BACKWARD.ordinal();
-								break;
-							case "TURNRIGHT":
-								cmd = Mobbob.commands.TURN_RIGHT.ordinal();
-								break;
-							case "TURNLEFT":
-								cmd = Mobbob.commands.TURN_LEFT.ordinal();
-								break;
-							case "SHAKEHEAD":
-								cmd = Mobbob.commands.SHAKE_HEAD.ordinal();
-								break;
-							case "BOUNCE":
-								cmd = Mobbob.commands.BOUNCE.ordinal();
-								break;
-							case "WOBBLE":
-								cmd = Mobbob.commands.WOBBLE.ordinal();
-								break;
-							case "WOBBLELEFT":
-								cmd = Mobbob.commands.WOBBLE_LEFT.ordinal();
-								break;
-							case "WOBBLERIGHT":
-								cmd = Mobbob.commands.WOBBLE_RIGHT.ordinal();
-								break;
-							case "TAPFEET":
-								cmd = Mobbob.commands.TAP_FEET.ordinal();
-								break;
-							case "TAPFOOTLEFT":
-								cmd = Mobbob.commands.TAP_FOOT_LEFT.ordinal();
-								break;
-							case "TAPFOOTRIGHT":
-								cmd = Mobbob.commands.TAP_FOOT_RIGHT.ordinal();
-								break;
-							case "SHAKELEGS":
-								cmd = Mobbob.commands.SHAKE_LEGS.ordinal();
-								break;
-							case "SHAKELEGLEFT":
-								cmd = Mobbob.commands.SHAKE_LEG_LEFT.ordinal();
-								break;
-							case "SHAKELEGRIGHT":
-								cmd = Mobbob.commands.SHAKE_LEG_RIGHT.ordinal();
-								break;
-							case "STOP":
-								cmd = Mobbob.commands.STOP.ordinal();
-								break;
-							default:
-								Log.e(TAG, "Unrecognized cmd:" + cmd);
-								break;
-						}
-						Log.i(TAG, "robot(" + cmd + "," + val + ")");
-						if (cmd != -1 && robot != null) {
-							robot.doCommand(cmd, val);
-						}
+						Log.i(TAG, "robot(" + str + "," + val + ")");
+						if (robot != null)
+							return doFunction(robot, str, 0, val);
 						return 0;
 					}
 				};
@@ -172,12 +137,7 @@ public class JSParser {
 				JSFunction Speak = new JSFunction(context, "Speak") {
 					public Integer Speak(String text) {
 						Log.i(TAG, "speak(" + text + ")");
-						mListen.pause();
-						display.setSpeaking(true);
-						speak.doCommand(text);
-						display.setSpeaking(false);
-						mListen.resume();
-						return 0;
+						return doFunction(mSpeak, text, 0, 0);
 					}
 				};
 				context.property("Speak", Speak);
@@ -185,10 +145,7 @@ public class JSParser {
 				JSFunction Audio = new JSFunction(context, "Audio") {
 					public Integer Audio(String text) {
 						Log.i(TAG, "audio(" + text + ")");
-						mListen.pause();
-						audio.doCommand(text);
-						mListen.resume();
-						return 0;
+						return doFunction(mAudio, text, 0, 0);
 					}
 				};
 				context.property("Audio", Audio);
@@ -196,10 +153,7 @@ public class JSParser {
 				JSFunction Tone = new JSFunction(context, "Tone") {
 					public Integer Tone(int freq, int secs) {
 						Log.i(TAG, "tone: freq=" + freq + "secs=" + secs);
-						mListen.pause();
-						tone.Tone(freq, secs * 1000);
-						mListen.resume();
-						return 0;
+						return doFunction(mTone, null, freq, secs * 1000);
 					}
 				};
 				context.property("Tone", Tone);
@@ -208,10 +162,7 @@ public class JSParser {
 					public Integer Note(String note, int timems) {
 						int octave = 3; /* 3rd octave */
 						Log.i(TAG, "note(" + note + ")");
-						mListen.pause();
-						tone.Tone(Note.valueOf(note + octave), timems);
-						mListen.resume();
-						return 0;
+						return doFunction(mTone, null, (int) Note.valueOf(note + octave), timems);
 					}
 				};
 				context.property("Note", MusicNote);
@@ -250,8 +201,10 @@ public class JSParser {
 					Log.e(TAG, "Error evaluating script: " + e);
 				}
 				if (robot != null)
-					robot.doCommand(Mobbob.commands.STOP.ordinal(), 0);
-				display.hideFace();
+					doFunction(robot, null, Mobbob.commands.STOP.ordinal(), 0);
+				mDisplay.hideFace();
+				if (mListen != null)
+					mListen.close();
 			}
 		};
 		thread.start();

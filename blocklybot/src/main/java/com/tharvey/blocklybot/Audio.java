@@ -13,25 +13,22 @@ import android.util.Log;
 /**
  * Manage audio playback
  */
-public class Audio {
+public class Audio implements IFunction {
 	private final static String TAG = Audio.class.getSimpleName();
 
-	private Activity mActivity;
 	private Context mContext;
 	private MediaPlayer mPlayer;
-	Handler mHandler;
 	String mPlaying;
 
 	public Audio(Activity activity) {
-		mActivity = activity;
 		mContext = activity;
-		start();
 	}
 
-	/**
-	 * synchronous - block until command complete
-	 */
-	public void doCommand(String resource) {
+	public boolean isBusy() {
+		return (mPlaying != null);
+	}
+
+	public boolean doFunction(String resource, int p2, int p3) {
 		Log.i(TAG, "Dir:" + Environment.getExternalStorageDirectory());
 		Log.i(TAG, "Playing '" + resource + "'");
 		int id;
@@ -62,7 +59,7 @@ public class Audio {
 		else if (resource.equals("yawn"))
 			id = R.raw.yawn;
 		else
-			return;
+			return false;
 		mPlaying = resource;
 		mPlayer = MediaPlayer.create(mContext, id);
 		mPlayer.setLooping(false);
@@ -75,49 +72,6 @@ public class Audio {
 			}
 		});
 		mPlayer.start();
-		while (mPlaying != null)
-			SystemClock.sleep(100);
-		Log.d(TAG, "done " + resource);
-	}
-
-	/**
-	 * async - add command to the queue
-	 */
-	public void queueCommand(String msg) {
-		Log.d(TAG, "Queueing '" + msg + "'");
-		mHandler.sendMessage(mHandler.obtainMessage(0, msg));
-	}
-
-	/**
-	 * create a background thread who's looper plays commands from the queue
-	 */
-	void start() {
-		// Create a handler attached to the HandlerThread's Looper
-		HandlerThread handlerThread = new HandlerThread("HandlerThread");
-		handlerThread.start();
-		mHandler = new Handler(handlerThread.getLooper()) {
-			@Override
-			public void handleMessage(Message msg) {
-				doCommand((String) msg.obj);
-			}
-		};
-	}
-
-	public void pause() {
-		Log.i(TAG, "pause");
-		if (mPlayer != null)
-			mPlayer.pause();
-	}
-
-	public void resume() {
-		Log.i(TAG, "resume");
-		if (mPlayer != null)
-			mPlayer.start();
-	}
-
-	public void close() {
-		Log.i(TAG, "close");
-		if (mPlayer != null)
-			mPlayer.stop();
+		return true;
 	}
 }
