@@ -108,8 +108,9 @@ public class Bluetooth extends Mobbob {
 					String chunk = new String(buffer, 0, bytes);
 					if (chunk.contains("\r\n")) {
 						inString += chunk;
-						Log.d(TAG, "Sending '" + inString + "'");
+						Log.d(TAG, "<< " + inString);
 						onSerialReceived(inString);
+						inString = "";
 					} else {
 						inString += chunk;
 					}

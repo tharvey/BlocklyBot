@@ -14,7 +14,6 @@ public abstract class Robot {
 	private String mDeviceName;
 	private String mDeviceAddress;
 	private IConnection.connectionStateEnum mConnectionState = IConnection.connectionStateEnum.isNull;
-	protected String mLastRX;
 	private IConnection mConnectionListener = null;
 
 	public abstract void serialSend(String theString);
@@ -31,7 +30,6 @@ public abstract class Robot {
 		mContext = this;
 		mDeviceAddress = address;
 		mDeviceName = name;
-		mLastRX = "";
 	}
 
 	public IConnection.connectionStateEnum getConnectionState() {
@@ -48,11 +46,6 @@ public abstract class Robot {
 		mConnectionState = state;
 		if (mConnectionListener != null)
 			mConnectionListener.connectionStateChanged(state);
-	}
-
-	protected void onSerialReceived(String theString) {
-		theString = theString.replace("\r\n", "");
-		mLastRX = theString;
 	}
 
 	public String getAddress() {
