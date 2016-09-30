@@ -41,7 +41,7 @@
                                                                                                                 <field name="NOTE">B</field>
                                                                                                                 <next>
                                                                                                                     <block type="audio_tone" id="85a8ee89-0da1-4e22-ae06-d25d845bbf73">
-                                                                                                                        <field name="FREQ">1000</field>
+                                                                                                                        <field name="FREQ">600</field>
                                                                                                                         <field name="TIME">1</field>
                                                                                                                         <next>
                                                                                                                             <block type="audio_tone" id="d34e3d4b-a21b-46d7-a6a4-717f0ee334de">
