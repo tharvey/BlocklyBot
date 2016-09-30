@@ -178,7 +178,10 @@ public class DiscoverySelector {
 
 	private void updateTitle() {
 		String dots = "...............";
-		mDialog.setTitle("Nearby Robots: " + mPhase + dots.substring(0, mCount));
+		int ndots = mCount;
+		if (ndots > dots.length())
+			ndots = dots.length();
+		mDialog.setTitle("Nearby Robots: " + mPhase + dots.substring(0, ndots));
 	}
 
 	/* popup dialog */
