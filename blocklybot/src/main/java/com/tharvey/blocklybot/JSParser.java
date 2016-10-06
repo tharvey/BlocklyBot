@@ -1,7 +1,10 @@
 package com.tharvey.blocklybot;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.pm.PackageManager;
 import android.os.SystemClock;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import org.liquidplayer.webkit.javascriptcore.JSContext;
@@ -110,7 +113,8 @@ public class JSParser {
 			}
 		};
 		mDisplay.setListener(eventListener);
-		if (phrases.size() > 0)
+		if (ContextCompat.checkSelfPermission(mActivity, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+		    && phrases.size() > 0)
 			mListen = new Listen(mActivity, phrases, eventListener);
 		else
 			mListen = null;

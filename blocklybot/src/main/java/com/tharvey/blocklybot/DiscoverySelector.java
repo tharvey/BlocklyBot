@@ -1,15 +1,18 @@
 package com.tharvey.blocklybot;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,6 +33,7 @@ import java.util.Map;
  */
 public class DiscoverySelector {
 	private final String TAG = getClass().getSimpleName();
+	public static final int REQUEST_ENABLE_BT = 1;
 
 	private Activity mActivity;
 	private BLEScan mBLEScan;
@@ -53,6 +57,16 @@ public class DiscoverySelector {
 		mCount = 0;
 		mPreferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
 
+		// Ensures Bluetooth is enabled on the device.  If Bluetooth is not currently enabled,
+		// fire an intent to display a dialog asking the user to grant permission to enable it.
+		BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+		if (!adapter.isEnabled()) {
+			Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+			Log.d(TAG, "requestPermissions:" + BluetoothAdapter.ACTION_REQUEST_ENABLE);
+			activity.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+			return;
+		}
+
 		// Initializes list view adapter.
 		mDeviceListAdapter = new DeviceListAdapter(mActivity);
 		Boolean compatOnly = mPreferences.getBoolean("pref_filterincompatible", true);
@@ -62,6 +76,12 @@ public class DiscoverySelector {
 		// see if we have BLE
 		if (scanBLE && !mActivity.getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
 			Log.i(TAG, "BLE not supported");
+			scanBLE = false;
+		}
+
+		// see if we have Location
+		if (ContextCompat.checkSelfPermission(mActivity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+			Log.i(TAG, "ACCESS_COARSE_LOCATION not allowed");
 			scanBLE = false;
 		}
 

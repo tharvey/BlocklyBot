@@ -335,4 +335,13 @@ public class BlocklyActivity extends AbstractBlocklyActivity implements IConnect
 		controller.addVariable("coconut");
 		controller.addVariable("carrot");
 	}
+
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == DiscoverySelector.REQUEST_ENABLE_BT) {
+			if (resultCode == RESULT_OK) {
+				DiscoverySelector dialog = new DiscoverySelector(this, this);
+				dialog.showDialog();
+			}
+		}
+	}
 }

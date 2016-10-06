@@ -1,7 +1,8 @@
 package com.tharvey.blocklybot;
 
 import android.Manifest;
-import android.bluetooth.BluetoothAdapter;
+import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,70 +19,37 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 	private final static String TAG = MainActivity.class.getSimpleName();
 
-	private static final int PERMISSION_REQUEST_RECORD_AUDIO = 1;
-	private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
-	private static final int REQUEST_ENABLE_BT = 1;
+	private SharedPreferences mSharedPref;
+	private List<String> mPermissionsWaiting = new ArrayList<>();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			// Android M Permission checks
-			Log.d(TAG, "Checking Android M permissions");
+		checkPermissions(this);
 
-			// Audio recording required for voice recognition
-			if (this.checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-				final android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
-				builder.setTitle("This app needs audio recording permission");
-				builder.setMessage("Please grant audio recording permsision so this app can listen for voice commands.");
-				builder.setPositiveButton(android.R.string.ok, null);
-				builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
-					@Override
-					public void onDismiss(DialogInterface dialog) {
-						requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO}, PERMISSION_REQUEST_RECORD_AUDIO);
-					}
-				});
-				builder.show();
-			}
-
-			// Location required for BLE scanning (yes, really it is... starting in Android 6.0)
-			if (this.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-				final android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
-				builder.setTitle("This app needs location access");
-				builder.setMessage("Please grant location access so this app can detect Bluetooth Low Energy devices.");
-				builder.setPositiveButton(android.R.string.ok, null);
-				builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
-					@Override
-					public void onDismiss(DialogInterface dialog) {
-						requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_COARSE_LOCATION);
-					}
-				});
-				builder.show();
-			}
-		}
-
-		// Ensures Bluetooth is enabled on the device.  If Bluetooth is not currently enabled,
-		// fire an intent to display a dialog asking the user to grant permission to enable it.
-		BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-		if (!adapter.isEnabled()) {
-			Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-			startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-		}
-
-		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-		if (sharedPref.getBoolean("installed", false)) {
+		mSharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+		if (mSharedPref.getBoolean("installed", false)) {
 			Log.i(TAG, "Copying example files on first run...");
-			sharedPref.edit().putBoolean("installed", true).commit();
+			mSharedPref.edit().putBoolean("installed", true).commit();
 			copyAssetFolder(getAssets(), "files", getFilesDir().getPath() /*+ "/samples"*/);
 		}
 
-		String controller = sharedPref.getString("pref_defaultView", "blockly");
+		Log.d(TAG, "waiting for " + mPermissionsWaiting.size() + " responses");
+		if (mPermissionsWaiting.size() == 0) {
+			launchPreferredActivity();
+		}
+	}
+
+	protected void launchPreferredActivity() {
+		String controller = mSharedPref.getString("pref_defaultView", "blockly");
 		Log.i(TAG, "Controller:" + controller);
 		if (controller.equals("panel")) {
 			final Intent intent = new Intent(this, RobotControlActivity.class);
@@ -89,6 +57,71 @@ public class MainActivity extends AppCompatActivity {
 		} else {
 			final Intent intent = new Intent(this, BlocklyActivity.class);
 			startActivity(intent);
+		}
+	}
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+		Log.d(TAG, "onRequestPermissionsResult: code=" + requestCode);
+		for (int i = 0; i < permissions.length; i++) {
+			Log.d(TAG, i + ":" + permissions[i] + ":" + grantResults[i]);
+			mPermissionsWaiting.remove(permissions[i]);
+		}
+		Log.d(TAG, "now waiting for " + mPermissionsWaiting.size() + " responses");
+		for (int i = 0; i < mPermissionsWaiting.size(); i++)
+			Log.d(TAG, i + ":" + mPermissionsWaiting.get(i));
+		if (mPermissionsWaiting.size() == 0) {
+			launchPreferredActivity();
+		}
+	}
+
+	public void checkPermissions(final Activity activity) {
+		// Android M Permission checks
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			String[] allPermissionNeeded = {
+					Manifest.permission.RECORD_AUDIO,
+					Manifest.permission.ACCESS_COARSE_LOCATION,
+			};
+			String[] permissionNames = {
+					"audio recording",
+					"location access"
+			};
+			String[] permissionExplanations = {
+					"listen for voice commands",
+					"detect Bluetooth Low Energy devices"
+			};
+			String message = "";
+
+			Log.d(TAG, "Checking Android M permissions");
+			for (int i = 0; i < allPermissionNeeded.length; i++) {
+				String permission = allPermissionNeeded[i];
+				String name = permissionNames[i];
+				String explanation = permissionExplanations[i];
+				if (checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
+					if (activity.shouldShowRequestPermissionRationale(permission))
+						message += "Please grant " + name + " so that it can " + explanation + "." + "\r\n\r\n";
+					mPermissionsWaiting.add(permission);
+				}
+			}
+
+			if (mPermissionsWaiting.size() > 0) {
+				if (!message.equals("")) {
+					final android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(activity);
+					builder.setTitle("This app requires the following permissions");
+					builder.setMessage(message);
+					builder.setPositiveButton(android.R.string.ok, null);
+					builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+						@Override
+						@TargetApi(23)
+						public void onDismiss(DialogInterface dialog) {
+							requestPermissions(mPermissionsWaiting.toArray(new String[0]), 0);
+						}
+					});
+					builder.show();
+				} else {
+					requestPermissions(mPermissionsWaiting.toArray(new String[0]), 0);
+				}
+			}
 		}
 	}
 
