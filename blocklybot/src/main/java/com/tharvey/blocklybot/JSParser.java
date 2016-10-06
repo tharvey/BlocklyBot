@@ -200,6 +200,11 @@ public class JSParser {
 				} catch (Exception e) {
 					Log.e(TAG, "Error evaluating script: " + e);
 				}
+
+				/* wait until Display is no longer showing */
+				while (mDisplay.isVisible())
+					SystemClock.sleep(100);
+				Log.i(TAG, "display no longer visible - cleanup");
 				if (robot != null)
 					doFunction(robot, null, Mobbob.commands.STOP.ordinal(), 0);
 				mDisplay.hideFace();
@@ -213,7 +218,7 @@ public class JSParser {
 
 	public void stop() {
 		Log.i(TAG, "stop()");
-		// TODO: how to stop script?
+		// TODO: how to stop
 		if (mListen != null)
 			mListen.close();
 	}

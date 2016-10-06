@@ -174,6 +174,10 @@ public class Display {
 		}
 	}
 
+	public boolean isVisible() {
+		return (mPopup.isShowing());
+	}
+
 	public void hideFace() {
 		Log.i(TAG, "hideFace");
 		mLayout.post(new Runnable() {
