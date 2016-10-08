@@ -95,4 +95,12 @@
             </block>
         </statement>
     </block>
+    <block type="speech_listen_text" id="307aba96-abd8-4a32-b546-fc6510ddda40" x="0" y="520" inline="false">
+        <field name="CMD">what is your name</field>
+        <statement name="FUNC">
+            <block type="audio_play" id="9f567bac-109f-416f-88f3-5e444cc31835" inline="true">
+                <field name="SOUND">i am BlocklyBot</field>
+            </block>
+        </statement>
+    </block>
 </xml>
