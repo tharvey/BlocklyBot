@@ -133,7 +133,7 @@ public class BlocklyActivity extends AbstractBlocklyActivity implements IConnect
 		if (mRobot != null && mRobot.getConnectionState() == connectionStateEnum.isConnected)
 			action.setTitle(mRobot.getName() + " : " + workspaceName.replace(".xml", ""));
 		else
-			action.setTitle(workspaceName.replace(".xml", ""));
+			action.setTitle("Not connected : " + workspaceName.replace(".xml", ""));
 		SharedPreferences.Editor editor = mPreferences.edit();
 		editor.putString("pref_lastWorkspace", workspaceName);
 		editor.commit();
