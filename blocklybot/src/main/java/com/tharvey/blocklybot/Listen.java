@@ -7,7 +7,6 @@ import android.util.Log;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.HashMap;
 import java.util.List;
 
 import edu.cmu.pocketsphinx.Assets;
@@ -22,11 +21,7 @@ import edu.cmu.pocketsphinx.SpeechRecognizerSetup;
 public class Listen implements RecognitionListener {
 	private final static String TAG = Listen.class.getSimpleName();
 
-	/* Used to handle permission request */
-	private static final int PERMISSIONS_REQUEST_RECORD_AUDIO = 1;
-
-	private SpeechRecognizer recognizer;
-	private HashMap<String, Integer> captions;
+	private SpeechRecognizer mRecognizer;
 	private Activity mActivity;
 	private IEventListener mEventListener;
 	private boolean mSetup;
@@ -59,7 +54,7 @@ public class Listen implements RecognitionListener {
 					Log.e(TAG, "Failed to init recognizer " + result);
 				} else {
 					Log.i(TAG, "Setup ok - initializing search");
-					recognizer.startListening("robot");
+					mRecognizer.startListening("robot");
 				}
 			}
 		}.execute();
@@ -71,23 +66,23 @@ public class Listen implements RecognitionListener {
 
 	public void pause() {
 		Log.i(TAG, "pause");
-		if (recognizer != null) {
-			recognizer.stop();
+		if (mRecognizer != null) {
+			mRecognizer.stop();
 		}
 	}
 
 	public void resume() {
 		Log.i(TAG, "resume");
-		if (recognizer != null) {
-			recognizer.startListening("robot");
+		if (mRecognizer != null) {
+			mRecognizer.startListening("robot");
 		}
 	}
 
 	public void close() {
 		Log.i(TAG, "close");
-		if (recognizer != null) {
-			recognizer.cancel();
-			recognizer.shutdown();
+		if (mRecognizer != null) {
+			mRecognizer.cancel();
+			mRecognizer.shutdown();
 		}
 	}
 
@@ -126,15 +121,15 @@ public class Listen implements RecognitionListener {
 	@Override
 	public void onEndOfSpeech() {
 		Log.d(TAG, "onEndOfSpeech");
-		recognizer.stop();
-		recognizer.startListening("robot");
+		mRecognizer.stop();
+		mRecognizer.startListening("robot");
 	}
 
 	private void setupRecognizer(File assetsDir, List<String> phrases) throws IOException {
 		Log.i(TAG, "setupRecognizer");
 		// The recognizer can be configured to perform multiple searches
 		// of different kind and switch between them
-		recognizer = SpeechRecognizerSetup.defaultSetup()
+		mRecognizer = SpeechRecognizerSetup.defaultSetup()
 				.setAcousticModel(new File(assetsDir, "en-us-ptm"))
 		        /* The dictionary is a text file with words and their phonetic pronounciation */
 				.setDictionary(new File(assetsDir, "cmudict-en-us.dict"))
@@ -143,7 +138,7 @@ public class Listen implements RecognitionListener {
 				.setBoolean("-allphone_ci", true)  // Use context-independent phonetic search, context-dependent is too slow for mobile
 				.getRecognizer();
 
-		recognizer.addListener(this);
+		mRecognizer.addListener(this);
 
         /* Build the Language Model using keyword search */
 		File file = new File(mActivity.getCacheDir(), "custom.gram");
@@ -154,7 +149,7 @@ public class Listen implements RecognitionListener {
 				writer.println(phrases.get(i) + " /1e-1/");
 			}
 			writer.close();
-			recognizer.addKeywordSearch("robot", file);
+			mRecognizer.addKeywordSearch("robot", file);
 		} catch (Exception e) {
 			Log.e(TAG, "error: " + e);
 		}
