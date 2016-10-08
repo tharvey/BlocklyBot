@@ -25,11 +25,13 @@ public class Listen implements RecognitionListener {
 	private Activity mActivity;
 	private IEventListener mEventListener;
 	private boolean mSetup;
+	private boolean mListening;
 
 	public Listen(Activity activity, final List<String> phrases, IEventListener callback) {
 		mActivity = activity;
 		mEventListener = callback;
 		mSetup = false;
+		mListening = false;
 
 		// Recognizer initialization is a time-consuming and it involves IO,
 		// so we execute it in async task
@@ -54,6 +56,7 @@ public class Listen implements RecognitionListener {
 					Log.e(TAG, "Failed to init recognizer " + result);
 				} else {
 					Log.i(TAG, "Setup ok - initializing search");
+					mListening = true;
 					mRecognizer.startListening("robot");
 				}
 			}
@@ -66,15 +69,21 @@ public class Listen implements RecognitionListener {
 
 	public void pause() {
 		Log.i(TAG, "pause");
-		if (mRecognizer != null) {
-			mRecognizer.stop();
+		if (mListening) {
+			mListening = false;
+			if (mRecognizer != null) {
+				mRecognizer.stop();
+			}
 		}
 	}
 
 	public void resume() {
 		Log.i(TAG, "resume");
-		if (mRecognizer != null) {
-			mRecognizer.startListening("robot");
+		if (!mListening) {
+			mListening = true;
+			if (mRecognizer != null) {
+				mRecognizer.startListening("robot");
+			}
 		}
 	}
 
@@ -93,7 +102,7 @@ public class Listen implements RecognitionListener {
 	 */
 	@Override
 	public void onPartialResult(Hypothesis hypothesis) {
-		if (hypothesis == null)
+		if (!mListening || hypothesis == null)
 			return;
 		String text = hypothesis.getHypstr().trim();
 		Log.d(TAG, "onPartialResult:" + text);
@@ -105,7 +114,7 @@ public class Listen implements RecognitionListener {
 	 */
 	@Override
 	public void onResult(Hypothesis hypothesis) {
-		if (hypothesis == null)
+		if (!mListening || hypothesis == null)
 			return;
 		Log.i(TAG, "onResult:" + hypothesis.getHypstr());
 	}
@@ -121,8 +130,10 @@ public class Listen implements RecognitionListener {
 	@Override
 	public void onEndOfSpeech() {
 		Log.d(TAG, "onEndOfSpeech");
-		mRecognizer.stop();
-		mRecognizer.startListening("robot");
+		if (mListening) {
+			mRecognizer.stop();
+			mRecognizer.startListening("robot");
+		}
 	}
 
 	private void setupRecognizer(File assetsDir, List<String> phrases) throws IOException {
