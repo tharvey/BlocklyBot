@@ -116,7 +116,9 @@ public class Listen implements RecognitionListener {
 	public void onResult(Hypothesis hypothesis) {
 		if (!mListening || hypothesis == null)
 			return;
-		Log.i(TAG, "onResult:" + hypothesis.getHypstr());
+		String text = hypothesis.getHypstr().trim();
+		Log.d(TAG, "onResult:" + text);
+		mEventListener.onEvent("listen", text);
 	}
 
 	@Override
