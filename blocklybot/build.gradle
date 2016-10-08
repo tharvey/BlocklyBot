@@ -38,6 +38,11 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.3.+'
-    compile project(':blocklylib-vertical')
     compile 'com.github.ericwlange:AndroidJSCore:3.0.1'
+    compile 'com.android.support:recyclerview-v7:24.2.1'
+    compile 'com.android.support:support-v4:24.2.1'
+    debugCompile project(':blocklylib-core-debug')
+    releaseCompile project(':blocklylib-core-release')
+    debugCompile project(':blocklylib-vertical-debug')
+    releaseCompile project(':blocklylib-vertical-release')
 }

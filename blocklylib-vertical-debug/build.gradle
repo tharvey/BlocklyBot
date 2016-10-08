@@ -1,0 +1,2 @@
+configurations.maybeCreate("default")
+artifacts.add("default", file('blocklylib-vertical-debug.aar'))
