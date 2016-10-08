@@ -150,7 +150,11 @@ public class JSParser {
 				JSFunction Speak = new JSFunction(context, "Speak") {
 					public Integer Speak(String text) {
 						Log.i(TAG, "speak(" + text + ")");
-						return doFunction(mSpeak, text, 0, 0);
+						int ret;
+						mDisplay.setSpeaking(true);
+						ret = doFunction(mSpeak, text, 0, 0);
+						mDisplay.setSpeaking(false);
+						return ret;
 					}
 				};
 				context.property("Speak", Speak);
