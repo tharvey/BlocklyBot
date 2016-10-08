@@ -123,6 +123,11 @@ public class DiscoverySelector {
 						mPhase = "Bluetooth LE";
 						updateTitle();
 						mBLEScan.start();
+					} else {
+						mProgress.setVisibility(View.INVISIBLE);
+						mPhase = "";
+						mCount = 0;
+						updateTitle();
 					}
 				}
 			});
