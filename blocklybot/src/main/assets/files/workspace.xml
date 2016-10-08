@@ -1,0 +1,39 @@
+<xml xmlns="http://www.w3.org/1999/xhtml">
+    <block type="start" id="startblock" x="-97" y="-48" deletable="false" inline="false">
+        <statement name="FUNC">
+            <block type="speech_speak" id="7dd699f7-b009-41b0-a00d-fb7111eba8ef">
+                <field name="TEXT">hello, i am BlocklyBot</field>
+                <next>
+                    <block type="robot_emote" id="ad0fc99b-3fc8-4107-8023-2826c9956192">
+                        <field name="TYPE">shakeHead</field>
+                        <next>
+                            <block type="speech_speak" id="ec9c0a4f-5238-4f0e-a01a-796c28cc16a3">
+                                <field name="TEXT">watch me whip</field>
+                                <next>
+                                    <block type="robot_emote" id="8d95f45d-b0d9-40ab-aafe-cc2b1316926e">
+                                        <field name="TYPE">wobble</field>
+                                        <next>
+                                            <block type="speech_speak" id="4e4f7117-1c22-4746-ad49-d0c3b5e4440e">
+                                                <field name="TEXT">watch me nay nay</field>
+                                                <next>
+                                                    <block type="robot_emote" id="7d1337fb-3001-46c8-8050-ed63fd06a96b">
+                                                        <field name="TYPE">shakeLegs</field>
+                                                        <next>
+                                                            <block type="audio_play" id="271440c3-31c6-4896-8fa5-3808e7706029" inline="true">
+                                                                <field name="SOUND">laser</field>
+                                                            </block>
+                                                        </next>
+                                                    </block>
+                                                </next>
+                                            </block>
+                                        </next>
+                                    </block>
+                                </next>
+                            </block>
+                        </next>
+                    </block>
+                </next>
+            </block>
+        </statement>
+    </block>
+</xml>

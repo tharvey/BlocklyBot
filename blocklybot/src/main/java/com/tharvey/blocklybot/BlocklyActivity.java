@@ -50,7 +50,7 @@ import java.util.List;
  */
 public class BlocklyActivity extends AbstractBlocklyActivity implements IConnection {
 	private static final String TAG = "BlocklyActivity";
-	public static final String SAVED_WORKSPACE_FILENAME_DEFAULT = "robot_workspace.xml";
+	public static final String SAVED_WORKSPACE_FILENAME_DEFAULT = "workspace.xml";
 	private static final List<String> BLOCK_DEFINITIONS = Arrays.asList(new String[]{
 			"default/loop_blocks.json",
 			"default/logic_blocks.json",
