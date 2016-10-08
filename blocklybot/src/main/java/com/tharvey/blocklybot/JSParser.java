@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.os.SystemClock;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.liquidplayer.webkit.javascriptcore.JSContext;
 import org.liquidplayer.webkit.javascriptcore.JSFunction;
@@ -58,6 +59,10 @@ public class JSParser {
 		final List<String> phrases = new ArrayList<String>();
 
 		mDisplay.showFace("default");
+		if (robot == null) {
+			mDisplay.showMessage("No robot connected", Toast.LENGTH_LONG);
+			SystemClock.sleep(500);
+		}
 
         /* Preparse code:
          *  - remove any root blocks that are not start blocks (TODO: get this done by blockly)
@@ -133,6 +138,10 @@ public class JSParser {
 						Log.i(TAG, "robot(" + str + "," + val + ")");
 						if (robot != null)
 							return doFunction(robot, str, 0, val);
+						else {
+							mDisplay.showMessage(str, Toast.LENGTH_SHORT);
+							SystemClock.sleep(1000);
+						}
 						return 0;
 					}
 				};
@@ -206,6 +215,7 @@ public class JSParser {
 				}
 
 				/* wait until Display is no longer showing */
+				mDisplay.showMessage("Select Back to exit", Toast.LENGTH_LONG);
 				while (mDisplay.isVisible())
 					SystemClock.sleep(100);
 				Log.i(TAG, "display no longer visible - cleanup");

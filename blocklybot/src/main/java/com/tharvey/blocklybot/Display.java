@@ -13,6 +13,7 @@ import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
+import android.widget.Toast;
 
 import java.util.Random;
 
@@ -183,6 +184,15 @@ public class Display {
 		mLayout.post(new Runnable() {
 			public void run() {
 				mPopup.dismiss();
+			}
+		});
+	}
+
+	public void showMessage(final String msg, final int len) {
+		mActivity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				Toast.makeText(mActivity, msg, len).show();
 			}
 		});
 	}
