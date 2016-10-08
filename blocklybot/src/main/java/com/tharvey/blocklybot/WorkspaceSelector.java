@@ -135,6 +135,8 @@ public class WorkspaceSelector {
 			};
 			String[] fileList1 = path.list(filter);
 			for (String file : fileList1) {
+				if (file.contains("."))
+					file = file.substring(0, file.lastIndexOf('.'));
 				r.add(file);
 			}
 		}
@@ -143,7 +145,7 @@ public class WorkspaceSelector {
 
 	private File getChosenFile(String fileChosen) {
 		if (fileChosen.equals(PARENT_DIR)) return currentPath.getParentFile();
-		else return new File(currentPath, fileChosen);
+		else return new File(currentPath, fileChosen + fileEndsWith);
 	}
 
 	private void setFileEndsWith(String fileEndsWith) {
