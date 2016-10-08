@@ -133,7 +133,7 @@ public class JSParser {
 				JSContext context = new JSContext();
 				JSFunction Robot = new JSFunction(context, "Robot") {
 					public Integer Robot(String str, Integer val) {
-						if (val < 1)
+						if (val == null || val < 1)
 							val = 1;
 						Log.i(TAG, "robot(" + str + "," + val + ")");
 						if (robot != null)
