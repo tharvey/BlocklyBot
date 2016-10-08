@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
 		checkPermissions(this);
 
 		mSharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-		if (mSharedPref.getBoolean("installed", false)) {
+		if (!mSharedPref.getBoolean("installed", false)) {
 			Log.i(TAG, "Copying example files on first run...");
 			mSharedPref.edit().putBoolean("installed", true).commit();
 			copyAssetFolder(getAssets(), "files", getFilesDir().getPath() /*+ "/samples"*/);
