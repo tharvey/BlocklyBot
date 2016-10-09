@@ -19,7 +19,7 @@ android {
     compileSdkVersion 23
     buildToolsVersion '23.0.3'
     defaultConfig {
-        applicationId "com.google.blockly.demo"
+        applicationId "com.tharvey.blocklybot"
         minSdkVersion 16
         targetSdkVersion 23
         versionCode 1
