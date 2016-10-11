@@ -1,5 +1,5 @@
 <h3>BlocklyBot</h3>
-Version 0.2<br>
+Version 0.3<br>
 Copyright 2016<br>
 Tim Harvey harvey.tim@gmail.com<br>
 <b>https://robotstem.wordpress.com/</b><br>
