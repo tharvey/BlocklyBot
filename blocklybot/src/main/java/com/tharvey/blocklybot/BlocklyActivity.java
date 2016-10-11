@@ -159,7 +159,6 @@ public class BlocklyActivity extends AbstractBlocklyActivity implements IConnect
 		} catch (BlocklyParserException e) {
 			// failed to parse xml
 		}
-		addDefaultVariables(getController());
 		updateTitlebar();
 	}
 
@@ -274,7 +273,8 @@ public class BlocklyActivity extends AbstractBlocklyActivity implements IConnect
 
 	@Override
 	protected void onInitBlankWorkspace() {
-		getController().loadWorkspaceContents(
+		BlocklyController controller = getController();
+		controller.loadWorkspaceContents(
 				"<xml xmlns='http://www.w3.org/1999/xhtml'>\n" +
 						"  <block type='start' id='startblock' " +
 						"    x='0' y='5' " +
@@ -283,7 +283,13 @@ public class BlocklyActivity extends AbstractBlocklyActivity implements IConnect
 						"  </block>" +
 						"</xml>"
 		);
-		addDefaultVariables(getController());
+
+		// TODO: (#22) Remove this override when variables are supported properly
+		controller.addVariable("orange");
+		controller.addVariable("apple");
+		controller.addVariable("bannana");
+		controller.addVariable("coconut");
+		controller.addVariable("carrot");
 	}
 
 	@Override
@@ -339,15 +345,6 @@ public class BlocklyActivity extends AbstractBlocklyActivity implements IConnect
 			}
 		}
 	};
-
-	static void addDefaultVariables(BlocklyController controller) {
-		// TODO: (#22) Remove this override when variables are supported properly
-		controller.addVariable("orange");
-		controller.addVariable("apple");
-		controller.addVariable("bannana");
-		controller.addVariable("coconut");
-		controller.addVariable("carrot");
-	}
 
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == DiscoverySelector.REQUEST_ENABLE_BT) {
