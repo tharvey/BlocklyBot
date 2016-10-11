@@ -20,6 +20,7 @@ import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
+import android.graphics.drawable.BitmapDrawable;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -45,14 +46,20 @@ public class Display {
 	private ObjectAnimator mSpeakAnimation;
 	private boolean mSpeaking;
 	private IEventListener mEventListener;
+	private static Display mContext = null;
 
 	public Display(Activity activity)
 	{
 		mActivity = activity;
+		mContext = this;
 	}
 
 	public void setListener(IEventListener callback) {
 		mEventListener = callback;
+	}
+
+	public static Display getDisplay() {
+		return mContext;
 	}
 
 	private boolean onEvent(String elem) {
@@ -72,6 +79,8 @@ public class Display {
 
 		mPopup  = new PopupWindow(mLayout, WindowManager.LayoutParams.MATCH_PARENT,
 				WindowManager.LayoutParams.MATCH_PARENT,true);
+		mPopup.setFocusable(false); // allows event to reach activity below
+		mPopup.setBackgroundDrawable(new BitmapDrawable());
 		mPopup.showAtLocation(mLayout, Gravity.NO_GRAVITY, 100, 100);
 
 		mEyeL.setOnTouchListener(new View.OnTouchListener() {

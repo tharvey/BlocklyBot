@@ -77,6 +77,17 @@ public class BlocklyActivity extends AbstractBlocklyActivity implements IConnect
 	SharedPreferences mPreferences;
 
 	@Override
+	public void onBackPressed() {
+		Log.i(TAG, "onBackPressed()");
+		Display display = Display.getDisplay();
+		if (display != null && display.isVisible()) {
+			display.hideFace();
+		} else {
+			super.onBackPressed();
+		}
+	}
+
+	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		action = getSupportActionBar();
