@@ -148,14 +148,13 @@ public class Display {
 		blinkL.setDuration(200);
 		blinkL.setRepeatCount(1);
 		blinkL.setRepeatMode(ObjectAnimator.REVERSE);
-		blinkL.setStartDelay(1000);
 		blinkL.setInterpolator(new AccelerateDecelerateInterpolator());
 		blinkR.setDuration(200);
 		blinkR.setRepeatCount(1);
 		blinkR.setRepeatMode(ObjectAnimator.REVERSE);
-		blinkR.setStartDelay(1000);
 		blinkR.setInterpolator(new AccelerateDecelerateInterpolator());
-		blink.play(blinkL).with(blinkR);
+		blink.playTogether(blinkL, blinkR);
+		blink.setStartDelay(1000);
 		blink.addListener(new Animator.AnimatorListener() {
 			@Override
 			public void onAnimationEnd(Animator animation) {
