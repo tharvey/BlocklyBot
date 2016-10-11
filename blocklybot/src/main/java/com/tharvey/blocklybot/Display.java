@@ -112,8 +112,9 @@ public class Display {
 		mLayout.getViewTreeObserver().addOnGlobalLayoutListener(
 				new ViewTreeObserver.OnGlobalLayoutListener() {
 					public void onGlobalLayout() {
-						Log.i(TAG, "mouth:" + mMouth.getX() + "," + mMouth.getY());
-						final ObjectAnimator breathe = ObjectAnimator.ofFloat(mMouth, "y", mMouth.getY(), mMouth.getY() - 30);
+						Log.i(TAG, "mouth:" + mMouth.getX() + "," + mMouth.getY() + ":" + mMouth.getHeight());
+						final ObjectAnimator breathe = ObjectAnimator.ofFloat(mMouth, "y",
+								mMouth.getY(), mMouth.getY() - mMouth.getHeight() / 4);
 						breathe.addListener(new Animator.AnimatorListener() {
 
 							@Override
