@@ -57,7 +57,7 @@ public class BlocklyActivity extends AbstractBlocklyActivity implements IConnect
 			"default/loop_blocks.json",
 			"default/logic_blocks.json",
 			"default/math_blocks.json",
-			"default/variable_blocks.json",
+			"variable_blocks.json",
 			"control_blocks.json",
 			"robot_blocks.json",
 			"speech_blocks.json",
@@ -66,6 +66,13 @@ public class BlocklyActivity extends AbstractBlocklyActivity implements IConnect
 	private static final List<String> JAVASCRIPT_GENERATORS = Arrays.asList(new String[]{
 			"robot_generators.js"
 	});
+	private String[] mVariables = {
+			"apple",
+			"orange",
+			"bannana",
+			"coconut",
+			"carrot",
+	};
 
 	private ActionBar action;
 	private File FILE_DIR;
@@ -126,7 +133,7 @@ public class BlocklyActivity extends AbstractBlocklyActivity implements IConnect
 				@Override
 				public void onFinishCodeGeneration(final String generatedCode) {
 					Log.i(TAG, "generatedCode:\n" + generatedCode);
-					mParser.parseCode(mRobot, generatedCode);
+					mParser.parseCode(mRobot, generatedCode, mVariables);
 				}
 			};
 
@@ -285,11 +292,8 @@ public class BlocklyActivity extends AbstractBlocklyActivity implements IConnect
 		);
 
 		// TODO: (#22) Remove this override when variables are supported properly
-		controller.addVariable("orange");
-		controller.addVariable("apple");
-		controller.addVariable("bannana");
-		controller.addVariable("coconut");
-		controller.addVariable("carrot");
+		for (int i = 0; i < mVariables.length; i++)
+			controller.addVariable(mVariables[i]);
 	}
 
 	@Override

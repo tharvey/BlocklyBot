@@ -69,7 +69,7 @@ public class JSParser {
 		return 0;
 	}
 
-	public final int parseCode(final Mobbob mobbob, String generatedCode) {
+	public final int parseCode(final Mobbob mobbob, String generatedCode, String[] vars) {
 		final Mobbob robot = mobbob;
 		final HashMap<String, JSFunction> eventMap = new HashMap<String, JSFunction>();
 		final List<String> phrases = new ArrayList<String>();
@@ -89,6 +89,9 @@ public class JSParser {
 		BufferedReader bufReader = new BufferedReader(new StringReader(generatedCode));
 		String line = null;
 		String newCode = "";
+		for (int i = 0; i < vars.length; i++)
+			newCode += "var " + vars[i] + " = 0;\n";
+		newCode += "\n";
 		try {
 			while ((line = bufReader.readLine()) != null) {
 				if (line.startsWith("function start()")

@@ -78,6 +78,59 @@ Blockly.JavaScript['wait_time'] = function(block) {
 /* Assign my control blocks to the ones already defined in blocklylib-core */
 Blockly.JavaScript['control_repeat'] = Blockly.JavaScript['controls_repeat'];
 
+Blockly.JavaScript['control_repeat_forever'] = function(block) {
+  var value = Blockly.JavaScript.statementToCode(block, 'FUNC')
+  return 'while(1) {\n' + value + '}\n';
+};
+
+/*
+ * Variables
+ */
+Blockly.JavaScript['variables_set'] = function(block) {
+  var variable = block.getFieldValue('VAR');
+  var value = block.getFieldValue('VALUE');
+  return variable + ' = ' + value + ';\n';
+};
+
+Blockly.JavaScript['variables_delta'] = function(block) {
+  var variable = block.getFieldValue('VAR');
+  var op = block.getFieldValue('OP');
+  var value = block.getFieldValue('VALUE');
+  return variable + ' = ' + variable + ' ' + op + ' ' + value + ';\n';
+};
+
+Blockly.JavaScript['variables_if'] = function(block) {
+  var variable = block.getFieldValue('VAR');
+  var op = block.getFieldValue('OP');
+  var value = block.getFieldValue('VALUE');
+  var func = Blockly.JavaScript.statementToCode(block, 'DO');
+  return 'if (' + variable + ' ' + op + ' ' + value + ') {\n' + func + '}\n';
+};
+
+Blockly.JavaScript['variables_if_else'] = function(block) {
+  var variable = block.getFieldValue('VAR');
+  var op = block.getFieldValue('OP');
+  var value = block.getFieldValue('VALUE');
+  var func_if = Blockly.JavaScript.statementToCode(block, 'DO');
+  var func_else = Blockly.JavaScript.statementToCode(block, 'ELSE');
+  return 'if (' + variable + ' ' + op + ' ' + value + ') {\n' + func_if + '} else {\n' + func_else + '}\n';
+};
+
+Blockly.JavaScript['variables_do'] = function(block) {
+  var op = block.getFieldValue('OP');
+  var variable = block.getFieldValue('VAR');
+  return 'Robot("' + op + '",' + variable + ', \'block_id_' + block.id + '\');\n';
+};
+
+Blockly.JavaScript['variables_while'] = function(block) {
+  var variable = block.getFieldValue('VAR');
+  var op = block.getFieldValue('OP');
+  var value = block.getFieldValue('VALUE');
+  var func = Blockly.JavaScript.statementToCode(block, 'DO');
+  return 'while (' + variable + ' ' + op + ' ' + value + ') {\n' + func + '}\n';
+};
+
+
 /*
  * Event Handlers
  */

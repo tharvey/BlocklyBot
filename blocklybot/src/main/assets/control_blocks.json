@@ -36,6 +36,23 @@
     "tooltip": "Repeat a set of statements several times"
   },
   {
+    "type": "control_repeat_forever",
+    "message0": "repeat forever %1 %2",
+    "args0": [
+      {
+        "type": "input_dummy"
+      },
+      {
+        "type": "input_statement",
+        "name": "FUNC"
+      }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 120,
+    "tooltip": "Repeat a set of statements forever"
+  },
+  {
     "type": "wait_time",
     "message0": "wait %1 seconds",
     "args0": [
