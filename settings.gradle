@@ -1,1 +1,1 @@
-include ':blocklybot', ':blocklylib-core-debug', ':blocklylib-vertical-debug', ':blocklylib-vertical-release', ':blocklylib-core-release'
+include ':blocklybot', ':blocklylib-core-debug', ':blocklylib-vertical-debug', ':blocklylib-vertical-release', ':blocklylib-core-release', ':js'

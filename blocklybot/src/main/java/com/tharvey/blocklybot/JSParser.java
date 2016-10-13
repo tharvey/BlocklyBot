@@ -19,15 +19,23 @@ package com.tharvey.blocklybot;
 import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
+import android.os.Looper;
 import android.os.SystemClock;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
 
-import org.liquidplayer.webkit.javascriptcore.JSContext;
-import org.liquidplayer.webkit.javascriptcore.JSFunction;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.Function;
+import org.mozilla.javascript.RhinoException;
+import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.ScriptableObject;
+import org.mozilla.javascript.debug.DebugFrame;
+import org.mozilla.javascript.debug.DebuggableScript;
+import org.mozilla.javascript.debug.Debugger;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,6 +55,12 @@ public class JSParser {
 	private Audio mAudio;
 	private Tone mTone;
 	private Display mDisplay;
+	private boolean mRunning;
+	private Mobbob mRobot;
+	private HashMap<String, String> mEventMap;
+	private Scriptable mScope;
+	private ObservingDebugger mDebugger;
+	private String[] mCodeLines;
 
 	public JSParser(Activity activity) {
 		mActivity = activity;
@@ -57,8 +71,12 @@ public class JSParser {
 		mListen = null;
 	}
 
-	private int doFunction(IFunction f, String p1, int p2, int p3)
-	{
+	public boolean isBusy() {
+		return mRunning;
+	}
+
+	/* perform async function and block until its complete */
+	private void doFunction(final IFunction f, final String p1, final int p2, final int p3) {
 		if (mListen != null)
 			mListen.pause();
 		f.doFunction(p1, p2, p3);
@@ -66,19 +84,94 @@ public class JSParser {
 			SystemClock.sleep(10);
 		if (mListen != null)
 			mListen.resume();
-		return 0;
+	}
+
+	/* Javascript debugger - currently this is used to check for a stop execution request
+	 *     every line of code for script termination, however it could
+	 *     be used in future for feedback of blockId
+	 */
+	class ObservingDebugger implements Debugger
+	{
+		boolean mStop = false;
+
+		private DebugFrame debugFrame = null;
+
+		/* stack frame class */
+		class ObservingDebugFrame implements DebugFrame
+		{
+			boolean mStop = false;
+
+			public void stop() {
+				this.mStop = true;
+			}
+
+			ObservingDebugFrame(boolean state)
+			{
+				this.mStop = state;
+			}
+
+			public void onEnter(Context cx, Scriptable activation,
+			                    Scriptable thisObj, Object[] args)
+			{
+				Log.i(TAG, "Debugger:enter");
+			}
+
+			public void onLineChange(Context cx, int n)
+			{
+				if(mStop){
+					throw new RuntimeException("Script Execution terminaed");
+				}
+				Log.d(TAG, String.format("Debugger: % 3d: %s", n, mCodeLines[n-1]));
+			}
+
+			public void onExceptionThrown(Context cx, Throwable ex)
+			{
+				Log.i(TAG, "Debugger:onExceptionThrown:" + ex);
+			}
+
+			public void onExit(Context cx, boolean byThrow,
+			                   Object resultOrException)
+			{
+				Log.i(TAG, "Debugger:exit");
+			}
+
+			@Override
+			public void onDebuggerStatement(Context arg0) {
+				Log.i(TAG, "Debugger:onDebuggerStatement");
+			}
+		}
+
+		public void stop() {
+			this.mStop = true;
+			Log.i(TAG, "Debugger:stop");
+			if(debugFrame != null){
+				((ObservingDebugFrame)debugFrame).stop();
+			}
+		}
+
+		public DebugFrame getFrame(Context cx, DebuggableScript fnOrScript)
+		{
+			if(debugFrame == null){
+				debugFrame = new ObservingDebugFrame(mStop);
+			}
+			return debugFrame;
+		}
+
+		@Override
+		public void handleCompilationDone(Context arg0, DebuggableScript arg1, String arg2) {
+		}
 	}
 
 	public final int parseCode(final Mobbob mobbob, String generatedCode, String[] vars) {
-		final Mobbob robot = mobbob;
-		final HashMap<String, JSFunction> eventMap = new HashMap<String, JSFunction>();
+		mRobot = mobbob;
+		mListen = null;
+		mEventMap = new HashMap<String, String>();
 		final List<String> phrases = new ArrayList<String>();
+		int i;
 
 		mDisplay.showFace("default");
-		if (robot == null) {
+		if (mRobot == null)
 			mDisplay.showMessage("No robot connected", Toast.LENGTH_LONG);
-			SystemClock.sleep(500);
-		}
 
         /* Preparse code:
          *  - remove any root blocks that are not start blocks (TODO: get this done by blockly)
@@ -87,46 +180,65 @@ public class JSParser {
          *  - add a footer: call start()
          */
 		BufferedReader bufReader = new BufferedReader(new StringReader(generatedCode));
-		String line = null;
+		String line;
 		String newCode = "";
-		for (int i = 0; i < vars.length; i++)
+		// declare vars
+		for (i = 0; i < vars.length; i++)
 			newCode += "var " + vars[i] + " = 0;\n";
 		newCode += "\n";
+		// filter out non-start root blocks
 		try {
 			while ((line = bufReader.readLine()) != null) {
-				if (line.startsWith("function start()")
-						|| line.startsWith("  ")
-						|| line.startsWith("}")
-						|| line.startsWith("Listen(")
-						|| line.startsWith("Wait(")
-						|| (line.length() == 0)
-						) {
-					Pattern p = Pattern.compile("Listen\\(\"([^\"]*)\",.*");
-					Matcher m = p.matcher(line);
-					if (m.find())
-						phrases.add(m.group(1));
-					newCode += line + "\n";
+				boolean skip = false;
+				Pattern listen_pat = Pattern.compile("BlocklyBot.Listen\\(\"([^\"]*)\",.*");
+				Matcher listen = listen_pat.matcher(line);
+				if (listen.find()) {
+					Log.d(TAG, "listen phrase:" + listen.group(1));
+					phrases.add(listen.group(1));
 				}
+				else if (line.startsWith("BlocklyBot.Wait(")) {
+				}
+				else if (line.startsWith("BlocklyBot")) {
+					Log.d(TAG, "Skipping root block outside of start: " + line);
+					skip = true;
+				}
+				if (!skip)
+					newCode += line + '\n';
 			}
-		} catch (Exception e) {
+		} catch (IOException e) {
 		}
-		newCode += "\nstart();\n";
-		Log.i(TAG, "newCode:\n" + newCode);
+
+		mCodeLines = newCode.split("\\n");
+		for (i = 0; i < mCodeLines.length; i++)
+			Log.d(TAG, String.format("% 3d: %s", i+1, mCodeLines[i]));
 		final String code = newCode;
 
-		/* create and register eventListener for various event generator s*/
+		// create and register eventListener for various event generators
 		IEventListener eventListener = new IEventListener() {
 			@Override
 			public boolean onEvent(String type, String param) {
 				final String map = type + ":" + param;
-				final JSFunction func = eventMap.get(map);
-				Log.i(TAG, "Event: " + map);
+				final String func = mEventMap.get(map);
+				Log.i(TAG, threadId() + ":Event: " + map);
 				if (func != null) {
 					// these come in on UI thread which we must not block on, so use a thread
 					Thread thread = new Thread() {
 						@Override
 						public void run() {
-							func.call();
+							Context context = Context.enter();
+							context.setOptimizationLevel(-1);
+							try {
+								Function start = context.compileFunction(mScope, func, map, 1, null);
+								start.call(context, mScope, context.newObject(mScope), new Object[0]);
+							} catch (RhinoException e) {
+								Log.e(TAG, "Exception in engine");
+								Log.e(TAG, e.getMessage());
+								Log.e(TAG, e.getScriptStackTrace());
+							} catch (RuntimeException e) {
+								Log.e(TAG, e.toString());
+							} finally {
+								Context.exit();
+							}
 						}
 					};
 					thread.start();
@@ -137,114 +249,65 @@ public class JSParser {
 			}
 		};
 		mDisplay.setListener(eventListener);
+
+		// Start voice recognitiong engine
 		if (ContextCompat.checkSelfPermission(mActivity, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
 		    && phrases.size() > 0)
 			mListen = new Listen(mActivity, phrases, eventListener);
-		else
-			mListen = null;
 
 		Thread thread = new Thread() {
 			@Override
 			public void run() {
-				/* wait for Listen class */
-				while (mListen != null && mListen.isSetup())
-					SystemClock.sleep(100);
-				JSContext context = new JSContext();
-				JSFunction Robot = new JSFunction(context, "Robot") {
-					public Integer Robot(String str, Integer val) {
-						if (val == null || val < 1)
-							val = 1;
-						Log.i(TAG, "robot(" + str + "," + val + ")");
-						if (robot != null)
-							return doFunction(robot, str, 0, val);
-						else {
-							mDisplay.showMessage(str, Toast.LENGTH_SHORT);
-							SystemClock.sleep(1000);
-						}
-						return 0;
-					}
-				};
-				context.property("Robot", Robot);
-
-				JSFunction Speak = new JSFunction(context, "Speak") {
-					public Integer Speak(String text) {
-						Log.i(TAG, "speak(" + text + ")");
-						int ret;
-						mDisplay.setSpeaking(true);
-						ret = doFunction(mSpeak, text, 0, 0);
-						mDisplay.setSpeaking(false);
-						return ret;
-					}
-				};
-				context.property("Speak", Speak);
-
-				JSFunction Audio = new JSFunction(context, "Audio") {
-					public Integer Audio(String text) {
-						Log.i(TAG, "audio(" + text + ")");
-						return doFunction(mAudio, text, 0, 0);
-					}
-				};
-				context.property("Audio", Audio);
-
-				JSFunction Tone = new JSFunction(context, "Tone") {
-					public Integer Tone(int freq, int secs) {
-						Log.i(TAG, "tone: freq=" + freq + "secs=" + secs);
-						return doFunction(mTone, null, freq, secs * 1000);
-					}
-				};
-				context.property("Tone", Tone);
-
-				JSFunction MusicNote = new JSFunction(context, "Note") {
-					public Integer Note(String note, int timems) {
-						int octave = 3; /* 3rd octave */
-						Log.i(TAG, "note(" + note + ")");
-						return doFunction(mTone, null, (int) Note.valueOf(note + octave), timems);
-					}
-				};
-				context.property("Note", MusicNote);
-
-				JSFunction Listen = new JSFunction(context, "Listen") {
-					public Integer Listen(String text, JSFunction func) {
-						Log.i(TAG, "listen(" + text + ")");
-						eventMap.put("listen:" + text, func);
-						return 0;
-					}
-				};
-				context.property("Listen", Listen);
-
-				JSFunction Sleep = new JSFunction(context, "Sleep") {
-					public Integer Sleep(int times) {
-						Log.i(TAG, "Sleep(" + times + ")");
-						SystemClock.sleep(1000 * times);
-						return 0;
-					}
-				};
-				context.property("Sleep", Sleep);
-
-				JSFunction Wait = new JSFunction(context, "Wait") {
-					public Integer Wait(String event, JSFunction func) {
-						Log.i(TAG, "Wait(" + event + ")");
-						eventMap.put(event, func);
-						return 0;
-					}
-				};
-				context.property("Wait", Wait);
-
-				try {
-					context.evaluateScript(code);
-					Log.i(TAG, "Code generation complete");
-				} catch (Exception e) {
-					Log.e(TAG, "Error evaluating script: " + e);
+				// Wait for voice recognition engine
+				if (mListen != null) {
+					Log.d(TAG, "Waiting for listener....");
+					while (!mListen.isSetup())
+						SystemClock.sleep(100);
+					Log.d(TAG, "Listener ready");
 				}
 
-				/* wait until Display is no longer showing */
-				mDisplay.showMessage("Select Back to exit", Toast.LENGTH_LONG);
-				while (mDisplay.isVisible())
-					SystemClock.sleep(100);
-				Log.i(TAG, "display no longer visible - cleanup");
-				if (robot != null)
-					doFunction(robot, null, Mobbob.commands.STOP.ordinal(), 0);
-				mDisplay.hideFace();
+				// setup Rhino
+				Log.i(TAG, "Configuring Rhino");
+				Context context = Context.enter();
+				mDebugger = new ObservingDebugger();
+				context.setDebugger(mDebugger, new Integer(0));
+				context.setGeneratingDebug(true);
+				context.setOptimizationLevel(-1);
+				mScope = context.initStandardObjects();
+				ScriptableObject.putProperty(mScope, "BlocklyBot", Context.javaToJS(JSParser.this, mScope));
+
+				mRunning = true;
+				try {
+					Log.d(TAG, "Evaluating code");
+					context.evaluateString(mScope, code, "code", 1, null);
+					Log.d(TAG, "Calling start()");
+					Function jsFunction = (Function) mScope.get("start", mScope);
+					Object jsResult = jsFunction.call(context, mScope, mScope, new Object[0]);
+					String result = Context.toString(jsResult);
+					Log.i(TAG, "result:" + result);
+				} catch (RhinoException e) {
+					Log.e(TAG, "Exception in engine");
+					Log.e(TAG, e.getMessage());
+					Log.e(TAG, e.getScriptStackTrace());
+				} catch (RuntimeException e) {
+					Log.i(TAG, "Script terminated");
+				} finally {
+					Context.exit();
+				}
+				mRunning = false;
+				Log.i(TAG, "execution done");
+
+				// wait display to complete (ie script terminated or complete)
+				if (mDisplay.isVisible()) {
+					mDisplay.showMessage("Select Back to exit", Toast.LENGTH_LONG);
+					while (mDisplay.isVisible())
+						SystemClock.sleep(100);
+				}
+
+				// cleanup
+				Log.i(TAG, "cleanup");
+				if (mRobot != null)
+					doFunction(mRobot, null, Mobbob.commands.STOP.ordinal(), 0);
 				if (mListen != null)
 					mListen.close();
 			}
@@ -253,10 +316,74 @@ public class JSParser {
 		return 0;
 	}
 
-	public void stop() {
-		Log.i(TAG, "stop()");
-		// TODO: how to stop
-		if (mListen != null)
-			mListen.close();
+	static public String threadId() {
+		if (Thread.currentThread() == Looper.getMainLooper().getThread())
+			return new String("UI");
+		else
+			return new String(Thread.currentThread().toString());
+
+	}
+
+	public void cancel() {
+		Log.i(TAG, "cancel()");
+		mDisplay.hideFace();
+		mDebugger.stop();
+	}
+
+	/*
+	 * Scriptables
+	 */
+	public void Robot(String str, int val) {
+		if (Thread.currentThread() == Looper.getMainLooper().getThread())
+			Log.i(TAG, "UI:robot(" + str + "," + val + ")");
+		else
+			Log.i(TAG, Thread.currentThread() + ":robot(" + str + "," + val + ")");
+		if (val < 1)
+			val = 1;
+		if (mRobot != null)
+			doFunction(mRobot, str, 0, val);
+		else {
+			mDisplay.showMessage(str, Toast.LENGTH_SHORT);
+			SystemClock.sleep(1000);
+		}
+	}
+
+	public void Speak(String text) {
+		Log.i(TAG, "speak(" + text + ")");
+		mDisplay.setSpeaking(true);
+		doFunction(mSpeak, text, 0, 0);
+		mDisplay.setSpeaking(false);
+	}
+
+	public void Audio(String text) {
+		Log.i(TAG, "audio(" + text + ")");
+		doFunction(mAudio, text, 0, 0);
+	}
+
+	public void Tone(int freq, int secs) {
+		Log.i(TAG, "tone: freq=" + freq + "secs=" + secs);
+		doFunction(mTone, null, freq, secs * 1000);
+	}
+
+	public void Note(String note, int timems) {
+		int octave = 3; /* 3rd octave */
+		Log.i(TAG, "note(" + note + ")");
+		doFunction(mTone, null, (int) Note.valueOf(note + octave), timems);
+	}
+
+	public void Listen(String text, String func) {
+		Log.i(TAG, "listen(" + text + ")");
+		mEventMap.put("listen:" + text, func);
+	}
+
+	public void Sleep(int times) {
+		Log.i(TAG, "Sleep(" + times + ")");
+		SystemClock.sleep(1000 * times);
+	}
+
+	public void Wait(String event, String func) {
+		Log.i(TAG, "Wait(" + event + ")");
+		Log.i(TAG, "func:" + func);
+		mEventMap.put(event, func);
 	}
 }

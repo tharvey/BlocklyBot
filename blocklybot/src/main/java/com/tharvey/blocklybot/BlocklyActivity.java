@@ -87,8 +87,8 @@ public class BlocklyActivity extends AbstractBlocklyActivity implements IConnect
 	public void onBackPressed() {
 		Log.i(TAG, "onBackPressed()");
 		Display display = Display.getDisplay();
-		if (display != null && display.isVisible()) {
-			display.hideFace();
+		if (mParser.isBusy()) {
+			mParser.cancel();
 		} else {
 			super.onBackPressed();
 		}
@@ -230,7 +230,7 @@ public class BlocklyActivity extends AbstractBlocklyActivity implements IConnect
 			alertNew.show();
 			return true;
 		} else if (id == R.id.action_stop) {
-			mParser.stop();
+			mParser.cancel();
 		} else if (id == R.id.action_connect) {
 			DiscoverySelector dialog = new DiscoverySelector(this, this);
 			dialog.showDialog();
