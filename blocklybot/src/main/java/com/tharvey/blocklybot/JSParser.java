@@ -190,13 +190,13 @@ public class JSParser {
 		try {
 			while ((line = bufReader.readLine()) != null) {
 				boolean skip = false;
-				Pattern listen_pat = Pattern.compile("BlocklyBot.Listen\\(\"([^\"]*)\",.*");
-				Matcher listen = listen_pat.matcher(line);
-				if (listen.find()) {
-					Log.d(TAG, "listen phrase:" + listen.group(1));
-					phrases.add(listen.group(1));
-				}
-				else if (line.startsWith("BlocklyBot.Wait(")) {
+				Pattern wait_pat = Pattern.compile("BlocklyBot.Wait\\(\"([^\"]*)\",.*");
+				Matcher wait = wait_pat.matcher(line);
+				if (wait.find()) {
+					String map = wait.group(1);
+					Log.d(TAG, "wait:" + map);
+					if (map.startsWith("listen:"))
+						phrases.add(map.substring(7));
 				}
 				else if (line.startsWith("BlocklyBot")) {
 					Log.d(TAG, "Skipping root block outside of start: " + line);
@@ -371,11 +371,6 @@ public class JSParser {
 		doFunction(mTone, null, (int) Note.valueOf(note + octave), timems);
 	}
 
-	public void Listen(String text, String func) {
-		Log.i(TAG, "listen(" + text + ")");
-		mEventMap.put("listen:" + text, func);
-	}
-
 	public void Sleep(int times) {
 		Log.i(TAG, "Sleep(" + times + ")");
 		SystemClock.sleep(1000 * times);
@@ -383,7 +378,6 @@ public class JSParser {
 
 	public void Wait(String event, String func) {
 		Log.i(TAG, "Wait(" + event + ")");
-		Log.i(TAG, "func:" + func);
 		mEventMap.put(event, func);
 	}
 }

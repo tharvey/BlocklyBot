@@ -51,6 +51,10 @@ Blockly.JavaScript['robot_stop'] = function(block) {
 
 Blockly.JavaScript['robot_repeat_internal'] = Blockly.JavaScript['controls_repeat'];
 
+Blockly.JavaScript['speech_speak'] = function(block) {
+  return 'BlocklyBot.Speak("' + block.getFieldValue('TEXT') + '", \'block_id_' + block.id + '\');\n';
+};
+
 Blockly.JavaScript['audio_play'] = function(block) {
   return 'BlocklyBot.Audio("' + block.getFieldValue('SOUND') + '", \'block_id_' + block.id + '\');\n';
 };
@@ -139,21 +143,17 @@ Blockly.JavaScript['start'] = function(block) {
     return 'function start() {\n' + value + '}\n';
 };
 
-Blockly.JavaScript['speech_speak'] = function(block) {
-  return 'BlocklyBot.Speak("' + block.getFieldValue('TEXT') + '", \'block_id_' + block.id + '\');\n';
-};
-
-Blockly.JavaScript['speech_listen'] = function(block) {
+Blockly.JavaScript['wait_listen'] = function(block) {
     var value = Blockly.JavaScript.statementToCode(block, 'FUNC')
-    return 'BlocklyBot.Listen("' + block.getFieldValue('CMD') + '", function() {\n' + value + '});';
+    return 'BlocklyBot.Wait("' + block.getFieldValue('EVENT') + '", function() {\n' + value + '});';
 };
 
-Blockly.JavaScript['speech_listen_text'] = function(block) {
+Blockly.JavaScript['wait_listen_text'] = function(block) {
     var value = Blockly.JavaScript.statementToCode(block, 'FUNC')
-    return 'BlocklyBot.Listen("' + block.getFieldValue('CMD') + '", function() {\n' + value + '});';
+    return 'BlocklyBot.Wait("listen:' + block.getFieldValue('TEXT') + '", function() {\n' + value + '});';
 };
 
-Blockly.JavaScript['wait_event'] = function(block) {
+Blockly.JavaScript['wait_touch'] = function(block) {
     var value = Blockly.JavaScript.statementToCode(block, 'FUNC')
     return 'BlocklyBot.Wait("' + block.getFieldValue('EVENT') + '", function() {\n' + value + '});';
 };

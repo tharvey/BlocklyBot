@@ -50,20 +50,16 @@
         <block type="speech_speak">
             <field name="TEXT">hello</field>
         </block>
-        <block type="speech_listen">
-            <field name="CMD">moveForward</field>
-        </block>
-        <block type="speech_listen_text">
-            <field name="CMD">command</field>
-        </block>
     </category>
 
     <category name="Control" colour="120">
         <block type="wait_time">
             <field name="TIME">1</field>
         </block>
-        <block type="wait_event">
-            <field name="EVENT">Touch</field>
+        <block type="wait_touch"></block>
+        <block type="wait_listen"></block>
+        <block type="wait_listen_text">
+            <field name="CMD">command</field>
         </block>
         <block type="control_repeat">
             <field name="TIMES">4</field>
