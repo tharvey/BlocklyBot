@@ -136,7 +136,7 @@ Blockly.JavaScript['variables_while'] = function(block) {
  */
 Blockly.JavaScript['start'] = function(block) {
     var value = Blockly.JavaScript.statementToCode(block, 'FUNC')
-    return 'function start() {\n' + value + '};\n';
+    return 'function start() {\n' + value + '}\n';
 };
 
 Blockly.JavaScript['speech_speak'] = function(block) {
