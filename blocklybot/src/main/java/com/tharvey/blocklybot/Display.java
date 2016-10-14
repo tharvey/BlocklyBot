@@ -47,6 +47,7 @@ public class Display {
 	private boolean mSpeaking;
 	private IEventListener mEventListener;
 	private static Display mContext = null;
+	private Toast mToast;
 
 	public Display(Activity activity)
 	{
@@ -208,6 +209,8 @@ public class Display {
 		Log.i(TAG, "hideFace");
 		mLayout.post(new Runnable() {
 			public void run() {
+				if (mToast != null)
+					mToast.cancel();
 				mPopup.dismiss();
 			}
 		});
@@ -217,7 +220,10 @@ public class Display {
 		mActivity.runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				Toast.makeText(mActivity, msg, len).show();
+				if (mToast != null)
+					mToast.cancel();
+				mToast = Toast.makeText(mActivity, msg, len);
+				mToast.show();
 			}
 		});
 	}
