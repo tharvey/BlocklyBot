@@ -15,6 +15,39 @@
     "tooltip": "start block"
   },
   {
+    "type": "control_function",
+    "message0": "Function %1 %2 %3",
+    "args0": [
+      {
+        "type": "field_input",
+        "name": "NAME"
+      },
+      {
+        "type": "input_dummy"
+      },
+      {
+        "type": "input_statement",
+        "name": "FUNC"
+      }
+    ],
+    "colour": 120,
+    "tooltip": "Declare Function"
+  },
+  {
+    "type": "control_call",
+    "message0": "Call %1",
+    "args0": [
+      {
+        "type": "field_input",
+        "name": "NAME"
+      }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 120,
+    "tooltip": "Call Function"
+  },
+  {
     "type": "control_repeat",
     "message0": "repeat %1 times %2 %3",
     "args0": [

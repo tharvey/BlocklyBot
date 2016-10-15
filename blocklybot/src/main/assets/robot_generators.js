@@ -87,6 +87,17 @@ Blockly.JavaScript['control_repeat_forever'] = function(block) {
   return 'while(1) {\n' + value + '}\n';
 };
 
+Blockly.JavaScript['control_function'] = function(block) {
+  var name = block.getFieldValue('NAME');
+  var value = Blockly.JavaScript.statementToCode(block, 'FUNC');
+  return 'function ' + name + '() {\n' + value + '}\n';
+};
+
+Blockly.JavaScript['control_call'] = function(block) {
+  var name = block.getFieldValue('NAME');
+  return name + '();\n';
+};
+
 /*
  * Variables
  */

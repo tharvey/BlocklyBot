@@ -61,6 +61,12 @@
         <block type="wait_listen_text">
             <field name="CMD">command</field>
         </block>
+        <block type="control_function">
+            <field name="NAME">function1</field>
+        </block>
+        <block type="control_call">
+            <field name="NAME">function1</field>
+        </block>
         <block type="control_repeat">
             <field name="TIMES">4</field>
         </block>
