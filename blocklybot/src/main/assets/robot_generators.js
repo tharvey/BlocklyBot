@@ -156,18 +156,19 @@ Blockly.JavaScript['start'] = function(block) {
 
 Blockly.JavaScript['wait_listen'] = function(block) {
     var value = Blockly.JavaScript.statementToCode(block, 'FUNC')
-    return 'BlocklyBot.Wait("' + block.getFieldValue('EVENT') + '", function() {\n' + value + '});';
+    return 'BlocklyBot.Wait("' + block.getFieldValue('EVENT') + '", function() {\n' + value + '});\n';
 };
 
 Blockly.JavaScript['wait_listen_text'] = function(block) {
     var value = Blockly.JavaScript.statementToCode(block, 'FUNC')
-    return 'BlocklyBot.Wait("listen:' + block.getFieldValue('TEXT') + '", function() {\n' + value + '});';
+    return 'BlocklyBot.Wait("listen:' + block.getFieldValue('TEXT') + '", function() {\n' + value + '});\n';
 };
 
 Blockly.JavaScript['wait_touch'] = function(block) {
     var value = Blockly.JavaScript.statementToCode(block, 'FUNC')
-    return 'BlocklyBot.Wait("' + block.getFieldValue('EVENT') + '", function() {\n' + value + '});';
+    return 'BlocklyBot.Wait("' + block.getFieldValue('EVENT') + '", function() {\n' + value + '});\n';
 };
+
 
 /**
  * The generated code for robot blocks includes block ID strings.  These are useful for
