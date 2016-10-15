@@ -48,6 +48,96 @@
     "tooltip": "Call Function"
   },
   {
+    "type": "if_event_touch",
+    "message0": "If Touch %1 %2 do %3 else %4",
+    "args0": [
+      {
+        "type": "field_dropdown",
+        "name": "EVENT",
+        "options": [
+          [
+            "Face",
+            "touch:face"
+          ],
+          [
+            "Eye",
+            "touch:eye"
+          ],
+          [
+            "Mouth",
+            "touch:mouth"
+          ]
+        ]
+      },
+      {
+        "type": "input_dummy"
+      },
+      {
+        "type": "input_statement",
+        "name": "DO"
+      },
+      {
+        "type": "input_statement",
+        "name": "ELSE"
+      }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 120,
+    "tooltip": "If touch event"
+  },
+  {
+    "type": "if_event_voice",
+    "message0": "If Voice %1 %2 do %3 else %4",
+    "args0": [
+      {
+        "type": "field_dropdown",
+        "name": "EVENT",
+        "options": [
+          [
+            "Move Forward",
+            "listen:move forward"
+          ],
+          [
+            "Move Backward",
+            "listen:move backward"
+          ],
+          [
+            "Turn Right",
+            "listen:turn right"
+          ],
+          [
+            "Turn Left",
+            "listen:turn left"
+          ],
+          [
+            "Stop",
+            "listen:stop"
+          ],
+          [
+            "Shake",
+            "listen:shake"
+          ]
+        ]
+      },
+      {
+        "type": "input_dummy"
+      },
+      {
+        "type": "input_statement",
+        "name": "DO"
+      },
+      {
+        "type": "input_statement",
+        "name": "ELSE"
+      }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 120,
+    "tooltip": "If touch event"
+  },
+  {
     "type": "control_repeat",
     "message0": "repeat %1 times %2 %3",
     "args0": [

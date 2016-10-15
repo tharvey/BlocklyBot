@@ -63,11 +63,11 @@ public class Display {
 		return mContext;
 	}
 
-	private boolean onEvent(String elem) {
+	private boolean onEvent(String elem, MotionEvent event) {
 		Log.i(TAG, "onEvent: touch " + elem);
 		if (mEventListener != null)
-			return mEventListener.onEvent("touch", elem);
-		return false;
+			mEventListener.onEvent("touch", elem);
+		return true;
 	}
 
 	public void showFace(String style) {
@@ -87,25 +87,25 @@ public class Display {
 		mEyeL.setOnTouchListener(new View.OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
-				return onEvent("eye");
+				return onEvent("eye", event);
 			}
 		});
 		mEyeR.setOnTouchListener(new View.OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
-				return onEvent("eye");
+				return onEvent("eye", event);
 			}
 		});
 		mMouth.setOnTouchListener(new View.OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
-				return onEvent("mouth");
+				return onEvent("mouth", event);
 			}
 		});
 		mLayout.setOnTouchListener(new View.OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
-				return onEvent("face");
+				return onEvent("face", event);
 			}
 		});
 

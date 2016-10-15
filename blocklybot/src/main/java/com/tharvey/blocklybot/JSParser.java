@@ -58,6 +58,7 @@ public class JSParser {
 	private boolean mRunning;
 	private Mobbob mRobot;
 	private HashMap<String, String> mEventMap;
+	private List<String> mEventPendingList;
 	private Scriptable mScope;
 	private ObservingDebugger mDebugger;
 	private String[] mCodeLines;
@@ -166,6 +167,7 @@ public class JSParser {
 		mRobot = mobbob;
 		mListen = null;
 		mEventMap = new HashMap<String, String>();
+		mEventPendingList = new ArrayList<String>();
 		final List<String> phrases = new ArrayList<String>();
 		int i;
 
@@ -186,17 +188,34 @@ public class JSParser {
 		for (i = 0; i < vars.length; i++)
 			newCode += "var " + vars[i] + " = 0;\n";
 		newCode += "\n";
-		// filter out non-start root blocks
 		try {
 			while ((line = bufReader.readLine()) != null) {
 				boolean skip = false;
-				Pattern wait_pat = Pattern.compile("BlocklyBot.Wait\\(\"([^\"]*)\",.*");
-				Matcher wait = wait_pat.matcher(line);
-				if (wait.find()) {
-					String map = wait.group(1);
-					Log.d(TAG, "wait:" + map);
-					if (map.startsWith("listen:"))
-						phrases.add(map.substring(7));
+
+				if (line.startsWith("BlocklyBot.Wait")) {
+					Matcher m = Pattern.compile("BlocklyBot.Wait\\(\"([^\"]*)\",.*").matcher(line);
+					if (m.find()) {
+						String map = m.group(1);
+						Log.d(TAG, "wait:" + map);
+						if (map.startsWith("listen:"))
+							phrases.add(map.substring(7));
+					}
+				}
+				else if (line.contains("BlocklyBot.EventTest")) {
+					Matcher m = Pattern.compile(".*BlocklyBot.EventTest\\(\"([^\"]*)\".*").matcher(line);
+					if (m.find()) {
+						String map = m.group(1);
+						Log.d(TAG, "eventtest:" + map);
+						if (map.startsWith("listen:"))
+							phrases.add(map.substring(7));
+					}
+				}
+				else if (line.startsWith("function ")) {
+					Matcher m = Pattern.compile("function ([^\\)]*)\\(\\).*").matcher(line);
+					if (m.find()) {
+						String name = m.group(1);
+						Log.d(TAG, "function:" + name);
+					}
 				}
 				else if (line.startsWith("BlocklyBot")) {
 					Log.d(TAG, "Skipping root block outside of start: " + line);
@@ -218,9 +237,11 @@ public class JSParser {
 			@Override
 			public boolean onEvent(String type, String param) {
 				final String map = type + ":" + param;
-				final String func = mEventMap.get(map);
-				Log.i(TAG, threadId() + ":Event: " + map);
-				if (func != null) {
+				final String waitfunc = mEventMap.get(map);
+				if (!mEventPendingList.contains(map))
+					mEventPendingList.add(map);
+				Log.i(TAG, "onEvent: " + map);
+				if (waitfunc != null) {
 					// these come in on UI thread which we must not block on, so use a thread
 					Thread thread = new Thread() {
 						@Override
@@ -228,7 +249,7 @@ public class JSParser {
 							Context context = Context.enter();
 							context.setOptimizationLevel(-1);
 							try {
-								Function start = context.compileFunction(mScope, func, map, 1, null);
+								Function start = context.compileFunction(mScope, waitfunc, map, 1, null);
 								start.call(context, mScope, context.newObject(mScope), new Object[0]);
 							} catch (RhinoException e) {
 								Log.e(TAG, "Exception in engine");
@@ -244,7 +265,6 @@ public class JSParser {
 					thread.start();
 					return true;
 				}
-				Log.e(TAG, "unhandled: " + map);
 				return false;
 			}
 		};
@@ -379,5 +399,15 @@ public class JSParser {
 	public void Wait(String event, String func) {
 		Log.i(TAG, "Wait(" + event + ")");
 		mEventMap.put(event, func);
+	}
+
+	public boolean EventTest(String map) {
+		Log.i(TAG, "EventTest(" + map + ")");
+		if (mEventPendingList.contains(map)) {
+			Log.i(TAG, "Event asserted");
+			mEventPendingList.remove(map); // read-to-clear
+			return true;
+		}
+		return false;
 	}
 }

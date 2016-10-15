@@ -71,6 +71,8 @@
             <field name="TIMES">4</field>
         </block>
         <block type="control_repeat_forever"></block>
+        <block type="if_event_touch"></block>
+        <block type="if_event_voice"></block>
     </category>
 
     <category name="Variables" colour="330">

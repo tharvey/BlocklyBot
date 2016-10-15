@@ -131,6 +131,20 @@ Blockly.JavaScript['variables_if_else'] = function(block) {
   return 'if (' + variable + ' ' + op + ' ' + value + ') {\n' + func_if + '} else {\n' + func_else + '}\n';
 };
 
+Blockly.JavaScript['if_event_touch'] = function(block) {
+    var func_if = Blockly.JavaScript.statementToCode(block, 'DO');
+    var func_else = Blockly.JavaScript.statementToCode(block, 'ELSE');
+    return 'if (BlocklyBot.EventTest("' + block.getFieldValue('EVENT') + '")) {\n'
+        + func_if + '} else {\n' + func_else + '}\n';
+};
+
+Blockly.JavaScript['if_event_voice'] = function(block) {
+    var func_if = Blockly.JavaScript.statementToCode(block, 'DO');
+    var func_else = Blockly.JavaScript.statementToCode(block, 'ELSE');
+    return 'if (BlocklyBot.EventTest("' + block.getFieldValue('EVENT') + '")) {\n'
+        + func_if + '} else {\n' + func_else + '}\n';
+};
+
 Blockly.JavaScript['variables_do'] = function(block) {
   var op = block.getFieldValue('OP');
   var variable = block.getFieldValue('VAR');
