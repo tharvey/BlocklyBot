@@ -46,21 +46,15 @@ public class Display {
 	private ObjectAnimator mSpeakAnimation;
 	private boolean mSpeaking;
 	private IEventListener mEventListener;
-	private static Display mContext = null;
 	private Toast mToast;
 
 	public Display(Activity activity)
 	{
 		mActivity = activity;
-		mContext = this;
 	}
 
 	public void setListener(IEventListener callback) {
 		mEventListener = callback;
-	}
-
-	public static Display getDisplay() {
-		return mContext;
 	}
 
 	private boolean onEvent(String elem, MotionEvent event) {

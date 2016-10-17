@@ -86,7 +86,6 @@ public class BlocklyActivity extends AbstractBlocklyActivity implements IConnect
 	@Override
 	public void onBackPressed() {
 		Log.i(TAG, "onBackPressed()");
-		Display display = Display.getDisplay();
 		if (mParser.isBusy()) {
 			mParser.cancel();
 		} else {
