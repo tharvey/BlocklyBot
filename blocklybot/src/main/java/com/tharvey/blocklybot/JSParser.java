@@ -57,7 +57,7 @@ public class JSParser {
 	private Display mDisplay;
 	private boolean mRunning;
 	private Mobbob mRobot;
-	private HashMap<String, String> mEventMap;
+	private HashMap<String, List<String>> mEventMap;
 	private List<String> mEventPendingList;
 	private Scriptable mScope;
 	private ObservingDebugger mDebugger;
@@ -166,7 +166,7 @@ public class JSParser {
 	public final int parseCode(final Mobbob mobbob, String generatedCode, String[] vars) {
 		mRobot = mobbob;
 		mListen = null;
-		mEventMap = new HashMap<String, String>();
+		mEventMap = new HashMap<String, List<String>>();
 		mEventPendingList = new ArrayList<String>();
 		final List<String> phrases = new ArrayList<String>();
 		int i;
@@ -237,35 +237,37 @@ public class JSParser {
 			@Override
 			public boolean onEvent(String type, String param) {
 				final String map = type + ":" + param;
-				final String waitfunc = mEventMap.get(map);
+				Log.i(TAG, "onEvent: " + map);
 				if (!mEventPendingList.contains(map))
 					mEventPendingList.add(map);
-				Log.i(TAG, "onEvent: " + map);
-				if (waitfunc != null) {
-					// these come in on UI thread which we must not block on, so use a thread
-					Thread thread = new Thread() {
-						@Override
-						public void run() {
-							Context context = Context.enter();
-							context.setOptimizationLevel(-1);
+				if (!mEventMap.containsKey(map))
+					return false;
+				final List<String> eventList = mEventMap.get(map);
+				// these come in on UI thread which we must not block on, so use a thread
+				Thread thread = new Thread() {
+					@Override
+					public void run() {
+						Context context = Context.enter();
+						context.setOptimizationLevel(-1);
+						for (String func : eventList) {
 							try {
-								Function start = context.compileFunction(mScope, waitfunc, map, 1, null);
+								Function start = context.compileFunction(mScope, func, map, 1, null);
 								start.call(context, mScope, context.newObject(mScope), new Object[0]);
 							} catch (RhinoException e) {
 								Log.e(TAG, "Exception in engine");
 								Log.e(TAG, e.getMessage());
 								Log.e(TAG, e.getScriptStackTrace());
+								break;
 							} catch (RuntimeException e) {
 								Log.e(TAG, e.toString());
-							} finally {
-								Context.exit();
+								break;
 							}
 						}
-					};
-					thread.start();
-					return true;
-				}
-				return false;
+						Context.exit();
+					}
+				};
+				thread.start();
+				return true;
 			}
 		};
 		mDisplay.setListener(eventListener);
@@ -398,7 +400,12 @@ public class JSParser {
 
 	public void Wait(String event, String func) {
 		Log.i(TAG, "Wait(" + event + ")");
-		mEventMap.put(event, func);
+		List<String> list = mEventMap.get(event);
+		if (list == null) {
+			list = new ArrayList<String>();
+			mEventMap.put(event, list);
+		}
+		list.add(func);
 	}
 
 	public boolean EventTest(String map) {
