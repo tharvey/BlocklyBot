@@ -316,7 +316,6 @@ public class JSParser {
 				} finally {
 					Context.exit();
 				}
-				mRunning = false;
 				Log.i(TAG, "execution done");
 
 				// wait display to complete (ie script terminated or complete)
@@ -325,6 +324,7 @@ public class JSParser {
 					while (mDisplay.isVisible())
 						SystemClock.sleep(100);
 				}
+				mRunning = false;
 
 				// cleanup
 				Log.i(TAG, "cleanup");
