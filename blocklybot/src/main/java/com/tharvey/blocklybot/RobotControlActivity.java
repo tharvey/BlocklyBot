@@ -54,10 +54,15 @@ public class RobotControlActivity extends AppCompatActivity implements IConnecti
 		Log.i(TAG, "updateStatus");
 		final ActionBar action = getSupportActionBar();
 		if (action != null) {
-			if (mRobot != null && mRobot.getConnectionState() == IConnection.connectionStateEnum.isConnected)
-				action.setTitle("Remote Control: " + mRobot.getName());
-			else
-				action.setTitle("Remote Control: not connected");
+			this.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					if (mRobot != null && mRobot.getConnectionState() == IConnection.connectionStateEnum.isConnected)
+						action.setTitle("Remote Control: " + mRobot.getName());
+					else
+						action.setTitle("Remote Control: not connected");
+				}
+			});
 		}
 	}
 
